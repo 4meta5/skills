@@ -1,0 +1,42 @@
+# Lefthook Git Hooks Configuration
+# https://github.com/evilmartians/lefthook
+#
+# Fast pre-commit hook runs: type checking + unit tests (excludes property tests)
+# Property tests can be run manually: npm run test:property
+#
+# Skip hooks when needed:
+#   LEFTHOOK=0 git commit -m "message"     # Skip all hooks
+#   SKIP=typecheck git commit -m "message" # Skip specific hook
+
+pre-commit:
+  parallel: true
+  commands:
+    typecheck:
+      glob: "*.{ts,tsx}"
+      root: "packages/skills-library"
+      run: npm run typecheck
+      fail_text: "TypeScript type check failed. Fix type errors before committing."
+
+    unit-tests:
+      glob: "*.{ts,tsx}"
+      root: "packages/skills-library"
+      run: npm test
+      fail_text: "Unit tests failed. Fix failing tests before committing."
+
+# Optional: Uncomment to add property tests to pre-push hook instead
+# pre-push:
+#   commands:
+#     property-tests:
+#       root: "packages/skills-library"
+#       run: npm run test:property
+#       fail_text: "Property tests failed."
+
+# Commit message validation (optional)
+# commit-msg:
+#   commands:
+#     check-format:
+#       run: |
+#         if ! head -1 {1} | grep -qE "^(feat|fix|docs|style|refactor|test|chore)(\(.+\))?: .{1,50}"; then
+#           echo "Commit message should follow conventional commits format"
+#           exit 1
+#         fi
