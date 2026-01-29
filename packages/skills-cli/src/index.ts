@@ -191,7 +191,7 @@ cli
   .option('-C, --cwd <path>', 'Target project directory (default: current directory)')
   .action(async (subcommand: string | undefined, args: string[], options: ProjectsOptions) => {
     await projectsCommand(
-      (subcommand as 'list' | 'add' | 'remove') || 'list',
+      (subcommand as 'list' | 'add' | 'remove' | 'cleanup') || 'list',
       args,
       options
     );

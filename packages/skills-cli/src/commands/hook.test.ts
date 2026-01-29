@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { mkdtemp, rm, readdir, readFile, mkdir, writeFile, stat } from 'fs/promises';
 import { join } from 'path';
 import { tmpdir } from 'os';
-import { getProjectInstallation } from '../config.js';
+import { getProjectInstallation, untrackProjectInstallation } from '../config.js';
 
 describe('hook command', () => {
   let targetDir: string;
@@ -14,6 +14,8 @@ describe('hook command', () => {
   });
 
   afterEach(async () => {
+    // Clean up tracking BEFORE deleting filesystem (prevents ghost entries in config)
+    await untrackProjectInstallation(targetDir, 'skill-forced-eval', 'hook');
     await rm(targetDir, { recursive: true, force: true });
   });
 
@@ -34,6 +36,23 @@ describe('hook command', () => {
       const content = await readFile(hookPath, 'utf-8');
       expect(content).toContain('MANDATORY SKILL ACTIVATION');
       expect(content).toContain('tdd');
+    });
+
+    it('should have NO EXCEPTIONS section in hook content', async () => {
+      const { hookCommand } = await import('./hook.js');
+
+      await hookCommand('add', ['skill-forced-eval'], { cwd: targetDir });
+
+      const hookPath = join(targetDir, '.claude', 'hooks', 'skill-forced-eval.sh');
+      const content = await readFile(hookPath, 'utf-8');
+
+      // Hook MUST contain absolute blocking language with no exceptions
+      expect(content).toContain('NO EXCEPTIONS');
+      expect(content).toContain('BLOCKED');
+
+      // Hook MUST NOT contain exception language that allows weaseling out
+      expect(content).not.toContain('Exceptions (Rare)');
+      expect(content).not.toContain('Manual intervention is acceptable');
     });
 
     it('should configure hook in settings.local.json', async () => {

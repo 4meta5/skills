@@ -1,5 +1,5 @@
 import { cp, readdir, stat, readFile, writeFile } from 'fs/promises';
-import { join } from 'path';
+import { join, resolve } from 'path';
 import { createSkillsLibrary, loadSkillFromPath } from '@anthropic/skills-library';
 import {
   getProjectsWithSkill,
@@ -19,7 +19,7 @@ interface SyncOptions {
  * Sync skills to all tracked projects that have them installed
  */
 export async function syncCommand(names: string[], options: SyncOptions = {}): Promise<void> {
-  const sourceDir = options.cwd || process.cwd();
+  const sourceDir = resolve(options.cwd || process.cwd());
 
   if (names.length === 0 && !options.all) {
     console.log('Usage: skills sync <skill-names...>');
@@ -93,6 +93,11 @@ export async function syncCommand(names: string[], options: SyncOptions = {}): P
     console.log(`${skillName}:`);
 
     for (const projectPath of projects) {
+      // Skip if this is the source project (avoid copying to itself)
+      if (resolve(projectPath) === sourceDir) {
+        continue;
+      }
+
       const targetSkillPath = join(projectPath, '.claude', 'skills', skillName);
 
       // Check if target project still exists and has the skill directory

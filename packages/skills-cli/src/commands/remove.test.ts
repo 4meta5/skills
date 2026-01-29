@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { mkdtemp, rm, readdir, readFile, mkdir, writeFile, stat } from 'fs/promises';
 import { join } from 'path';
 import { tmpdir } from 'os';
-import { trackProjectInstallation, getProjectInstallation, trackInstalledSkill } from '../config.js';
+import { trackProjectInstallation, getProjectInstallation, trackInstalledSkill, untrackProjectInstallation, untrackInstalledSkill } from '../config.js';
 
 describe('remove command', () => {
   let targetDir: string;
@@ -25,6 +25,11 @@ describe('remove command', () => {
   });
 
   afterEach(async () => {
+    // Clean up tracking BEFORE deleting filesystem (prevents ghost entries in config)
+    await untrackProjectInstallation(targetDir, 'test-skill', 'skill');
+    await untrackProjectInstallation(targetDir, 'other-skill', 'skill');
+    await untrackProjectInstallation(targetDir, 'another-skill', 'skill');
+    await untrackInstalledSkill('test-skill');
     await rm(targetDir, { recursive: true, force: true });
   });
 

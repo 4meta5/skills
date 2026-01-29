@@ -455,29 +455,44 @@ describe('project installation tracking logic', () => {
 
 // Integration tests for the actual implementation functions
 describe('project installation tracking functions', () => {
-  // Note: These tests will FAIL until we implement the functions
-  // This is the RED phase of TDD
+  // Track all created project paths for cleanup
+  const trackedProjects: Array<{ path: string; name: string; type: 'skill' | 'hook' }> = [];
+
+  afterEach(async () => {
+    // Clean up all tracked projects after each test
+    const { untrackProjectInstallation } = await import('./config.js');
+    for (const { path, name, type } of trackedProjects) {
+      await untrackProjectInstallation(path, name, type);
+    }
+    trackedProjects.length = 0;
+  });
+
+  // Helper to track and record a project installation
+  async function trackAndRecord(path: string, name: string, type: 'skill' | 'hook') {
+    const { trackProjectInstallation } = await import('./config.js');
+    await trackProjectInstallation(path, name, type);
+    trackedProjects.push({ path, name, type });
+  }
 
   it('trackProjectInstallation adds skill to project', async () => {
-    // Import the function (will fail until implemented)
-    const { trackProjectInstallation, loadConfig } = await import('./config.js');
+    const { loadConfig } = await import('./config.js');
 
     const projectPath = '/tmp/test-project-' + Date.now();
     const skillName = 'tdd';
 
-    await trackProjectInstallation(projectPath, skillName, 'skill');
+    await trackAndRecord(projectPath, skillName, 'skill');
 
     const config = await loadConfig();
     expect(config.projectInstallations?.[projectPath]?.skills).toContain('tdd');
   });
 
   it('trackProjectInstallation adds hook to project', async () => {
-    const { trackProjectInstallation, loadConfig } = await import('./config.js');
+    const { loadConfig } = await import('./config.js');
 
     const projectPath = '/tmp/test-hook-project-' + Date.now();
     const hookName = 'skill-forced-eval';
 
-    await trackProjectInstallation(projectPath, hookName, 'hook');
+    await trackAndRecord(projectPath, hookName, 'hook');
 
     const config = await loadConfig();
     const hooks = config.projectInstallations?.[projectPath]?.hooks;
@@ -486,13 +501,16 @@ describe('project installation tracking functions', () => {
   });
 
   it('untrackProjectInstallation removes skill from project', async () => {
-    const { trackProjectInstallation, untrackProjectInstallation, loadConfig } = await import('./config.js');
+    const { untrackProjectInstallation, loadConfig } = await import('./config.js');
 
     const projectPath = '/tmp/test-project-' + Date.now();
 
-    await trackProjectInstallation(projectPath, 'tdd', 'skill');
-    await trackProjectInstallation(projectPath, 'no-workarounds', 'skill');
+    await trackAndRecord(projectPath, 'tdd', 'skill');
+    await trackAndRecord(projectPath, 'no-workarounds', 'skill');
     await untrackProjectInstallation(projectPath, 'tdd', 'skill');
+    // Remove from tracking since we manually untracked it
+    const idx = trackedProjects.findIndex(t => t.path === projectPath && t.name === 'tdd');
+    if (idx >= 0) trackedProjects.splice(idx, 1);
 
     const config = await loadConfig();
     expect(config.projectInstallations?.[projectPath]?.skills).not.toContain('tdd');
@@ -500,29 +518,32 @@ describe('project installation tracking functions', () => {
   });
 
   it('untrackProjectInstallation removes project when empty', async () => {
-    const { trackProjectInstallation, untrackProjectInstallation, loadConfig } = await import('./config.js');
+    const { untrackProjectInstallation, loadConfig } = await import('./config.js');
 
     const projectPath = '/tmp/test-project-' + Date.now();
 
-    await trackProjectInstallation(projectPath, 'tdd', 'skill');
+    await trackAndRecord(projectPath, 'tdd', 'skill');
     await untrackProjectInstallation(projectPath, 'tdd', 'skill');
+    // Remove from tracking since we manually untracked it and project was removed
+    const idx = trackedProjects.findIndex(t => t.path === projectPath && t.name === 'tdd');
+    if (idx >= 0) trackedProjects.splice(idx, 1);
 
     const config = await loadConfig();
     expect(config.projectInstallations?.[projectPath]).toBeUndefined();
   });
 
   it('getProjectsWithSkill returns all projects with skill', async () => {
-    const { trackProjectInstallation, getProjectsWithSkill } = await import('./config.js');
+    const { getProjectsWithSkill } = await import('./config.js');
 
     const timestamp = Date.now();
     const projectA = `/tmp/test-project-a-${timestamp}`;
     const projectB = `/tmp/test-project-b-${timestamp}`;
     const projectC = `/tmp/test-project-c-${timestamp}`;
 
-    await trackProjectInstallation(projectA, 'tdd', 'skill');
-    await trackProjectInstallation(projectA, 'no-workarounds', 'skill');
-    await trackProjectInstallation(projectB, 'tdd', 'skill');
-    await trackProjectInstallation(projectC, 'no-workarounds', 'skill');
+    await trackAndRecord(projectA, 'tdd', 'skill');
+    await trackAndRecord(projectA, 'no-workarounds', 'skill');
+    await trackAndRecord(projectB, 'tdd', 'skill');
+    await trackAndRecord(projectC, 'no-workarounds', 'skill');
 
     const projects = await getProjectsWithSkill('tdd');
 
@@ -532,14 +553,14 @@ describe('project installation tracking functions', () => {
   });
 
   it('getAllTrackedProjects returns all projects', async () => {
-    const { trackProjectInstallation, getAllTrackedProjects } = await import('./config.js');
+    const { getAllTrackedProjects } = await import('./config.js');
 
     const timestamp = Date.now();
     const projectA = `/tmp/test-project-a-${timestamp}`;
     const projectB = `/tmp/test-project-b-${timestamp}`;
 
-    await trackProjectInstallation(projectA, 'tdd', 'skill');
-    await trackProjectInstallation(projectB, 'no-workarounds', 'skill');
+    await trackAndRecord(projectA, 'tdd', 'skill');
+    await trackAndRecord(projectB, 'no-workarounds', 'skill');
 
     const projects = await getAllTrackedProjects();
 
@@ -548,13 +569,13 @@ describe('project installation tracking functions', () => {
   });
 
   it('normalizes project paths by removing trailing slash', async () => {
-    const { trackProjectInstallation, loadConfig } = await import('./config.js');
+    const { loadConfig } = await import('./config.js');
 
     const timestamp = Date.now();
     const projectPath = `/tmp/test-project-${timestamp}/`;
     const normalizedPath = `/tmp/test-project-${timestamp}`;
 
-    await trackProjectInstallation(projectPath, 'tdd', 'skill');
+    await trackAndRecord(projectPath, 'tdd', 'skill');
 
     const config = await loadConfig();
     expect(config.projectInstallations?.[normalizedPath]).toBeDefined();

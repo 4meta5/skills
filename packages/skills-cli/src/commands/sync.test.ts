@@ -183,5 +183,32 @@ NEW content with improvements!
         await rm(sourceDir, { recursive: true, force: true });
       }
     });
+
+    it('should skip the source project when it is also a tracked project', async () => {
+      const { syncCommand } = await import('./sync.js');
+
+      // Use projectA as BOTH the source AND a tracked project
+      // This simulates the real-world scenario where we run sync from within
+      // a project that is also tracked (e.g., skills-cli project itself)
+      const sourceDir = projectA;
+
+      // Update the skill content in projectA (the source)
+      await writeFile(
+        join(sourceDir, '.claude', 'skills', testSkillName, 'SKILL.md'),
+        sourceSkillContent,
+        'utf-8'
+      );
+
+      // This should NOT throw an error about "src and dest cannot be the same"
+      // It should skip projectA and only sync to projectB
+      await expect(syncCommand([testSkillName], { cwd: sourceDir })).resolves.not.toThrow();
+
+      // projectB should have the updated content
+      const contentB = await readFile(
+        join(projectB, '.claude', 'skills', testSkillName, 'SKILL.md'),
+        'utf-8'
+      );
+      expect(contentB).toContain('NEW content with improvements!');
+    });
   });
 });

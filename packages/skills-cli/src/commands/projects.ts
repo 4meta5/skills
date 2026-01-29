@@ -1,4 +1,4 @@
-import { readdir, stat } from 'fs/promises';
+import { readdir, stat, access } from 'fs/promises';
 import { join, resolve } from 'path';
 import {
   getAllTrackedProjects,
@@ -26,7 +26,7 @@ export async function getProjectsForSkill(skillName: string): Promise<string[]> 
  * Projects command handler
  */
 export async function projectsCommand(
-  subcommand: 'list' | 'add' | 'remove' = 'list',
+  subcommand: 'list' | 'add' | 'remove' | 'cleanup' = 'list',
   args: string[] = [],
   options: ProjectsOptions = {}
 ): Promise<void> {
@@ -40,11 +40,15 @@ export async function projectsCommand(
     case 'remove':
       await removeProject(args, options);
       break;
+    case 'cleanup':
+      await cleanupProjects(options);
+      break;
     default:
-      console.log('Usage: skills projects [list|add|remove]');
+      console.log('Usage: skills projects [list|add|remove|cleanup]');
       console.log('       skills projects --skill <name>');
       console.log('       skills projects add .');
       console.log('       skills projects remove <path>');
+      console.log('       skills projects cleanup');
   }
 }
 
@@ -162,4 +166,63 @@ async function removeProject(args: string[], options: ProjectsOptions): Promise<
   } else {
     console.log(`${projectPath} is not tracked`);
   }
+}
+
+/**
+ * Check if a directory exists
+ */
+async function directoryExists(path: string): Promise<boolean> {
+  try {
+    const stats = await stat(path);
+    return stats.isDirectory();
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Remove entries for non-existent directories from tracking
+ */
+async function cleanupProjects(options: ProjectsOptions): Promise<void> {
+  const config = await loadConfig();
+  const installations = config.projectInstallations || {};
+  const projectPaths = Object.keys(installations);
+
+  if (projectPaths.length === 0) {
+    console.log('No projects tracked.');
+    return;
+  }
+
+  let removed = 0;
+  const toRemove: string[] = [];
+
+  for (const projectPath of projectPaths) {
+    const exists = await directoryExists(projectPath);
+    if (!exists) {
+      toRemove.push(projectPath);
+    }
+  }
+
+  if (toRemove.length === 0) {
+    console.log(`All ${projectPaths.length} tracked project(s) still exist.`);
+    return;
+  }
+
+  console.log(`Found ${toRemove.length} stale project(s):\n`);
+
+  for (const projectPath of toRemove) {
+    const installation = installations[projectPath];
+    console.log(`  ${projectPath}`);
+    if (installation.skills.length > 0) {
+      console.log(`    Skills: ${installation.skills.join(', ')}`);
+    }
+    if (installation.hooks.length > 0) {
+      console.log(`    Hooks: ${installation.hooks.join(', ')}`);
+    }
+    delete config.projectInstallations![projectPath];
+    removed++;
+  }
+
+  await saveConfig(config);
+  console.log(`\nRemoved ${removed} stale project(s) from tracking.`);
 }

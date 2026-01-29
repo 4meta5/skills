@@ -50,11 +50,26 @@ IMPLEMENTING (Step 3):
 [Now proceeds with implementation following both activated skills]
 ```
 
-## BLOCKING CONDITIONS
+## BLOCKING CONDITIONS - NO EXCEPTIONS
 
 - If tdd = YES: You are BLOCKED until Phase 1 (RED) is complete - failing test required
 - If no-workarounds = YES: You are BLOCKED from manual workarounds
 - Skills CHAIN: If both tdd AND no-workarounds are YES, follow BOTH
+
+## NO EXCEPTIONS
+
+These rationalizations are REJECTED:
+- "It's a simple change" → BLOCKED. Write the test.
+- "Just this once" → BLOCKED. That's what you said last time.
+- "I'll add tests after" → BLOCKED. Tests after = not TDD.
+- "It's faster to do it manually" → BLOCKED. Fix the tool.
+- "The tool is mostly working" → BLOCKED. Mostly = broken.
+- "One-time migration" → BLOCKED. Build the feature.
+
+If you are unsure whether a skill applies, ASK THE USER:
+"Should I skip the [skill-name] skill for this task?"
+
+Only proceed without activation if user EXPLICITLY says yes.
 
 This activation sequence is MANDATORY. Skipping Step 2 violates project policy.
 
