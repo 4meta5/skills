@@ -149,6 +149,29 @@ export async function detectTesting(ctx: DetectionContext): Promise<DetectedTech
       evidence: 'Cargo.toml (built-in)',
       tags: ['cargo', 'rust', 'testing', 'unit-testing']
     });
+
+    // Check for proptest (property-based testing for Rust)
+    const devDeps = ctx.cargoToml['dev-dependencies'];
+    if (devDeps && ('proptest' in devDeps || 'proptest-derive' in devDeps)) {
+      testing.push({
+        name: 'proptest',
+        category: 'testing',
+        confidence: 'high',
+        evidence: 'Cargo.toml dev-dependencies proptest',
+        tags: ['proptest', 'rust', 'testing', 'property-based', 'fuzzing']
+      });
+    }
+
+    // Check for quickcheck (another property-based testing lib for Rust)
+    if (devDeps && 'quickcheck' in devDeps) {
+      testing.push({
+        name: 'quickcheck',
+        category: 'testing',
+        confidence: 'high',
+        evidence: 'Cargo.toml dev-dependencies quickcheck',
+        tags: ['quickcheck', 'rust', 'testing', 'property-based']
+      });
+    }
   }
 
   // Python testing

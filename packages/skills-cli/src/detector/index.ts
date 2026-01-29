@@ -1,6 +1,7 @@
 import { readFile, readdir, stat } from 'fs/promises';
 import { join } from 'path';
 import { parse as parseYaml } from 'yaml';
+import { parse as parseToml } from 'smol-toml';
 import type {
   ProjectAnalysis,
   DetectionContext,
@@ -82,7 +83,7 @@ async function readPackageJson(projectPath: string): Promise<PackageJson | undef
 async function readCargoToml(projectPath: string): Promise<CargoToml | undefined> {
   try {
     const content = await readFile(join(projectPath, 'Cargo.toml'), 'utf-8');
-    return parseYaml(content);
+    return parseToml(content) as CargoToml;
   } catch {
     return undefined;
   }
@@ -242,6 +243,42 @@ async function findWorkspaces(projectPath: string): Promise<string[]> {
     }
   } catch {
     // lerna.json doesn't exist
+  }
+
+  // Check common project subdirectories that aren't JS workspaces
+  // These often contain separate services (Rust, Go, Python backends)
+  const COMMON_PROJECT_SUBDIRS = [
+    'backend',
+    'api',
+    'server',
+    'core',
+    'services',
+    'functions',
+    'lambda',
+    'workers'
+  ];
+
+  for (const subdir of COMMON_PROJECT_SUBDIRS) {
+    // Skip if already included in workspaces
+    if (workspaces.includes(subdir)) continue;
+
+    const subdirPath = join(projectPath, subdir);
+    try {
+      const s = await stat(subdirPath);
+      if (!s.isDirectory()) continue;
+
+      // Check if this subdirectory has its own project config
+      const hasCargoToml = await stat(join(subdirPath, 'Cargo.toml')).then(() => true).catch(() => false);
+      const hasGoMod = await stat(join(subdirPath, 'go.mod')).then(() => true).catch(() => false);
+      const hasPyProject = await stat(join(subdirPath, 'pyproject.toml')).then(() => true).catch(() => false);
+      const hasPackageJson = await stat(join(subdirPath, 'package.json')).then(() => true).catch(() => false);
+
+      if (hasCargoToml || hasGoMod || hasPyProject || hasPackageJson) {
+        workspaces.push(subdir);
+      }
+    } catch {
+      // Subdirectory doesn't exist
+    }
   }
 
   // Deduplicate

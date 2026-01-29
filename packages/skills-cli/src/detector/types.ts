@@ -4,6 +4,21 @@
 export type Confidence = 'high' | 'medium' | 'low';
 
 /**
+ * Category classification for skills
+ * Used for functional deduplication - skills in the same category
+ * serve similar purposes and only the best one should be recommended
+ */
+export type SkillCategory =
+  | 'testing'
+  | 'security'
+  | 'framework'
+  | 'deployment'
+  | 'database'
+  | 'code-quality'
+  | 'documentation'
+  | 'workflow';
+
+/**
  * Category of detected technology
  */
 export type TechnologyCategory =
@@ -52,6 +67,17 @@ export interface PackageJson {
 }
 
 /**
+ * Cargo dependency specification
+ */
+export type CargoDependency = string | {
+  version?: string;
+  features?: string[];
+  optional?: boolean;
+  path?: string;
+  git?: string;
+};
+
+/**
  * Cargo.toml structure (partial)
  */
 export interface CargoToml {
@@ -59,8 +85,8 @@ export interface CargoToml {
     name?: string;
     version?: string;
   };
-  dependencies?: Record<string, string | { version?: string }>;
-  'dev-dependencies'?: Record<string, string | { version?: string }>;
+  dependencies?: Record<string, CargoDependency>;
+  'dev-dependencies'?: Record<string, CargoDependency>;
 }
 
 /**

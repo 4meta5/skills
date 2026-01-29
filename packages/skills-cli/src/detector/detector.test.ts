@@ -654,3 +654,200 @@ describe('Workspace Detection', () => {
     expect(result.testing.some(t => t.name === 'Vitest')).toBe(true);
   });
 });
+
+// =============================================================================
+// REGRESSION TESTS: Subdirectory and Rust-specific detection
+// =============================================================================
+// These tests cover bugs where the scanner fails to detect technologies in
+// subdirectories like backend/ that aren't JS workspaces, and Rust-specific
+// deployment/database/testing libraries.
+
+describe('Subdirectory Detection (Non-JS Workspaces)', () => {
+  let testDir: string;
+
+  beforeEach(async () => {
+    testDir = join(tmpdir(), `skills-test-${Date.now()}-${Math.random().toString(36).slice(2)}`);
+    await mkdir(testDir, { recursive: true });
+  });
+
+  afterEach(async () => {
+    try {
+      await rm(testDir, { recursive: true, force: true });
+    } catch {
+      // Ignore cleanup errors
+    }
+  });
+
+  it('detects Rust in backend/ directory with Cargo.toml', async () => {
+    // Frontend JS project at root
+    await writeFile(
+      join(testDir, 'package.json'),
+      JSON.stringify({
+        name: 'fullstack-app',
+        dependencies: { svelte: '^5.0.0' }
+      })
+    );
+
+    // Rust backend (NOT a JS workspace)
+    await mkdir(join(testDir, 'backend'), { recursive: true });
+    await writeFile(
+      join(testDir, 'backend', 'Cargo.toml'),
+      `[package]
+name = "backend-api"
+version = "0.1.0"
+
+[dependencies]
+tokio = { version = "1", features = ["full"] }
+`
+    );
+
+    const result = await analyzeProject(testDir);
+
+    // Should detect Rust from backend/
+    expect(result.languages.some(l => l.name === 'Rust')).toBe(true);
+    // Should also detect Svelte from root
+    expect(result.frameworks.some(f => f.name === 'Svelte 5')).toBe(true);
+  });
+
+  it('detects technologies in api/ directory with Cargo.toml', async () => {
+    await writeFile(
+      join(testDir, 'package.json'),
+      JSON.stringify({ name: 'web-app' })
+    );
+
+    await mkdir(join(testDir, 'api'), { recursive: true });
+    await writeFile(
+      join(testDir, 'api', 'Cargo.toml'),
+      `[package]
+name = "api"
+version = "0.1.0"
+`
+    );
+
+    const result = await analyzeProject(testDir);
+
+    expect(result.languages.some(l => l.name === 'Rust')).toBe(true);
+  });
+
+  it('detects technologies in server/ directory with go.mod', async () => {
+    await writeFile(
+      join(testDir, 'package.json'),
+      JSON.stringify({ name: 'web-app' })
+    );
+
+    await mkdir(join(testDir, 'server'), { recursive: true });
+    await writeFile(
+      join(testDir, 'server', 'go.mod'),
+      `module example.com/server
+
+go 1.21
+`
+    );
+
+    const result = await analyzeProject(testDir);
+
+    expect(result.languages.some(l => l.name === 'Go')).toBe(true);
+  });
+});
+
+describe('Rust AWS Lambda Detection', () => {
+  it('detects AWS Lambda from lambda_http in Cargo.toml', async () => {
+    const ctx = createContext({
+      cargoToml: {
+        package: { name: 'lambda-api', version: '0.1.0' },
+        dependencies: {
+          'lambda_http': '0.8',
+          'lambda_runtime': '0.8',
+          'tokio': { version: '1', features: ['full'] }
+        }
+      }
+    });
+
+    const result = await detectDeployment(ctx);
+
+    expect(result.some(d => d.name === 'AWS Lambda' || d.tags?.includes('lambda'))).toBe(true);
+  });
+
+  it('detects AWS Lambda from cargo-lambda config', async () => {
+    const ctx = createContext({
+      cargoToml: {
+        package: { name: 'lambda-api', version: '0.1.0' },
+        dependencies: {
+          'lambda_runtime': '0.8'
+        }
+      },
+      // cargo-lambda uses .cargo-lambda directory or Cargo.toml metadata
+      configFiles: ['.cargo-lambda']
+    });
+
+    const result = await detectDeployment(ctx);
+
+    expect(result.some(d => d.name === 'AWS Lambda' || d.tags?.includes('lambda'))).toBe(true);
+  });
+});
+
+describe('Rust SQLx Database Detection', () => {
+  it('detects SQLx with Postgres from Cargo.toml', async () => {
+    const ctx = createContext({
+      cargoToml: {
+        package: { name: 'db-app', version: '0.1.0' },
+        dependencies: {
+          'sqlx': { version: '0.7', features: ['runtime-tokio', 'postgres'] }
+        }
+      }
+    });
+
+    const result = await detectDatabases(ctx);
+
+    expect(result.some(d => d.name === 'SQLx' || d.tags?.includes('sqlx'))).toBe(true);
+    expect(result.some(d => d.tags?.includes('postgres'))).toBe(true);
+  });
+
+  it('detects SQLx with MySQL from Cargo.toml', async () => {
+    const ctx = createContext({
+      cargoToml: {
+        package: { name: 'db-app', version: '0.1.0' },
+        dependencies: {
+          'sqlx': { version: '0.7', features: ['runtime-tokio', 'mysql'] }
+        }
+      }
+    });
+
+    const result = await detectDatabases(ctx);
+
+    expect(result.some(d => d.name === 'SQLx' || d.tags?.includes('sqlx'))).toBe(true);
+  });
+});
+
+describe('Rust proptest Detection', () => {
+  it('detects proptest in dev-dependencies', async () => {
+    const ctx = createContext({
+      cargoToml: {
+        package: { name: 'my-crate', version: '0.1.0' },
+        'dev-dependencies': {
+          'proptest': '1.4'
+        }
+      }
+    });
+
+    const result = await detectTesting(ctx);
+
+    expect(result.some(t => t.name === 'proptest' || t.tags?.includes('property-based'))).toBe(true);
+  });
+
+  it('detects proptest-derive in dev-dependencies', async () => {
+    const ctx = createContext({
+      cargoToml: {
+        package: { name: 'my-crate', version: '0.1.0' },
+        'dev-dependencies': {
+          'proptest': '1.4',
+          'proptest-derive': '0.4'
+        }
+      }
+    });
+
+    const result = await detectTesting(ctx);
+
+    expect(result.some(t => t.name === 'proptest' || t.tags?.includes('property-based'))).toBe(true);
+  });
+});

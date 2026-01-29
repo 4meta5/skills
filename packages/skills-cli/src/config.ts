@@ -23,10 +23,20 @@ export interface InstalledSkillRef {
   installedAt: string;
 }
 
+/**
+ * Track what skills and hooks are installed in a specific project
+ */
+export interface ProjectInstallation {
+  skills: string[];
+  hooks: string[];
+  lastUpdated: string;
+}
+
 export interface SkillsConfig {
   defaults: string[];
   sources: SkillSource[];
   installed: InstalledSkillRef[];
+  projectInstallations?: Record<string, ProjectInstallation>;
 }
 
 const CONFIG_DIR = join(homedir(), '.config', 'claude-skills');
@@ -36,7 +46,8 @@ const SOURCES_CACHE_DIR = join(CONFIG_DIR, 'sources');
 const DEFAULT_CONFIG: SkillsConfig = {
   defaults: [],
   sources: [],
-  installed: []
+  installed: [],
+  projectInstallations: {}
 };
 
 export function getSourcesCacheDir(): string {
@@ -159,4 +170,122 @@ export async function untrackInstalledSkill(name: string): Promise<void> {
   config.installed = config.installed || [];
   config.installed = config.installed.filter(s => s.name !== name);
   await saveConfig(config);
+}
+
+// Project installation tracking
+
+/**
+ * Normalize a project path (remove trailing slashes)
+ */
+function normalizeProjectPath(projectPath: string): string {
+  return projectPath.replace(/\/+$/, '');
+}
+
+/**
+ * Track a skill or hook installation to a specific project
+ */
+export async function trackProjectInstallation(
+  projectPath: string,
+  name: string,
+  type: 'skill' | 'hook'
+): Promise<void> {
+  const normalizedPath = normalizeProjectPath(projectPath);
+  const config = await loadConfig();
+  config.projectInstallations = config.projectInstallations || {};
+
+  // Create project entry if it doesn't exist
+  if (!config.projectInstallations[normalizedPath]) {
+    config.projectInstallations[normalizedPath] = {
+      skills: [],
+      hooks: [],
+      lastUpdated: new Date().toISOString()
+    };
+  }
+
+  const installation = config.projectInstallations[normalizedPath];
+  const list = type === 'skill' ? installation.skills : installation.hooks;
+
+  // Add to list if not already present
+  if (!list.includes(name)) {
+    list.push(name);
+    installation.lastUpdated = new Date().toISOString();
+  }
+
+  await saveConfig(config);
+}
+
+/**
+ * Remove tracking of a skill or hook from a specific project
+ */
+export async function untrackProjectInstallation(
+  projectPath: string,
+  name: string,
+  type: 'skill' | 'hook'
+): Promise<void> {
+  const normalizedPath = normalizeProjectPath(projectPath);
+  const config = await loadConfig();
+  config.projectInstallations = config.projectInstallations || {};
+
+  const installation = config.projectInstallations[normalizedPath];
+  if (!installation) {
+    return; // Nothing to untrack
+  }
+
+  if (type === 'skill') {
+    installation.skills = installation.skills.filter(s => s !== name);
+  } else {
+    installation.hooks = installation.hooks.filter(h => h !== name);
+  }
+
+  installation.lastUpdated = new Date().toISOString();
+
+  // Remove project entry if empty
+  if (installation.skills.length === 0 && installation.hooks.length === 0) {
+    delete config.projectInstallations[normalizedPath];
+  }
+
+  await saveConfig(config);
+}
+
+/**
+ * Get all projects that have a specific skill installed
+ */
+export async function getProjectsWithSkill(skillName: string): Promise<string[]> {
+  const config = await loadConfig();
+  const installations = config.projectInstallations || {};
+
+  return Object.entries(installations)
+    .filter(([, installation]) => installation.skills.includes(skillName))
+    .map(([path]) => path);
+}
+
+/**
+ * Get all projects that have a specific hook installed
+ */
+export async function getProjectsWithHook(hookName: string): Promise<string[]> {
+  const config = await loadConfig();
+  const installations = config.projectInstallations || {};
+
+  return Object.entries(installations)
+    .filter(([, installation]) => installation.hooks.includes(hookName))
+    .map(([path]) => path);
+}
+
+/**
+ * Get all tracked projects
+ */
+export async function getAllTrackedProjects(): Promise<string[]> {
+  const config = await loadConfig();
+  const installations = config.projectInstallations || {};
+
+  return Object.keys(installations);
+}
+
+/**
+ * Get the installation details for a specific project
+ */
+export async function getProjectInstallation(projectPath: string): Promise<ProjectInstallation | undefined> {
+  const normalizedPath = normalizeProjectPath(projectPath);
+  const config = await loadConfig();
+  return config.projectInstallations?.[normalizedPath];
 }

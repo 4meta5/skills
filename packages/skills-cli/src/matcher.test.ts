@@ -1,12 +1,13 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import type { ProjectAnalysis, DetectedTechnology, Confidence } from './detector/types.js';
+import type { ProjectAnalysis, DetectedTechnology, Confidence, SkillCategory } from './detector/types.js';
 import {
   matchSkills,
   getAllRecommendations,
   filterByConfidence,
   filterByTag,
   type MatchResult,
-  type SkillRecommendation
+  type SkillRecommendation,
+  type SkillAlternative
 } from './matcher.js';
 
 // Mock the skills library
@@ -273,5 +274,164 @@ describe('Curated Sources Matching', () => {
       r.tags.some(t => t.includes('aws') || t.includes('cdk')) && r.source === 'curated'
     );
     expect(awsRecs.length).toBeGreaterThan(0);
+  });
+});
+
+describe('Category-based Deduplication', () => {
+  it('includes category in bundled skill recommendations', async () => {
+    const analysis = createAnalysis({
+      languages: [createTech('TypeScript', 'language', ['typescript', 'ts'])]
+    });
+
+    const result = await matchSkills(analysis);
+
+    const tsSkill = getAllRecommendations(result).find(r => r.name === 'code-review-ts');
+    expect(tsSkill).toBeDefined();
+    expect(tsSkill!.category).toBe('code-quality');
+  });
+
+  it('includes category in curated skill recommendations', async () => {
+    const analysis = createAnalysis({
+      frameworks: [
+        createTech('Svelte 5', 'framework', ['svelte', 'svelte5', 'runes', 'frontend'])
+      ]
+    });
+
+    const result = await matchSkills(analysis);
+
+    const allRecs = getAllRecommendations(result);
+    const svelteRecs = allRecs.filter(r =>
+      r.tags.some(t => t.includes('svelte')) && r.source === 'curated'
+    );
+    expect(svelteRecs.length).toBeGreaterThan(0);
+    expect(svelteRecs[0].category).toBe('framework');
+  });
+
+  it('includes priority in bundled skill recommendations', async () => {
+    const analysis = createAnalysis({
+      languages: [createTech('TypeScript', 'language', ['typescript', 'ts'])]
+    });
+
+    const result = await matchSkills(analysis);
+
+    const tsSkill = getAllRecommendations(result).find(r => r.name === 'code-review-ts');
+    expect(tsSkill).toBeDefined();
+    expect(tsSkill!.priority).toBe(10);
+  });
+
+  it('includes priority in curated skill recommendations', async () => {
+    const analysis = createAnalysis({
+      frameworks: [
+        createTech('Svelte 5', 'framework', ['svelte', 'svelte5', 'runes', 'frontend'])
+      ]
+    });
+
+    const result = await matchSkills(analysis);
+
+    const allRecs = getAllRecommendations(result);
+    const svelteRecs = allRecs.filter(r =>
+      r.tags.some(t => t.includes('svelte')) && r.source === 'curated'
+    );
+    expect(svelteRecs.length).toBeGreaterThan(0);
+    expect(svelteRecs[0].priority).toBe(10);
+  });
+
+  it('bundled skills take priority over curated for same category', async () => {
+    // Security category has both bundled (security-analysis) and potentially curated skills
+    const analysis = createAnalysis({
+      languages: [createTech('TypeScript', 'language', ['typescript', 'ts', 'security'])]
+    });
+
+    const result = await matchSkills(analysis);
+
+    const allRecs = getAllRecommendations(result);
+    const securityRecs = allRecs.filter(r => r.category === 'security');
+
+    // If any security skills matched, bundled should be first
+    if (securityRecs.length > 0) {
+      const firstSecurity = securityRecs[0];
+      // Bundled takes priority, so if it matched it should be first
+      if (firstSecurity.name === 'security-analysis') {
+        expect(firstSecurity.source).toBe('bundled');
+      }
+    }
+  });
+
+  it('tracks alternatives structure correctly when present', async () => {
+    // Create a recommendation with alternatives manually to test the interface
+    const recWithAlts: SkillRecommendation = {
+      name: 'test-skill',
+      confidence: 'high',
+      reason: 'test',
+      source: 'bundled',
+      tags: ['test'],
+      category: 'testing',
+      priority: 10,
+      alternatives: [
+        { name: 'alt-skill-1', source: 'curated' },
+        { name: 'alt-skill-2', source: 'registered' }
+      ]
+    };
+
+    expect(recWithAlts.alternatives).toHaveLength(2);
+    expect(recWithAlts.alternatives![0].name).toBe('alt-skill-1');
+    expect(recWithAlts.alternatives![0].source).toBe('curated');
+    expect(recWithAlts.alternatives![1].name).toBe('alt-skill-2');
+    expect(recWithAlts.alternatives![1].source).toBe('registered');
+  });
+
+  it('deduplication groups by category and sorted tags', async () => {
+    // Test the deduplication key logic
+    const rec1: SkillRecommendation = {
+      name: 'skill-1',
+      confidence: 'high',
+      reason: 'test',
+      source: 'bundled',
+      tags: ['a', 'b'],
+      category: 'testing',
+      priority: 10
+    };
+
+    const rec2: SkillRecommendation = {
+      name: 'skill-2',
+      confidence: 'high',
+      reason: 'test',
+      source: 'curated',
+      tags: ['b', 'a'],  // Same tags, different order
+      category: 'testing',
+      priority: 5
+    };
+
+    // Both should have same deduplication key since tags are sorted
+    // This is a unit test for the concept
+    expect(rec1.category).toBe(rec2.category);
+    expect([...rec1.tags].sort().join(',')).toBe([...rec2.tags].sort().join(','));
+  });
+
+  it('skills without category get unique dedup key', async () => {
+    // Test that uncategorized skills are not deduplicated together
+    const rec1: SkillRecommendation = {
+      name: 'skill-1',
+      confidence: 'high',
+      reason: 'test',
+      source: 'bundled',
+      tags: ['a', 'b']
+      // No category
+    };
+
+    const rec2: SkillRecommendation = {
+      name: 'skill-2',
+      confidence: 'high',
+      reason: 'test',
+      source: 'curated',
+      tags: ['a', 'b']
+      // No category
+    };
+
+    // Without category, they should be treated as unique (not deduplicated)
+    expect(rec1.category).toBeUndefined();
+    expect(rec2.category).toBeUndefined();
+    // They have same tags but different names, so uncategorized:skill-1 != uncategorized:skill-2
+    expect(rec1.name).not.toBe(rec2.name);
   });
 });

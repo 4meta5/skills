@@ -24,9 +24,10 @@ export { extendWithTesting, extendWithSecurity } from './templates/extend-projec
 
 // Bundled skills
 export {
-  testFirstBugfix,
+  tdd,
   unitTestWorkflow,
   suggestTests,
+  noWorkarounds,
   codeReview,
   codeReviewTs,
   codeReviewJs,

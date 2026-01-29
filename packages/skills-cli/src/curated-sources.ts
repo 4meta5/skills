@@ -1,4 +1,5 @@
 import type { SkillSource } from './config.js';
+import type { SkillCategory } from './detector/types.js';
 
 /**
  * A curated skill source with metadata for matching
@@ -6,8 +7,10 @@ import type { SkillSource } from './config.js';
 export interface CuratedSource {
   source: SkillSource;
   description: string;
-  tags: string[];      // Tags for matching detected technologies
-  skills: string[];    // Known skill names in this source
+  tags: string[];           // Tags for matching detected technologies
+  skills: string[];         // Known skill names in this source
+  category: SkillCategory;  // Functional category for deduplication
+  priority?: number;        // Higher = better (default 0). Used to pick best skill in category
 }
 
 /**
@@ -15,38 +18,25 @@ export interface CuratedSource {
  *
  * These are community-maintained skill repositories that are
  * automatically recommended when relevant technologies are detected.
+ *
+ * DEDUPLICATION: Only ONE skill per (category + tags) combination should be kept.
+ * When multiple skills serve the same purpose, keep the most comprehensive/maintained one.
  */
 export const CURATED_SOURCES: CuratedSource[] = [
-  // Svelte 5 Skills
+  // Svelte 5 Skills - DEDUPLICATED: kept only the most comprehensive one
+  // Removed: claude-svelte5-skill (splinesreticulating), svelte-5-runes (wiesson)
   {
     source: {
       name: 'svelte-claude-skills',
       url: 'https://github.com/spences10/svelte-claude-skills',
+      path: '.claude/skills',
       type: 'git'
     },
     description: 'Svelte 5 runes and reactivity patterns',
     tags: ['svelte', 'svelte5', 'sveltekit', 'runes'],
-    skills: ['svelte5-runes']
-  },
-  {
-    source: {
-      name: 'claude-svelte5-skill',
-      url: 'https://github.com/splinesreticulating/claude-svelte5-skill',
-      type: 'git'
-    },
-    description: 'Comprehensive SvelteKit 2 + Svelte 5 skill',
-    tags: ['svelte', 'svelte5', 'sveltekit', 'sveltekit2'],
-    skills: ['svelte5']
-  },
-  {
-    source: {
-      name: 'svelte-5-runes',
-      url: 'https://github.com/wiesson/svelte-5-runes',
-      type: 'git'
-    },
-    description: 'Dedicated Svelte 5 runes skill',
-    tags: ['svelte', 'svelte5', 'runes'],
-    skills: ['svelte-5-runes']
+    skills: ['svelte-runes'],
+    category: 'framework',
+    priority: 10  // Primary Svelte 5 skill
   },
 
   // AWS Skills
@@ -58,7 +48,9 @@ export const CURATED_SOURCES: CuratedSource[] = [
     },
     description: 'AWS CDK, Lambda, ECS, SAM, and cost estimation skills',
     tags: ['aws', 'cdk', 'lambda', 'sam', 'ecs', 'infrastructure', 'iac'],
-    skills: ['aws-cdk', 'aws-lambda', 'aws-sam', 'aws-ecs', 'aws-cost']
+    skills: ['aws-cdk', 'aws-lambda', 'aws-sam', 'aws-ecs', 'aws-cost'],
+    category: 'deployment',
+    priority: 10
   },
 
   // Cloudflare Skills
@@ -78,7 +70,9 @@ export const CURATED_SOURCES: CuratedSource[] = [
       'cloudflare-kv',
       'cloudflare-pages',
       'cloudflare-queues'
-    ]
+    ],
+    category: 'deployment',
+    priority: 10
   },
 
   // Database Skills
@@ -86,12 +80,14 @@ export const CURATED_SOURCES: CuratedSource[] = [
     source: {
       name: 'database-skills',
       url: 'https://github.com/jezweb/claude-skills',
-      path: 'database',
+      path: 'skills',
       type: 'git'
     },
     description: 'Neon Postgres, Drizzle ORM, and database integration skills',
     tags: ['neon', 'postgres', 'postgresql', 'drizzle', 'database', 'serverless'],
-    skills: ['neon-postgres', 'drizzle-orm']
+    skills: ['neon-vercel-postgres', 'drizzle-orm'],
+    category: 'database',
+    priority: 10
   }
 ];
 

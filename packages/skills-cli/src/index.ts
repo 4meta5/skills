@@ -8,6 +8,10 @@ import { initCommand } from './commands/init.js';
 import { sourceCommand } from './commands/source.js';
 import { updateCommand } from './commands/update.js';
 import { scanCommand } from './commands/scan.js';
+import { hookCommand } from './commands/hook.js';
+import { removeCommand } from './commands/remove.js';
+import { syncCommand } from './commands/sync.js';
+import { projectsCommand } from './commands/projects.js';
 
 interface ListOptions {
   category?: string;
@@ -21,6 +25,7 @@ interface AddOptions {
   user?: boolean;
   git?: string;
   ref?: string;
+  cwd?: string;
 }
 
 interface InitOptions {
@@ -45,6 +50,28 @@ interface ScanOptions {
   all?: boolean;
   filter?: string;
   minConfidence?: string;
+  showAlternatives?: boolean;
+  yes?: boolean;
+}
+
+interface HookOptions {
+  cwd?: string;
+}
+
+interface RemoveOptions {
+  cwd?: string;
+}
+
+interface SyncOptions {
+  all?: boolean;
+  dryRun?: boolean;
+  cwd?: string;
+}
+
+interface ProjectsOptions {
+  skill?: string;
+  json?: boolean;
+  cwd?: string;
 }
 
 const cli = cac('skills');
@@ -72,8 +99,17 @@ cli
   .option('-u, --user', 'Install to user directory (~/.claude/skills)')
   .option('-g, --git <url>', 'Install from git URL')
   .option('--ref <ref>', 'Git ref (branch/tag/commit) for --git')
+  .option('-C, --cwd <path>', 'Target project directory (default: current directory)')
   .action(async (names: string[], options: AddOptions) => {
     await addCommand(names, options);
+  });
+
+cli
+  .command('remove [...names]', 'Remove skills from current project')
+  .alias('rm')
+  .option('-C, --cwd <path>', 'Target project directory (default: current directory)')
+  .action(async (names: string[], options: RemoveOptions) => {
+    await removeCommand(names, options);
   });
 
 cli
@@ -120,10 +156,45 @@ cli
   .option('--json', 'Output as JSON')
   .option('-i, --install', 'Interactively select and install skills')
   .option('-a, --all', 'Install all recommended skills')
+  .option('-y, --yes', 'Skip confirmation prompts (use with --all)')
   .option('-f, --filter <tag>', 'Filter recommendations by tag (e.g., svelte, cloudflare)')
   .option('-m, --min-confidence <level>', 'Minimum confidence level (high, medium, low)')
+  .option('--show-alternatives', 'Show deduplicated alternative skills')
   .action(async (options: ScanOptions) => {
     await scanCommand(options);
+  });
+
+cli
+  .command('hook [subcommand] [...args]', 'Manage Claude Code hooks')
+  .option('-C, --cwd <path>', 'Target project directory (default: current directory)')
+  .action(async (subcommand: string | undefined, args: string[], options: HookOptions) => {
+    await hookCommand(
+      (subcommand as 'add' | 'list' | 'remove' | 'available') || 'list',
+      args,
+      options
+    );
+  });
+
+cli
+  .command('sync [...names]', 'Sync skills to all tracked projects')
+  .option('-a, --all', 'Sync all skills in all projects')
+  .option('-d, --dry-run', 'Show what would be updated without making changes')
+  .option('-C, --cwd <path>', 'Source directory for skills (default: current directory)')
+  .action(async (names: string[], options: SyncOptions) => {
+    await syncCommand(names, options);
+  });
+
+cli
+  .command('projects [subcommand] [...args]', 'Manage tracked project installations')
+  .option('-s, --skill <name>', 'Filter by skill name')
+  .option('--json', 'Output as JSON')
+  .option('-C, --cwd <path>', 'Target project directory (default: current directory)')
+  .action(async (subcommand: string | undefined, args: string[], options: ProjectsOptions) => {
+    await projectsCommand(
+      (subcommand as 'list' | 'add' | 'remove') || 'list',
+      args,
+      options
+    );
   });
 
 cli.help();

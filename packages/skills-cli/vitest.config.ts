@@ -5,6 +5,13 @@ export default defineConfig({
     exclude: [
       '**/node_modules/**',
       '**/dist/**'
-    ]
+    ],
+    // Run tests sequentially to avoid race conditions with shared config file
+    pool: 'forks',
+    poolOptions: {
+      forks: {
+        singleFork: true
+      }
+    }
   }
 });

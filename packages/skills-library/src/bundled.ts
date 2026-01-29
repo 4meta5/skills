@@ -31,11 +31,12 @@ function loadBundledSkill(name: string): Skill {
 }
 
 // Testing skills
-export const testFirstBugfix = loadBundledSkill('test-first-bugfix');
+export const tdd = loadBundledSkill('tdd');
 export const unitTestWorkflow = loadBundledSkill('unit-test-workflow');
 export const suggestTests = loadBundledSkill('suggest-tests');
 
 // Development skills
+export const noWorkarounds = loadBundledSkill('no-workarounds');
 export const codeReview = loadBundledSkill('code-review');
 export const codeReviewTs = loadBundledSkill('code-review-ts');
 export const codeReviewJs = loadBundledSkill('code-review-js');
@@ -56,11 +57,12 @@ export const describeCodebase = loadBundledSkill('describe-codebase');
  */
 export const bundledSkills: Record<string, Skill> = {
   // Testing
-  'test-first-bugfix': testFirstBugfix,
+  'tdd': tdd,
   'unit-test-workflow': unitTestWorkflow,
   'suggest-tests': suggestTests,
 
   // Development
+  'no-workarounds': noWorkarounds,
   'code-review': codeReview,
   'code-review-ts': codeReviewTs,
   'code-review-js': codeReviewJs,

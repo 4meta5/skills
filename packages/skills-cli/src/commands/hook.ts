@@ -1,0 +1,311 @@
+import { mkdir, writeFile, readdir, stat, chmod, readFile } from 'fs/promises';
+import { join, dirname } from 'path';
+import { fileURLToPath } from 'url';
+import { trackProjectInstallation, untrackProjectInstallation } from '../config.js';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+interface HookOptions {
+  cwd?: string;
+}
+
+/**
+ * Get the path to bundled hooks directory
+ * From dist/src/commands/hook.js -> ../../../hooks
+ */
+function getBundledHooksDir(): string {
+  return join(__dirname, '..', '..', '..', 'hooks');
+}
+
+/**
+ * Get the target hooks directory for a project
+ */
+function getProjectHooksDir(cwd: string): string {
+  return join(cwd, '.claude', 'hooks');
+}
+
+/**
+ * Bundled hooks with their content
+ * These are embedded directly to avoid file path issues
+ */
+const BUNDLED_HOOKS: Record<string, { filename: string; content: string }> = {
+  'skill-forced-eval': {
+    filename: 'skill-forced-eval.sh',
+    content: `#!/bin/bash
+# Skill Forced Evaluation Hook - SOTA 3-Step Activation
+# Forces Claude to ACTIVATE skills via Skill() tool, not just evaluate them
+# Achieves ~84% skill activation vs ~20% baseline (per Scott Spence's research)
+
+# This hook intercepts UserPromptSubmit and forces actual skill activation
+
+# Read the input JSON (contains the user's prompt)
+INPUT=$(cat)
+PROMPT=$(echo "$INPUT" | jq -r '.prompt // ""')
+
+cat << 'ACTIVATION_CONTEXT'
+
+## MANDATORY SKILL ACTIVATION SEQUENCE
+
+### Step 1 - EVALUATE (do this in your response):
+For each installed skill, state: [skill-name] - YES/NO - [reason]
+
+Installed skills to evaluate:
+- tdd: Trigger = implementing features, fixing bugs, refactoring code (RED→GREEN→REFACTOR)
+- no-workarounds: Trigger = building tools, CLI features, automation
+- dogfood-skills: Trigger = completing features in skills-cli
+
+### Step 2 - ACTIVATE (do this immediately after Step 1):
+IF any skills are YES → Use Skill(skill-name) tool for EACH relevant skill NOW
+IF no skills are YES → State "No skills activated" and proceed
+
+### Step 3 - IMPLEMENT:
+Only after Step 2 is complete, proceed with implementation.
+
+## CRITICAL REQUIREMENTS
+
+1. You MUST call Skill() tool in Step 2 for every YES skill
+2. The evaluation (Step 1) is WORTHLESS unless you ACTIVATE (Step 2) the skills
+3. Do NOT skip to implementation without completing Step 2
+
+## Example of Correct Sequence:
+
+\`\`\`
+SKILL EVALUATION (Step 1):
+- tdd: YES - fixing a bug in the CLI
+- no-workarounds: YES - fixing CLI tool code
+- dogfood-skills: NO - not completing a feature yet
+
+ACTIVATING SKILLS (Step 2):
+[Calls Skill("tdd")]
+[Calls Skill("no-workarounds")]
+
+IMPLEMENTING (Step 3):
+[Now proceeds with implementation following both activated skills]
+\`\`\`
+
+## BLOCKING CONDITIONS
+
+- If tdd = YES: You are BLOCKED until Phase 1 (RED) is complete - failing test required
+- If no-workarounds = YES: You are BLOCKED from manual workarounds
+- Skills CHAIN: If both tdd AND no-workarounds are YES, follow BOTH
+
+This activation sequence is MANDATORY. Skipping Step 2 violates project policy.
+
+ACTIVATION_CONTEXT
+
+exit 0
+`
+  }
+};
+
+/**
+ * List available bundled hooks
+ */
+function listBundledHooks(): string[] {
+  return Object.keys(BUNDLED_HOOKS);
+}
+
+/**
+ * Get a bundled hook by name
+ */
+function getBundledHook(name: string): { filename: string; content: string } | undefined {
+  return BUNDLED_HOOKS[name];
+}
+
+/**
+ * Hook command handler
+ */
+export async function hookCommand(
+  subcommand: 'add' | 'list' | 'remove' | 'available',
+  args: string[],
+  options: HookOptions = {}
+): Promise<void> {
+  const projectDir = options.cwd || process.cwd();
+
+  switch (subcommand) {
+    case 'add':
+      await addHooks(args, projectDir);
+      break;
+    case 'list':
+      await listHooks(projectDir);
+      break;
+    case 'remove':
+      await removeHooks(args, projectDir);
+      break;
+    case 'available':
+      listAvailableHooks();
+      break;
+    default:
+      console.log('Usage: skills hook <add|list|remove|available> [names...]');
+  }
+}
+
+/**
+ * Add hooks to project
+ */
+async function addHooks(names: string[], projectDir: string): Promise<void> {
+  if (names.length === 0) {
+    console.log('Usage: skills hook add <hook-names...>');
+    console.log('Available hooks:');
+    listBundledHooks().forEach(name => console.log(`  - ${name}`));
+    return;
+  }
+
+  const hooksDir = getProjectHooksDir(projectDir);
+  await mkdir(hooksDir, { recursive: true });
+
+  let installed = 0;
+
+  for (const name of names) {
+    const hook = getBundledHook(name);
+    if (!hook) {
+      console.error(`x ${name} - not found`);
+      continue;
+    }
+
+    const hookPath = join(hooksDir, hook.filename);
+    await writeFile(hookPath, hook.content, 'utf-8');
+    await chmod(hookPath, 0o755); // Make executable
+
+    // Track hook installation in project
+    await trackProjectInstallation(projectDir, name, 'hook');
+
+    console.log(`+ ${name} -> .claude/hooks/${hook.filename}`);
+    installed++;
+  }
+
+  if (installed > 0) {
+    console.log(`\nInstalled ${installed} hook(s) to .claude/hooks`);
+
+    // Auto-configure settings.local.json
+    await configureHooksInSettings(names, projectDir);
+  }
+}
+
+/**
+ * Configure hooks in settings.local.json
+ */
+async function configureHooksInSettings(hookNames: string[], projectDir: string): Promise<void> {
+  const settingsPath = join(projectDir, '.claude', 'settings.local.json');
+
+  let settings: Record<string, unknown> = {};
+
+  // Try to read existing settings
+  try {
+    const content = await readFile(settingsPath, 'utf-8');
+    settings = JSON.parse(content);
+  } catch {
+    // File doesn't exist or is invalid, start fresh
+  }
+
+  // Ensure hooks structure exists
+  if (!settings.hooks) {
+    settings.hooks = {};
+  }
+  const hooks = settings.hooks as Record<string, unknown>;
+
+  if (!hooks.UserPromptSubmit) {
+    hooks.UserPromptSubmit = [];
+  }
+  const userPromptSubmitHooks = hooks.UserPromptSubmit as Array<{ hooks: Array<{ type: string; command: string }> }>;
+
+  // Add each hook if not already present
+  for (const hookName of hookNames) {
+    const hook = getBundledHook(hookName);
+    if (!hook) continue;
+
+    const hookCommand = `"$CLAUDE_PROJECT_DIR"/.claude/hooks/${hook.filename}`;
+
+    // Check if this hook is already configured
+    const alreadyConfigured = userPromptSubmitHooks.some(entry =>
+      entry.hooks?.some(h => h.command === hookCommand)
+    );
+
+    if (!alreadyConfigured) {
+      userPromptSubmitHooks.push({
+        hooks: [
+          {
+            type: 'command',
+            command: hookCommand
+          }
+        ]
+      });
+      console.log(`Configured ${hookName} in settings.local.json`);
+    } else {
+      console.log(`${hookName} already configured in settings.local.json`);
+    }
+  }
+
+  // Write updated settings
+  await writeFile(settingsPath, JSON.stringify(settings, null, 2) + '\n', 'utf-8');
+}
+
+/**
+ * List installed hooks in project
+ */
+async function listHooks(projectDir: string): Promise<void> {
+  const hooksDir = getProjectHooksDir(projectDir);
+
+  try {
+    const files = await readdir(hooksDir);
+    if (files.length === 0) {
+      console.log('No hooks installed.');
+      return;
+    }
+
+    console.log('Installed hooks:');
+    for (const file of files) {
+      const filePath = join(hooksDir, file);
+      const fileStat = await stat(filePath);
+      if (fileStat.isFile()) {
+        const executable = (fileStat.mode & 0o111) !== 0;
+        console.log(`  - ${file}${executable ? ' (executable)' : ''}`);
+      }
+    }
+  } catch {
+    console.log('No hooks directory found.');
+  }
+}
+
+/**
+ * Remove hooks from project
+ */
+async function removeHooks(names: string[], projectDir: string): Promise<void> {
+  const hooksDir = getProjectHooksDir(projectDir);
+
+  if (names.length === 0) {
+    console.log('Usage: skills hook remove <hook-names...>');
+    return;
+  }
+
+  const { unlink } = await import('fs/promises');
+
+  for (const name of names) {
+    const hook = getBundledHook(name);
+    const filename = hook?.filename || `${name}.sh`;
+    const hookPath = join(hooksDir, filename);
+
+    try {
+      await unlink(hookPath);
+
+      // Untrack hook from project
+      await untrackProjectInstallation(projectDir, name, 'hook');
+
+      console.log(`- ${name}`);
+    } catch {
+      console.error(`x ${name} - not found`);
+    }
+  }
+}
+
+/**
+ * List available bundled hooks
+ */
+function listAvailableHooks(): void {
+  console.log('Available hooks:');
+  for (const name of listBundledHooks()) {
+    const hook = getBundledHook(name);
+    console.log(`  - ${name} (${hook?.filename})`);
+  }
+}

@@ -9,7 +9,7 @@ export const testingCategory: SkillCategory = 'testing';
  * Skills that belong to the testing category
  */
 export const testingSkills = [
-  'test-first-bugfix',
+  'tdd',
   'unit-testing',
   'integration-testing'
 ] as const;

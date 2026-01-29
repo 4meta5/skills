@@ -26,6 +26,8 @@ interface ScanOptions {
   all?: boolean;
   filter?: string;
   minConfidence?: string;
+  showAlternatives?: boolean;  // Show deduplicated alternatives
+  yes?: boolean;  // Skip confirmation prompts
 }
 
 export async function scanCommand(options: ScanOptions = {}): Promise<void> {
@@ -70,8 +72,9 @@ export async function scanCommand(options: ScanOptions = {}): Promise<void> {
   } else {
     // Show install hint
     console.log('\nTo install recommended skills:');
-    console.log('  skills scan --install     # Interactive selection');
-    console.log('  skills scan --all         # Install all high confidence');
+    console.log('  skills scan --install           # Interactive selection');
+    console.log('  skills scan --all               # Install all high confidence');
+    console.log('  skills scan --show-alternatives # See deduplicated alternatives');
   }
 }
 
@@ -115,7 +118,9 @@ function formatRecommendation(rec: SkillRecommendation) {
     reason: rec.reason,
     source: rec.source,
     sourceName: rec.sourceName,
-    tags: rec.tags
+    tags: rec.tags,
+    category: rec.category,
+    alternatives: rec.alternatives
   };
 }
 
@@ -172,45 +177,82 @@ function displayStack(analysis: ProjectAnalysis): void {
 }
 
 /**
- * Display skill recommendations
+ * Group recommendations by category
+ */
+function groupByCategory(recommendations: SkillRecommendation[]): Map<string, SkillRecommendation[]> {
+  const groups = new Map<string, SkillRecommendation[]>();
+
+  for (const rec of recommendations) {
+    const category = rec.category?.toUpperCase() || 'OTHER';
+    const existing = groups.get(category) || [];
+    existing.push(rec);
+    groups.set(category, existing);
+  }
+
+  return groups;
+}
+
+/**
+ * Display skill recommendations grouped by category
  */
 function displayRecommendations(matchResult: MatchResult, options: ScanOptions): void {
   console.log('Recommended Skills:\n');
 
   const minConfidence = parseConfidence(options.minConfidence);
 
+  // Collect all recommendations that pass filter
+  const allRecs: SkillRecommendation[] = [];
+
   if (matchResult.high.length > 0 && confidenceAtLeast(minConfidence, 'high')) {
-    console.log('  HIGH CONFIDENCE');
     for (const rec of matchResult.high) {
       if (options.filter && !matchesFilter(rec, options.filter)) continue;
-      displayRecommendation(rec);
+      allRecs.push(rec);
     }
-    console.log();
   }
 
   if (matchResult.medium.length > 0 && confidenceAtLeast(minConfidence, 'medium')) {
-    console.log('  MEDIUM CONFIDENCE');
     for (const rec of matchResult.medium) {
       if (options.filter && !matchesFilter(rec, options.filter)) continue;
-      displayRecommendation(rec);
+      allRecs.push(rec);
     }
-    console.log();
   }
 
   if (matchResult.low.length > 0 && confidenceAtLeast(minConfidence, 'low')) {
-    console.log('  LOW CONFIDENCE');
     for (const rec of matchResult.low) {
       if (options.filter && !matchesFilter(rec, options.filter)) continue;
-      displayRecommendation(rec);
+      allRecs.push(rec);
+    }
+  }
+
+  // Group by category
+  const byCategory = groupByCategory(allRecs);
+
+  // Display by category
+  for (const [category, recs] of byCategory) {
+    const altCount = recs.reduce((sum, r) => sum + (r.alternatives?.length || 0), 0);
+    const altText = altCount > 0 ? ` (${recs.length + altCount} skills available)` : '';
+
+    console.log(`  ${category}${altText}`);
+    for (const rec of recs) {
+      displayRecommendation(rec, options);
     }
     console.log();
   }
 }
 
-function displayRecommendation(rec: SkillRecommendation): void {
+function displayRecommendation(rec: SkillRecommendation, options: ScanOptions): void {
   const sourceInfo = rec.sourceName ? ` (${rec.sourceName})` : ' (bundled)';
-  console.log(`  + ${rec.name}${sourceInfo}`);
+  const confidenceMarker = rec.confidence === 'high' ? '' : ` [${rec.confidence}]`;
+  console.log(`  + ${rec.name}${sourceInfo}${confidenceMarker}`);
   console.log(`    ${rec.reason}`);
+
+  // Show alternatives if requested
+  if (options.showAlternatives && rec.alternatives && rec.alternatives.length > 0) {
+    const altList = rec.alternatives.map(a => `${a.name} (${a.source})`).join(', ');
+    console.log(`    Alternatives: ${altList}`);
+  } else if (rec.alternatives && rec.alternatives.length > 0) {
+    console.log(`    ${rec.alternatives.length} alternative(s) available`);
+  }
 }
 
 /**
@@ -297,14 +339,17 @@ async function installAll(
 
   console.log(`\nInstalling ${toInstall.length} skill(s)...`);
 
-  const shouldProceed = await confirm({
-    message: `Install ${toInstall.length} skill(s)?`,
-    default: true
-  });
+  // Skip confirmation if --yes flag is provided
+  if (!options.yes) {
+    const shouldProceed = await confirm({
+      message: `Install ${toInstall.length} skill(s)?`,
+      default: true
+    });
 
-  if (!shouldProceed) {
-    console.log('Installation cancelled.');
-    return;
+    if (!shouldProceed) {
+      console.log('Installation cancelled.');
+      return;
+    }
   }
 
   await installSkills(toInstall, analysis);
@@ -335,30 +380,37 @@ async function installSkills(
           installedAt: new Date().toISOString()
         });
       } else if (rec.source === 'curated' && rec.sourceName) {
-        // Register curated source if not already registered
+        // Get curated source config (always has correct path, etc.)
+        const curatedSource = getCuratedSource(rec.sourceName);
+        if (!curatedSource) {
+          throw new Error(`Unknown curated source: ${rec.sourceName}`);
+        }
+
+        // Register or update source from curated config
+        // This ensures the source has the correct path even if previously registered wrong
         const existingSource = await getSource(rec.sourceName);
-        if (!existingSource) {
-          const curatedSource = getCuratedSource(rec.sourceName);
-          if (curatedSource) {
-            console.log(`  Registering source: ${rec.sourceName}`);
-            await addSource(curatedSource.source);
-            await cloneOrUpdateSource(curatedSource.source);
-          }
+        const needsUpdate = !existingSource ||
+          existingSource.path !== curatedSource.source.path ||
+          existingSource.url !== curatedSource.source.url;
+
+        if (needsUpdate) {
+          console.log(`  ${existingSource ? 'Updating' : 'Registering'} source: ${rec.sourceName}`);
+          await addSource(curatedSource.source);
         }
 
-        // Install skill from source
-        const source = await getSource(rec.sourceName);
-        if (source) {
-          await copySkillFromSource(source, rec.name, targetDir);
-          const commit = await getSourceCommit(source);
+        // Clone or update the repository
+        await cloneOrUpdateSource(curatedSource.source);
 
-          await trackInstalledSkill({
-            name: rec.name,
-            source: rec.sourceName,
-            ref: commit,
-            installedAt: new Date().toISOString()
-          });
-        }
+        // Install skill from source using the curated config
+        await copySkillFromSource(curatedSource.source, rec.name, targetDir);
+        const commit = await getSourceCommit(curatedSource.source);
+
+        await trackInstalledSkill({
+          name: rec.name,
+          source: rec.sourceName,
+          ref: commit,
+          installedAt: new Date().toISOString()
+        });
       } else if (rec.source === 'registered' && rec.sourceName) {
         // Install from registered source
         const source = await getSource(rec.sourceName);

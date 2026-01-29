@@ -30,9 +30,10 @@
   "license": "MIT",
   "dependencies": {
     "@anthropic/skills-library": "*",
-    "cac": "^6.7.14",
     "@inquirer/prompts": "^7.2.1",
+    "cac": "^6.7.14",
     "simple-git": "^3.22.0",
+    "smol-toml": "^1.6.0",
     "yaml": "^2.3.0"
   },
   "devDependencies": {

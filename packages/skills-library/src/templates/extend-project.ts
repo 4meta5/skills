@@ -6,13 +6,13 @@ import type { ProjectTemplate } from '../types.js';
 export const extendWithTesting: ProjectTemplate = {
   name: 'extend-testing',
   description: 'Add testing skills and configuration to an existing project',
-  skills: ['test-first-bugfix'],
+  skills: ['tdd'],
   claudemd: `## Testing
 
 This project uses a test-first approach to bug fixing.
 
 ### Skills
-- @.claude/skills/test-first-bugfix/SKILL.md
+- @.claude/skills/tdd/SKILL.md
 
 ### Commands
 - \`npm test\` - Run tests

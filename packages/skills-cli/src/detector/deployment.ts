@@ -193,5 +193,37 @@ export async function detectDeployment(ctx: DetectionContext): Promise<DetectedT
     });
   }
 
+  // Rust AWS Lambda detection from Cargo.toml
+  if (ctx.cargoToml?.dependencies) {
+    const deps = ctx.cargoToml.dependencies;
+    const hasLambdaHttp = 'lambda_http' in deps;
+    const hasLambdaRuntime = 'lambda_runtime' in deps;
+
+    if (hasLambdaHttp || hasLambdaRuntime) {
+      if (!deployment.some(d => d.name === 'AWS Lambda')) {
+        deployment.push({
+          name: 'AWS Lambda',
+          category: 'deployment',
+          confidence: 'high',
+          evidence: `Cargo.toml ${hasLambdaHttp ? 'lambda_http' : 'lambda_runtime'} dependency`,
+          tags: ['aws', 'lambda', 'serverless', 'rust', 'cargo-lambda']
+        });
+      }
+    }
+  }
+
+  // cargo-lambda config detection
+  if (ctx.configFiles.includes('.cargo-lambda') || ctx.configFiles.includes('cargo-lambda.toml')) {
+    if (!deployment.some(d => d.name === 'AWS Lambda')) {
+      deployment.push({
+        name: 'AWS Lambda',
+        category: 'deployment',
+        confidence: 'high',
+        evidence: 'cargo-lambda config',
+        tags: ['aws', 'lambda', 'serverless', 'rust', 'cargo-lambda']
+      });
+    }
+  }
+
   return deployment;
 }

@@ -282,5 +282,42 @@ export async function detectDatabases(ctx: DetectionContext): Promise<DetectedTe
     }
   }
 
+  // Rust SQLx detection from Cargo.toml
+  if (ctx.cargoToml?.dependencies) {
+    const deps = ctx.cargoToml.dependencies;
+    const sqlxDep = deps['sqlx'];
+
+    if (sqlxDep) {
+      // Extract features from sqlx dependency to detect database type
+      const sqlxTags: string[] = ['sqlx', 'rust', 'database'];
+      let dbType = '';
+
+      // sqlx can be a string "0.7" or an object { version: "0.7", features: [...] }
+      if (typeof sqlxDep === 'object' && sqlxDep.features) {
+        const features = sqlxDep.features;
+        if (features.includes('postgres')) {
+          sqlxTags.push('postgres', 'postgresql');
+          dbType = ' (Postgres)';
+        }
+        if (features.includes('mysql')) {
+          sqlxTags.push('mysql');
+          dbType = dbType || ' (MySQL)';
+        }
+        if (features.includes('sqlite')) {
+          sqlxTags.push('sqlite');
+          dbType = dbType || ' (SQLite)';
+        }
+      }
+
+      databases.push({
+        name: `SQLx${dbType}`,
+        category: 'database',
+        confidence: 'high',
+        evidence: 'Cargo.toml sqlx dependency',
+        tags: sqlxTags
+      });
+    }
+  }
+
   return databases;
 }

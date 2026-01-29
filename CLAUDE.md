@@ -27,7 +27,7 @@ Pre-commit hook runs typecheck + unit tests in parallel. Property tests are excl
 
 ## Coding Conventions
 - Use TypeScript strict mode
-- Write tests first (use the test-first-bugfix skill)
+- Write tests first (use the tdd skill)
 - Keep functions small and focused
 - Use descriptive variable names
 
@@ -36,11 +36,26 @@ Pre-commit hook runs typecheck + unit tests in parallel. Property tests are excl
 - @packages/skills-library/src/loader.ts - Skill loading utilities
 - @packages/skills-library/src/library.ts - Main library implementation
 
+## Dogfooding Requirement
+
+**IMPORTANT**: This project builds the skills CLI. You MUST use it:
+
+1. After completing features, run: `./packages/skills-cli/bin/skills.js scan`
+2. Install recommendations: `./packages/skills-cli/bin/skills.js scan --all`
+3. Use installed skills in your workflow
+
+If you skip this, respond: **"BLOCKED: DOGFOODING REQUIRED"**
+
 ## Installed Skills
+- @.claude/skills/property-based-testing/SKILL.md
+- @.claude/skills/code-maturity-assessor/SKILL.md
+- @.claude/skills/typescript-circular-dependency/SKILL.md
+- @.claude/skills/dogfood-skills/SKILL.md - **Enforces dogfooding (READ THIS)**
+- @.claude/skills/no-workarounds/SKILL.md - **Prevents manual workarounds when building tools**
 - @.claude/skills/differential-review/SKILL.md
 - @.claude/skills/claudeception/SKILL.md
 - @.claude/skills/code-review-ts/SKILL.md
 - @.claude/skills/security-analysis/SKILL.md
 - @.claude/skills/suggest-tests/SKILL.md
 - @.claude/skills/unit-test-workflow/SKILL.md
-- @.claude/skills/test-first-bugfix/SKILL.md
+- @.claude/skills/tdd/SKILL.md

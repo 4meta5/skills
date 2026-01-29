@@ -6,7 +6,7 @@ import type { ProjectTemplate } from '../types.js';
 export const newTsProject: ProjectTemplate = {
   name: 'typescript-project',
   description: 'A new TypeScript project with testing and linting configured',
-  skills: ['test-first-bugfix'],
+  skills: ['tdd'],
   claudemd: `# Project
 
 ## Development Commands
@@ -16,7 +16,7 @@ export const newTsProject: ProjectTemplate = {
 
 ## Coding Conventions
 - Use TypeScript strict mode
-- Write tests first (use the test-first-bugfix skill)
+- Write tests first (use the tdd skill)
 - Keep functions small and focused
 - Use descriptive variable names
 `,

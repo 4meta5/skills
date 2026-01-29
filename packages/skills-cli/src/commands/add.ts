@@ -1,7 +1,7 @@
 import { createSkillsLibrary, loadSkillFromPath } from '@anthropic/skills-library';
 import type { Skill } from '@anthropic/skills-library';
 import { selectSkills } from '../interactive.js';
-import { getDefaults, trackInstalledSkill, getSource } from '../config.js';
+import { getDefaults, trackInstalledSkill, getSource, getSources, trackProjectInstallation } from '../config.js';
 import {
   parseGitUrl,
   extractSourceName,
@@ -11,7 +11,7 @@ import {
   getSkillPathInSource,
   getSourceCommit
 } from '../git.js';
-import { parseSkillRef, loadRemoteSkill } from '../registry.js';
+import { parseSkillRef, loadRemoteSkill, resolveSkillRef } from '../registry.js';
 import { join } from 'path';
 import { homedir } from 'os';
 
@@ -20,6 +20,7 @@ interface AddOptions {
   user?: boolean;
   git?: string;  // Git URL to install from
   ref?: string;  // Git ref (branch/tag/commit)
+  cwd?: string;  // Target project directory (defaults to process.cwd())
 }
 
 export async function addCommand(names: string[], options: AddOptions = {}): Promise<void> {
@@ -29,7 +30,8 @@ export async function addCommand(names: string[], options: AddOptions = {}): Pro
     return;
   }
 
-  const library = createSkillsLibrary();
+  const projectDir = options.cwd || process.cwd();
+  const library = createSkillsLibrary({ cwd: projectDir });
   const location = options.user ? 'user' : 'project';
 
   let skillNames: string[];
@@ -89,7 +91,7 @@ export async function addCommand(names: string[], options: AddOptions = {}): Pro
         // Copy skill to target directory
         const targetDir = location === 'user'
           ? join(homedir(), '.claude', 'skills')
-          : join(process.cwd(), '.claude', 'skills');
+          : join(projectDir, '.claude', 'skills');
 
         await copySkillFromSource(source, skillName, targetDir);
 
@@ -101,17 +103,67 @@ export async function addCommand(names: string[], options: AddOptions = {}): Pro
           ref: commit,
           installedAt: new Date().toISOString()
         });
+
+        // Track project installation (for project-level only)
+        if (location === 'project') {
+          await trackProjectInstallation(projectDir, skillName, 'skill');
+        }
       } else {
         // Try bundled/local first
-        skill = await library.loadSkill(skillName);
-        await library.installSkill(skill, { location });
+        let foundInBundled = false;
+        try {
+          skill = await library.loadSkill(skillName);
+          await library.installSkill(skill, { location });
+          foundInBundled = true;
 
-        // Track as bundled
-        await trackInstalledSkill({
-          name: skillName,
-          source: 'bundled',
-          installedAt: new Date().toISOString()
-        });
+          // Track as bundled
+          await trackInstalledSkill({
+            name: skillName,
+            source: 'bundled',
+            installedAt: new Date().toISOString()
+          });
+
+          // Track project installation (for project-level only)
+          if (location === 'project') {
+            await trackProjectInstallation(projectDir, skillName, 'skill');
+          }
+        } catch {
+          // Not found in bundled, search registered sources
+        }
+
+        if (!foundInBundled) {
+          const resolved = await resolveSkillRef(skillName);
+          if (resolved) {
+            // Found in a registered source
+            const source = await getSource(resolved.source);
+            if (source) {
+              const targetDir = location === 'user'
+                ? join(homedir(), '.claude', 'skills')
+                : join(projectDir, '.claude', 'skills');
+
+              await copySkillFromSource(source, skillName, targetDir);
+
+              const commit = await getSourceCommit(source);
+              await trackInstalledSkill({
+                name: skillName,
+                source: resolved.source,
+                ref: commit,
+                installedAt: new Date().toISOString()
+              });
+
+              // Track project installation (for project-level only)
+              if (location === 'project') {
+                await trackProjectInstallation(projectDir, skillName, 'skill');
+              }
+
+              console.log(`+ ${skillName} (from ${resolved.source})`);
+              installed++;
+              installedNames.push(skillName);
+              continue;
+            }
+          }
+          throw new Error('not found');
+        }
       }
 
       console.log(`+ ${skillName}${sourceName ? ` (from ${sourceName})` : ''}`);
@@ -196,11 +248,12 @@ async function installFromGitUrl(
   }
 
   // Install the skills
+  const projectDir = options.cwd || process.cwd();
   const targetDir = options.user
     ? join(homedir(), '.claude', 'skills')
-    : join(process.cwd(), '.claude', 'skills');
+    : join(projectDir, '.claude', 'skills');
 
-  const library = createSkillsLibrary();
+  const library = createSkillsLibrary({ cwd: projectDir });
   let installed = 0;
 
   for (const skillName of toInstall) {
