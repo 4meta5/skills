@@ -37,4 +37,10 @@ Pre-commit hook runs typecheck + unit tests in parallel. Property tests are excl
 - @packages/skills-library/src/library.ts - Main library implementation
 
 ## Installed Skills
+- @.claude/skills/differential-review/SKILL.md
+- @.claude/skills/claudeception/SKILL.md
+- @.claude/skills/code-review-ts/SKILL.md
+- @.claude/skills/security-analysis/SKILL.md
+- @.claude/skills/suggest-tests/SKILL.md
+- @.claude/skills/unit-test-workflow/SKILL.md
 - @.claude/skills/test-first-bugfix/SKILL.md

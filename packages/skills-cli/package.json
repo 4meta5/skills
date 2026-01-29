@@ -1,0 +1,42 @@
+{
+  "name": "@anthropic/skills-cli",
+  "version": "1.0.0",
+  "description": "CLI for managing Claude Code skills",
+  "type": "module",
+  "main": "dist/src/index.js",
+  "bin": {
+    "skills": "./bin/skills.js",
+    "sk": "./bin/skills.js"
+  },
+  "files": [
+    "dist",
+    "bin"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "claude",
+    "ai",
+    "skills",
+    "anthropic",
+    "cli"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@anthropic/skills-library": "*",
+    "cac": "^6.7.14",
+    "@inquirer/prompts": "^7.2.1",
+    "simple-git": "^3.22.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.0.0",
+    "vitest": "^1.0.0"
+  }
+}

@@ -1,6 +1,7 @@
 ---
 name: test-first-bugfix
 description: Enforces test-first bug fixing workflow. Use when fixing bugs to ensure regression tests exist before implementing fixes. Blocks progress until failing tests are written.
+category: testing
 disable-model-invocation: false
 user-invocable: true
 allowed-tools: Read, Grep, Glob, Bash, Write, Edit

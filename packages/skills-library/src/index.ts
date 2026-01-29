@@ -22,5 +22,20 @@ export * from './categories/index.js';
 export { newTsProject } from './templates/new-project.js';
 export { extendWithTesting, extendWithSecurity } from './templates/extend-project.js';
 
-// Bundled skills (re-exported from skills directory)
-export { testFirstBugfix, getBundledSkill, listBundledSkillNames } from '../skills/index.js';
+// Bundled skills
+export {
+  testFirstBugfix,
+  unitTestWorkflow,
+  suggestTests,
+  codeReview,
+  codeReviewTs,
+  codeReviewJs,
+  codeReviewRust,
+  prDescription,
+  refactorSuggestions,
+  securityAnalysis,
+  describeCodebase,
+  bundledSkills,
+  getBundledSkill,
+  listBundledSkillNames
+} from './bundled.js';

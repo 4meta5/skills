@@ -5,13 +5,17 @@
     "packages/*"
   ],
   "scripts": {
-    "build": "npm run build -w @anthropic/skills-library",
-    "test": "npm run test -w @anthropic/skills-library",
+    "build": "npm run build -w @anthropic/skills-library && npm run build -w @anthropic/skills-cli",
+    "build:lib": "npm run build -w @anthropic/skills-library",
+    "build:cli": "npm run build -w @anthropic/skills-cli",
+    "test": "npm run test -w @anthropic/skills-library && npm run test -w @anthropic/skills-cli",
     "test:property": "npm run test:property -w @anthropic/skills-library",
     "test:all": "npm run test:all -w @anthropic/skills-library",
     "lint": "npm run lint -w @anthropic/skills-library",
-    "typecheck": "npm run typecheck -w @anthropic/skills-library",
-    "prepare": "lefthook install"
+    "typecheck": "npm run typecheck -w @anthropic/skills-library && npm run typecheck -w @anthropic/skills-cli",
+    "prepare": "lefthook install",
+    "skills": "node packages/skills-cli/bin/skills.js",
+    "sk": "node packages/skills-cli/bin/skills.js"
   },
   "devDependencies": {
     "lefthook": "^2.0.16"

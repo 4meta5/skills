@@ -1,5 +1,6 @@
 import { mkdir, writeFile, copyFile, readFile } from 'fs/promises';
 import { join, dirname } from 'path';
+import { fileURLToPath } from 'url';
 import { homedir } from 'os';
 import type {
   Skill,
@@ -12,11 +13,17 @@ import type {
 } from './types.js';
 import { loadSkillFromPath, loadSkillsFromDirectory } from './loader.js';
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
 /**
  * Get the path to bundled skills in this package
+ * In development: packages/skills-library/skills
+ * In dist: packages/skills-library/skills (skills dir is at package root, not in dist)
  */
 function getBundledSkillsPath(): string {
-  return join(__dirname, '..', 'skills');
+  // __dirname is dist/src when compiled, so go up two levels to package root
+  return join(__dirname, '..', '..', 'skills');
 }
 
 /**
