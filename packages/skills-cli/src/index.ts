@@ -7,6 +7,7 @@ import { defaultsCommand } from './commands/defaults.js';
 import { initCommand } from './commands/init.js';
 import { sourceCommand } from './commands/source.js';
 import { updateCommand } from './commands/update.js';
+import { scanCommand } from './commands/scan.js';
 
 interface ListOptions {
   category?: string;
@@ -36,6 +37,14 @@ interface SourceOptions {
 interface UpdateOptions {
   check?: boolean;
   all?: boolean;
+}
+
+interface ScanOptions {
+  json?: boolean;
+  install?: boolean;
+  all?: boolean;
+  filter?: string;
+  minConfidence?: string;
 }
 
 const cli = cac('skills');
@@ -104,6 +113,17 @@ cli
   .option('-a, --all', 'Update all installed skills from sources')
   .action(async (names: string[], options: UpdateOptions) => {
     await updateCommand(names, options);
+  });
+
+cli
+  .command('scan', 'Analyze project and recommend skills')
+  .option('--json', 'Output as JSON')
+  .option('-i, --install', 'Interactively select and install skills')
+  .option('-a, --all', 'Install all recommended skills')
+  .option('-f, --filter <tag>', 'Filter recommendations by tag (e.g., svelte, cloudflare)')
+  .option('-m, --min-confidence <level>', 'Minimum confidence level (high, medium, low)')
+  .action(async (options: ScanOptions) => {
+    await scanCommand(options);
   });
 
 cli.help();

@@ -32,7 +32,8 @@
     "@anthropic/skills-library": "*",
     "cac": "^6.7.14",
     "@inquirer/prompts": "^7.2.1",
-    "simple-git": "^3.22.0"
+    "simple-git": "^3.22.0",
+    "yaml": "^2.3.0"
   },
   "devDependencies": {
     "@types/node": "^20.0.0",
