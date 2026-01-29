@@ -21,3 +21,7 @@ export type {
   CorrectiveLoopOptions,
   CorrectiveLoopResult,
 } from './corrective-loop.js';
+
+// Hookable middleware
+export { createHookableMiddleware, createEnhancedMiddleware } from './hooks.js';
+export type { HookFunctions, HookableMiddleware } from './hooks.js';

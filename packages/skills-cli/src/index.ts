@@ -14,6 +14,8 @@ import { syncCommand } from './commands/sync.js';
 import { projectsCommand } from './commands/projects.js';
 import { statsCommand } from './commands/stats.js';
 import { claudemdCommand } from './commands/claudemd.js';
+import { embedCommand } from './commands/embed.js';
+import { evaluateCommand } from './commands/evaluate.js';
 
 interface ListOptions {
   category?: string;
@@ -83,6 +85,19 @@ interface StatsOptions {
 }
 
 interface ClaudemdOptions {
+  cwd?: string;
+}
+
+interface EmbedOptions {
+  output?: string;
+  skillsDir?: string;
+  model?: string;
+  cwd?: string;
+}
+
+interface EvaluateCommandOptions {
+  skillsDir?: string;
+  json?: boolean;
   cwd?: string;
 }
 
@@ -224,6 +239,25 @@ cli
   .option('-C, --cwd <path>', 'Target project directory (default: current directory)')
   .action(async (subcommand: string | undefined, args: string[], options: ClaudemdOptions) => {
     await claudemdCommand(subcommand || 'list', args, options);
+  });
+
+cli
+  .command('embed', 'Generate vector store from installed skills')
+  .option('-o, --output <path>', 'Output path for vector_store.json')
+  .option('-s, --skills-dir <path>', 'Skills directory to scan')
+  .option('-m, --model <name>', 'Embedding model (default: Xenova/all-MiniLM-L6-v2)')
+  .option('-C, --cwd <path>', 'Working directory (default: current directory)')
+  .action(async (options: EmbedOptions) => {
+    await embedCommand(options);
+  });
+
+cli
+  .command('evaluate', 'Generate dynamic skill evaluation prompt')
+  .option('-s, --skills-dir <path>', 'Skills directory to scan')
+  .option('--json', 'Output as JSON')
+  .option('-C, --cwd <path>', 'Working directory (default: current directory)')
+  .action(async (options: EvaluateCommandOptions) => {
+    await evaluateCommand(options);
   });
 
 cli.help();

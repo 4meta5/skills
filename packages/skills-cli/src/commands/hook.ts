@@ -100,13 +100,39 @@ exit 0
 # Skill Forced Evaluation Hook - SOTA 3-Step Activation
 # Forces Claude to ACTIVATE skills via Skill() tool, not just evaluate them
 # Achieves ~84% skill activation vs ~20% baseline (per Scott Spence's research)
-
-# This hook intercepts UserPromptSubmit and forces actual skill activation
+#
+# This hook uses dynamic skill discovery via 'skills evaluate' command
+# to evaluate ALL installed skills, not just a hardcoded list.
 
 # Read the input JSON (contains the user's prompt)
 INPUT=$(cat)
 PROMPT=$(echo "$INPUT" | jq -r '.prompt // ""')
 
+# Try to find the skills CLI
+SKILLS_CLI=""
+for cmd in \\
+  "\${CLAUDE_PROJECT_DIR}/packages/skills-cli/bin/skills.js" \\
+  "\${CLAUDE_PROJECT_DIR}/node_modules/.bin/skills" \\
+  "$(which skills 2>/dev/null)" \\
+  "\${HOME}/.npm-global/bin/skills"
+do
+  if [ -x "$cmd" ] 2>/dev/null || [ -f "$cmd" ] 2>/dev/null; then
+    SKILLS_CLI="$cmd"
+    break
+  fi
+done
+
+# If skills CLI found, use dynamic evaluation
+if [ -n "$SKILLS_CLI" ]; then
+  # Run skills evaluate for dynamic skill list
+  if [[ "$SKILLS_CLI" == *.js ]]; then
+    node "$SKILLS_CLI" evaluate --cwd "\${CLAUDE_PROJECT_DIR:-.}" 2>/dev/null && exit 0
+  else
+    "$SKILLS_CLI" evaluate --cwd "\${CLAUDE_PROJECT_DIR:-.}" 2>/dev/null && exit 0
+  fi
+fi
+
+# Fallback to minimal hardcoded list if CLI not available
 cat << 'ACTIVATION_CONTEXT'
 
 ## MANDATORY SKILL ACTIVATION SEQUENCE
@@ -132,42 +158,11 @@ Only after Step 2 is complete, proceed with implementation.
 2. The evaluation (Step 1) is WORTHLESS unless you ACTIVATE (Step 2) the skills
 3. Do NOT skip to implementation without completing Step 2
 
-## Example of Correct Sequence:
-
-\`\`\`
-SKILL EVALUATION (Step 1):
-- tdd: YES - fixing a bug in the CLI
-- no-workarounds: YES - fixing CLI tool code
-- dogfood-skills: NO - not completing a feature yet
-
-ACTIVATING SKILLS (Step 2):
-[Calls Skill("tdd")]
-[Calls Skill("no-workarounds")]
-
-IMPLEMENTING (Step 3):
-[Now proceeds with implementation following both activated skills]
-\`\`\`
-
 ## BLOCKING CONDITIONS - NO EXCEPTIONS
 
 - If tdd = YES: You are BLOCKED until Phase 1 (RED) is complete - failing test required
 - If no-workarounds = YES: You are BLOCKED from manual workarounds
 - Skills CHAIN: If both tdd AND no-workarounds are YES, follow BOTH
-
-## NO EXCEPTIONS
-
-These rationalizations are REJECTED:
-- "It's a simple change" → BLOCKED. Write the test.
-- "Just this once" → BLOCKED. That's what you said last time.
-- "I'll add tests after" → BLOCKED. Tests after = not TDD.
-- "It's faster to do it manually" → BLOCKED. Fix the tool.
-- "The tool is mostly working" → BLOCKED. Mostly = broken.
-- "One-time migration" → BLOCKED. Build the feature.
-
-If you are unsure whether a skill applies, ASK THE USER:
-"Should I skip the [skill-name] skill for this task?"
-
-Only proceed without activation if user EXPLICITLY says yes.
 
 This activation sequence is MANDATORY. Skipping Step 2 violates project policy.
 
