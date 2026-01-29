@@ -1,4 +1,5 @@
 import { createSkillsLibrary, loadSkillFromPath } from '@anthropic/skills-library';
+import { updateClaudeMd } from '../claudemd.js';
 import type { Skill } from '@anthropic/skills-library';
 import { selectSkills } from '../interactive.js';
 import { getDefaults, trackInstalledSkill, getSource, getSources, trackProjectInstallation } from '../config.js';
@@ -180,11 +181,9 @@ export async function addCommand(names: string[], options: AddOptions = {}): Pro
 
     // Update CLAUDE.md if installing to project
     if (location === 'project') {
-      try {
-        await library.extendProject(installedNames);
+      const result = await updateClaudeMd(projectDir, 'add', installedNames);
+      if (result.success && result.added.length > 0) {
         console.log('Updated CLAUDE.md with skill references.');
-      } catch (error) {
-        // extendProject may fail if we couldn't install all skills
       }
     }
   }
@@ -281,11 +280,10 @@ async function installFromGitUrl(
 
     // Update CLAUDE.md if installing to project
     if (!options.user) {
-      try {
-        await library.extendProject(toInstall);
+      const projectDir = options.cwd || process.cwd();
+      const result = await updateClaudeMd(projectDir, 'add', toInstall);
+      if (result.success && result.added.length > 0) {
         console.log('Updated CLAUDE.md with skill references.');
-      } catch (error) {
-        // extendProject may fail
       }
     }
   }

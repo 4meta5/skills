@@ -3,6 +3,7 @@ import { stat } from 'fs/promises';
 import { join, resolve } from 'path';
 import { selectSkills, confirmAction } from '../interactive.js';
 import { getDefaults } from '../config.js';
+import { updateClaudeMd } from '../claudemd.js';
 
 interface InitOptions {
   defaults?: boolean;
@@ -71,12 +72,8 @@ export async function initCommand(path: string = '.', options: InitOptions = {})
       }
     }
 
-    // Extend project to update/create CLAUDE.md
-    try {
-      await library.extendProject(skillNames);
-    } catch {
-      // May fail if some skills weren't found
-    }
+    // Update CLAUDE.md with skill references
+    await updateClaudeMd(targetPath, 'add', skillNames);
   }
 
   console.log(`\nProject initialized at ${targetPath}`);

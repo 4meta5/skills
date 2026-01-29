@@ -19,6 +19,7 @@ import {
 } from '../git.js';
 import { join } from 'path';
 import { homedir } from 'os';
+import { updateClaudeMd } from '../claudemd.js';
 
 interface ScanOptions {
   json?: boolean;
@@ -28,10 +29,11 @@ interface ScanOptions {
   minConfidence?: string;
   showAlternatives?: boolean;  // Show deduplicated alternatives
   yes?: boolean;  // Skip confirmation prompts
+  cwd?: string;   // Target project directory
 }
 
 export async function scanCommand(options: ScanOptions = {}): Promise<void> {
-  const projectPath = process.cwd();
+  const projectPath = options.cwd || process.cwd();
 
   console.log('Analyzing project...\n');
 
@@ -362,7 +364,7 @@ async function installSkills(
   skills: SkillRecommendation[],
   analysis: ProjectAnalysis
 ): Promise<void> {
-  const targetDir = join(process.cwd(), '.claude', 'skills');
+  const targetDir = join(analysis.projectPath, '.claude', 'skills');
   const library = createSkillsLibrary({ cwd: analysis.projectPath });
   let installed = 0;
   const installedNames: string[] = [];
@@ -439,11 +441,9 @@ async function installSkills(
     console.log(`\nInstalled ${installed} skill(s) to .claude/skills`);
 
     // Update CLAUDE.md
-    try {
-      await library.extendProject(installedNames);
+    const result = await updateClaudeMd(analysis.projectPath, 'add', installedNames);
+    if (result.success && result.added.length > 0) {
       console.log('Updated CLAUDE.md with skill references.');
-    } catch {
-      // May fail if skills weren't found via library
     }
   }
 }

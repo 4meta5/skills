@@ -94,5 +94,56 @@ describe('add command', () => {
       expect(installation?.skills).toContain('tdd');
       expect(installation?.skills).toContain('no-workarounds');
     });
+
+    it('should not duplicate skill references when adding same skill twice', async () => {
+      const { addCommand } = await import('./add.js');
+
+      await mkdir(join(targetDir, '.claude', 'skills'), { recursive: true });
+      await writeFile(join(targetDir, 'CLAUDE.md'), '# Test Project\n\n## Installed Skills\n');
+
+      // Add same skill twice
+      await addCommand(['tdd'], { cwd: targetDir });
+      await addCommand(['tdd'], { cwd: targetDir });
+
+      // Read CLAUDE.md and count references
+      const content = await readFile(join(targetDir, 'CLAUDE.md'), 'utf-8');
+      const matches = content.match(/@\.claude\/skills\/tdd\/SKILL\.md/g);
+
+      // Should only have ONE reference, not two
+      expect(matches?.length).toBe(1);
+    });
+
+    it('should preserve user content when updating CLAUDE.md', async () => {
+      const { addCommand } = await import('./add.js');
+
+      await mkdir(join(targetDir, '.claude', 'skills'), { recursive: true });
+      await writeFile(
+        join(targetDir, 'CLAUDE.md'),
+        `# My Custom Project
+
+This is my custom intro that should not be modified.
+
+## Custom Commands
+- npm run my-custom-command
+
+## Installed Skills
+- @.claude/skills/existing-skill/SKILL.md
+
+## Additional Notes
+These notes should also remain.
+`,
+        'utf-8'
+      );
+
+      // Add a skill
+      await addCommand(['tdd'], { cwd: targetDir });
+
+      const content = await readFile(join(targetDir, 'CLAUDE.md'), 'utf-8');
+
+      // User content should be preserved
+      expect(content).toContain('This is my custom intro');
+      expect(content).toContain('npm run my-custom-command');
+      expect(content).toContain('These notes should also remain');
+    });
   });
 });

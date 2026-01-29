@@ -12,6 +12,8 @@ import { hookCommand } from './commands/hook.js';
 import { removeCommand } from './commands/remove.js';
 import { syncCommand } from './commands/sync.js';
 import { projectsCommand } from './commands/projects.js';
+import { statsCommand } from './commands/stats.js';
+import { claudemdCommand } from './commands/claudemd.js';
 
 interface ListOptions {
   category?: string;
@@ -71,6 +73,16 @@ interface SyncOptions {
 interface ProjectsOptions {
   skill?: string;
   json?: boolean;
+  cwd?: string;
+}
+
+interface StatsOptions {
+  json?: boolean;
+  since?: string;
+  skill?: string;
+}
+
+interface ClaudemdOptions {
   cwd?: string;
 }
 
@@ -153,6 +165,7 @@ cli
 
 cli
   .command('scan', 'Analyze project and recommend skills')
+  .option('-C, --cwd <path>', 'Target project directory (default: current directory)')
   .option('--json', 'Output as JSON')
   .option('-i, --install', 'Interactively select and install skills')
   .option('-a, --all', 'Install all recommended skills')
@@ -195,6 +208,22 @@ cli
       args,
       options
     );
+  });
+
+cli
+  .command('stats', 'Show skill usage statistics')
+  .option('--json', 'Output as JSON')
+  .option('-s, --since <date>', 'Filter events since date (ISO format or "7d" for 7 days ago)')
+  .option('--skill <name>', 'Filter by skill name')
+  .action(async (options: StatsOptions) => {
+    await statsCommand(options);
+  });
+
+cli
+  .command('claudemd [subcommand] [...args]', 'Manage CLAUDE.md skill references')
+  .option('-C, --cwd <path>', 'Target project directory (default: current directory)')
+  .action(async (subcommand: string | undefined, args: string[], options: ClaudemdOptions) => {
+    await claudemdCommand(subcommand || 'list', args, options);
   });
 
 cli.help();
