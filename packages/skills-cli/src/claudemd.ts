@@ -5,8 +5,9 @@
  * for automated skill reference management.
  */
 
-import { readFile, writeFile, readdir } from 'fs/promises';
+import { readdir } from 'fs/promises';
 import { join } from 'path';
+import { readMarkdownFile, writeMarkdownFile } from './shared/markdown.js';
 
 /**
  * Result of parsing a CLAUDE.md file
@@ -297,7 +298,7 @@ export async function updateClaudeMd(
     // Read existing content or start with empty
     let content = '';
     try {
-      content = await readFile(claudeMdPath, 'utf-8');
+      content = await readMarkdownFile(claudeMdPath);
     } catch {
       // File doesn't exist, that's OK
     }
@@ -332,7 +333,7 @@ export async function updateClaudeMd(
 
     // Write updated content
     if (result.success && (result.added.length > 0 || result.removed.length > 0)) {
-      await writeFile(claudeMdPath, result.content, 'utf-8');
+      await writeMarkdownFile(claudeMdPath, result.content);
     }
 
     return result;
@@ -361,7 +362,7 @@ async function discoverInstalledSkills(projectDir: string): Promise<string[]> {
       if (entry.isDirectory()) {
         // Check if it has a SKILL.md
         try {
-          await readFile(join(skillsDir, entry.name, 'SKILL.md'), 'utf-8');
+          await readMarkdownFile(join(skillsDir, entry.name, 'SKILL.md'));
           skills.push(entry.name);
         } catch {
           // Not a valid skill directory

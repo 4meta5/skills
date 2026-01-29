@@ -32,7 +32,10 @@ export async function addCommand(names: string[], options: AddOptions = {}): Pro
   }
 
   const projectDir = options.cwd || process.cwd();
-  const library = createSkillsLibrary({ cwd: projectDir });
+  // Use sourceDir (cwd) to FIND skills, projectDir to INSTALL them
+  const sourceDir = process.cwd();
+  const sourceLibrary = createSkillsLibrary({ cwd: sourceDir });
+  const targetLibrary = createSkillsLibrary({ cwd: projectDir });
   const location = options.user ? 'user' : 'project';
 
   let skillNames: string[];
@@ -47,8 +50,8 @@ export async function addCommand(names: string[], options: AddOptions = {}): Pro
     }
     console.log(`Using default skills: ${skillNames.join(', ')}`);
   } else if (names.length === 0) {
-    // Interactive mode
-    const allSkills = await library.listSkills();
+    // Interactive mode - list skills from SOURCE directory
+    const allSkills = await sourceLibrary.listSkills();
     if (allSkills.length === 0) {
       console.log('No skills available to add.');
       return;
@@ -110,11 +113,11 @@ export async function addCommand(names: string[], options: AddOptions = {}): Pro
           await trackProjectInstallation(projectDir, skillName, 'skill');
         }
       } else {
-        // Try bundled/local first
+        // Try bundled/local first - load from SOURCE, install to TARGET
         let foundInBundled = false;
         try {
-          skill = await library.loadSkill(skillName);
-          await library.installSkill(skill, { location });
+          skill = await sourceLibrary.loadSkill(skillName);
+          await targetLibrary.installSkill(skill, { location });
           foundInBundled = true;
 
           // Track as bundled

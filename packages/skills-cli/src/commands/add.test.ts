@@ -145,5 +145,62 @@ These notes should also remain.
       expect(content).toContain('npm run my-custom-command');
       expect(content).toContain('These notes should also remain');
     });
+
+    it('should install skill from source project to target project when skill only exists in source', async () => {
+      // BUG: When using -C to install to a different directory,
+      // the add command looks for skills in the TARGET directory instead of the SOURCE.
+      // This means skills that exist in the current project but not in the target
+      // will fail to be found.
+
+      const { addCommand } = await import('./add.js');
+
+      // Create a "source" project with a skill
+      const sourceDir = await mkdtemp(join(tmpdir(), 'skills-source-'));
+      try {
+        await mkdir(join(sourceDir, '.claude', 'skills', 'my-local-skill'), { recursive: true });
+        await writeFile(
+          join(sourceDir, '.claude', 'skills', 'my-local-skill', 'SKILL.md'),
+          `---
+name: my-local-skill
+description: A skill that only exists in the source project
+category: testing
+---
+
+# My Local Skill
+
+This skill only exists in the source project.
+`,
+          'utf-8'
+        );
+
+        // Create target project structure
+        await mkdir(join(targetDir, '.claude', 'skills'), { recursive: true });
+        await writeFile(join(targetDir, 'CLAUDE.md'), '# Target Project\n\n## Installed Skills\n');
+
+        // Change to source directory and install to target
+        const originalCwd = process.cwd();
+        process.chdir(sourceDir);
+        try {
+          await addCommand(['my-local-skill'], { cwd: targetDir });
+
+          // The skill should be installed to targetDir
+          const targetSkillsDir = join(targetDir, '.claude', 'skills');
+          const installed = await readdir(targetSkillsDir);
+
+          expect(installed).toContain('my-local-skill');
+
+          // Verify the skill content was copied
+          const skillContent = await readFile(
+            join(targetSkillsDir, 'my-local-skill', 'SKILL.md'),
+            'utf-8'
+          );
+          expect(skillContent).toContain('A skill that only exists in the source project');
+        } finally {
+          process.chdir(originalCwd);
+        }
+      } finally {
+        await rm(sourceDir, { recursive: true, force: true });
+      }
+    });
   });
 });
