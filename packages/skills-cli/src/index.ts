@@ -16,6 +16,9 @@ import { statsCommand } from './commands/stats.js';
 import { claudemdCommand } from './commands/claudemd.js';
 import { embedCommand } from './commands/embed.js';
 import { evaluateCommand } from './commands/evaluate.js';
+import { validateCommand } from './commands/validate.js';
+import { hygieneCommand } from './commands/hygiene.js';
+import { migrateCommand } from './commands/migrate.js';
 
 interface ListOptions {
   category?: string;
@@ -46,6 +49,8 @@ interface SourceOptions {
 interface UpdateOptions {
   check?: boolean;
   all?: boolean;
+  review?: boolean;
+  yes?: boolean;
 }
 
 interface ScanOptions {
@@ -99,6 +104,27 @@ interface EvaluateCommandOptions {
   skillsDir?: string;
   json?: boolean;
   cwd?: string;
+}
+
+interface ValidateCommandOptions {
+  cwd?: string;
+  path?: string;
+  json?: boolean;
+}
+
+interface HygieneCommandOptions {
+  cwd?: string;
+  dryRun?: boolean;
+  confirm?: boolean;
+  json?: boolean;
+  recursive?: boolean;
+}
+
+interface MigrateCommandOptions {
+  cwd?: string;
+  dryRun?: boolean;
+  confirm?: boolean;
+  json?: boolean;
 }
 
 const cli = cac('skills');
@@ -174,6 +200,8 @@ cli
   .command('update [...names]', 'Update skills from sources')
   .option('-c, --check', 'Check for updates without applying')
   .option('-a, --all', 'Update all installed skills from sources')
+  .option('-r, --review', 'Review changes before applying (security review)')
+  .option('-y, --yes', 'Auto-confirm even HIGH risk updates (use with --review)')
   .action(async (names: string[], options: UpdateOptions) => {
     await updateCommand(names, options);
   });
@@ -258,6 +286,38 @@ cli
   .option('-C, --cwd <path>', 'Working directory (default: current directory)')
   .action(async (options: EvaluateCommandOptions) => {
     await evaluateCommand(options);
+  });
+
+cli
+  .command('validate [path]', 'Validate installed skills')
+  .option('-C, --cwd <path>', 'Target project directory (default: current directory)')
+  .option('--json', 'Output as JSON')
+  .action(async (path: string | undefined, options: ValidateCommandOptions) => {
+    await validateCommand({ ...options, path });
+  });
+
+cli
+  .command('hygiene [subcommand]', 'Detect and clean slop (auto-generated test skills)')
+  .option('-C, --cwd <path>', 'Target project directory (default: current directory)')
+  .option('-d, --dry-run', 'Show what would be deleted without deleting')
+  .option('--confirm', 'Actually delete slop (required for clean)')
+  .option('--json', 'Output as JSON')
+  .option('-r, --recursive', 'Scan package subdirectories')
+  .action(async (subcommand: string | undefined, options: HygieneCommandOptions) => {
+    await hygieneCommand(
+      (subcommand as 'scan' | 'clean') || 'scan',
+      options
+    );
+  });
+
+cli
+  .command('migrate', 'Migrate skills to custom/upstream directory structure')
+  .option('-C, --cwd <path>', 'Target project directory (default: current directory)')
+  .option('-d, --dry-run', 'Show what would be migrated without changes')
+  .option('--confirm', 'Actually migrate skills')
+  .option('--json', 'Output as JSON')
+  .action(async (options: MigrateCommandOptions) => {
+    await migrateCommand(options);
   });
 
 cli.help();
