@@ -83,28 +83,42 @@ export async function loadSkillFromPath(skillPath: string): Promise<Skill> {
 }
 
 /**
- * Load all skills from a directory containing skill folders
+ * Load all skills from a directory containing skill folders.
+ * Recursively searches up to maxDepth levels for nested skill bundles.
  */
-export async function loadSkillsFromDirectory(skillsDir: string): Promise<Skill[]> {
+export async function loadSkillsFromDirectory(
+  skillsDir: string,
+  maxDepth: number = 4
+): Promise<Skill[]> {
   const skills: Skill[] = [];
 
-  try {
-    const entries = await readdir(skillsDir, { withFileTypes: true });
+  async function searchDirectory(dir: string, depth: number): Promise<void> {
+    if (depth > maxDepth) return;
 
-    for (const entry of entries) {
-      if (entry.isDirectory()) {
-        const skillPath = join(skillsDir, entry.name);
-        try {
-          const skill = await loadSkillFromPath(skillPath);
-          skills.push(skill);
-        } catch {
-          // Skip invalid skill directories
+    try {
+      const entries = await readdir(dir, { withFileTypes: true });
+
+      for (const entry of entries) {
+        if (entry.isDirectory()) {
+          const dirPath = join(dir, entry.name);
+
+          // Try to load skill from this directory
+          try {
+            const skill = await loadSkillFromPath(dirPath);
+            skills.push(skill);
+          } catch {
+            // Not a skill directory, continue
+          }
+
+          // Recursively search subdirectories for nested skills
+          await searchDirectory(dirPath, depth + 1);
         }
       }
+    } catch {
+      // Directory may not exist or be unreadable
     }
-  } catch {
-    // Skills directory may not exist
   }
 
+  await searchDirectory(skillsDir, 0);
   return skills;
 }

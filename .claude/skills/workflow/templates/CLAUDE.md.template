@@ -1,0 +1,58 @@
+# Project: {{project_name}}
+
+## Commands
+
+```bash
+npm run dev       # Start development server
+npm test          # Run tests
+npm run build     # Build for production
+npm run lint      # Lint code
+npm run typecheck # Type checking
+```
+
+## Code Style
+
+- {{language}} with strict mode
+- Tests required for new features (TDD workflow)
+- No workarounds for tool bugs (fix the tool)
+- Short functions, descriptive names
+- Document non-obvious code
+
+## Project Structure
+
+```
+{{project_structure}}
+```
+
+## Protected Files
+
+Never read or modify these files:
+- .env
+- .env.local
+- credentials.json
+- *.pem
+- *.key
+
+## Git Policy
+
+- Never push to remote (user handles pushes)
+- Commit after completing tasks
+- Use conventional commit messages
+
+## Skills
+
+Installed skills for this project:
+
+{{#each skills}}
+- @.claude/skills/{{this}}/SKILL.md
+{{/each}}
+
+## Testing
+
+- Run `npm test` before committing
+- Use TDD: RED then GREEN then REFACTOR
+- Property tests for serialization and pure functions
+
+## Notes
+
+{{notes}}

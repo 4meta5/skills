@@ -1,0 +1,54 @@
+# Agent Coordination
+
+## Current Task
+
+{{task_description}}
+
+## Active Agents
+
+| ID | Task | Status | Started | Output |
+|----|------|--------|---------|--------|
+{{#each active_agents}}
+| {{this.id}} | {{this.task}} | {{this.status}} | {{this.started}} | {{this.output}} |
+{{/each}}
+
+## Context Handoff
+
+{{#each handoffs}}
+### From {{this.from}} to {{this.to}}
+
+**Discovered:** {{this.discovery}}
+
+**Next steps:** {{this.next_steps}}
+{{/each}}
+
+## Dependencies
+
+```
+{{dependency_graph}}
+```
+
+## Completed Agents
+
+{{#each completed_agents}}
+### Agent {{this.id}}: {{this.task}}
+
+**Status:** {{this.status}}
+**Duration:** {{this.duration}}
+
+**Results:**
+{{this.results}}
+
+**Files modified:**
+{{#each this.files}}
+- {{this}}
+{{/each}}
+{{/each}}
+
+## Coordination Notes
+
+{{notes}}
+
+## Last Updated
+
+{{date}}

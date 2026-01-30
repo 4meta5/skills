@@ -1,0 +1,70 @@
+# {{project_name}}
+
+{{description}}
+
+## Quick Start
+
+```bash
+# Install dependencies
+npm install
+
+# Start development
+npm run dev
+
+# Run tests
+npm test
+```
+
+## Features
+
+{{#each features}}
+- {{this}}
+{{/each}}
+
+## Installation
+
+```bash
+npm install {{package_name}}
+```
+
+## Usage
+
+```{{language}}
+{{usage_example}}
+```
+
+## API Reference
+
+{{api_reference}}
+
+## Development
+
+### Prerequisites
+
+- Node.js 20+
+- npm 10+
+
+### Setup
+
+```bash
+git clone {{repo_url}}
+cd {{project_name}}
+npm install
+```
+
+### Commands
+
+| Command | Description |
+|---------|-------------|
+| `npm run dev` | Start development server |
+| `npm test` | Run tests |
+| `npm run build` | Build for production |
+| `npm run lint` | Lint code |
+
+## Contributing
+
+See [CONTRIBUTING.md](./CONTRIBUTING.md) for guidelines.
+
+## License
+
+{{license}}

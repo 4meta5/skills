@@ -224,4 +224,42 @@ Content`);
     const skills = await loadSkillsFromDirectory('/non/existent/path');
     expect(skills).toEqual([]);
   });
+
+  it('discovers nested skills in subdirectories', async () => {
+    // Create parent skill
+    await mkdir(join(tempDir, 'parent-skill'));
+    await writeFile(join(tempDir, 'parent-skill', 'SKILL.md'), `---
+name: parent-skill
+description: Parent skill with nested skills
+---
+
+Content`);
+
+    // Create nested skill bundle directory
+    await mkdir(join(tempDir, 'parent-skill', 'skills', 'child-skill-one'), { recursive: true });
+    await writeFile(join(tempDir, 'parent-skill', 'skills', 'child-skill-one', 'SKILL.md'), `---
+name: child-skill-one
+description: First nested skill
+---
+
+Content 1`);
+
+    // Create another nested skill
+    await mkdir(join(tempDir, 'parent-skill', 'skills', 'child-skill-two'), { recursive: true });
+    await writeFile(join(tempDir, 'parent-skill', 'skills', 'child-skill-two', 'SKILL.md'), `---
+name: child-skill-two
+description: Second nested skill
+---
+
+Content 2`);
+
+    const skills = await loadSkillsFromDirectory(tempDir);
+
+    // Should find parent AND both children
+    expect(skills).toHaveLength(3);
+    const names = skills.map((s: { metadata: { name: string } }) => s.metadata.name);
+    expect(names).toContain('parent-skill');
+    expect(names).toContain('child-skill-one');
+    expect(names).toContain('child-skill-two');
+  });
 });

@@ -74,15 +74,61 @@ LOW    aws-cdk                AWS CDK patterns (detected: cloudflare)
 
 Skills activate based on context, not manual invocation. The router scores your prompt against skill descriptions and triggers the right one.
 
-### Bundled Skills
+## Bundled Skills
 
-| Category | Skills |
-|----------|--------|
-| Testing | tdd, unit-test-workflow, suggest-tests, property-based-testing |
-| Development | no-workarounds, code-review, code-review-ts |
-| Security | security-analysis, differential-review |
-| Documentation | markdown-writer |
-| Learning | claudeception |
+### Testing & Quality
+
+| Skill | Description |
+|-------|-------------|
+| tdd | Test-driven development workflow (RED/GREEN/REFACTOR) |
+| unit-test-workflow | Multi-phase test generation |
+| suggest-tests | Recommend tests based on git diff |
+| property-based-testing | Property and invariant testing guidance |
+
+### Development Workflow
+
+| Skill | Description |
+|-------|-------------|
+| no-workarounds | Prevents manual workarounds when building tools |
+| dogfood-skills | Enforces using the tools you build |
+| claudeception | Extracts learnings into new skills |
+| typescript-circular-dependency | Detect and resolve circular imports |
+
+### Code Review & Security
+
+| Skill | Description |
+|-------|-------------|
+| code-review-ts | TypeScript-specific review guidelines |
+| security-analysis | Static security review for PRs |
+| differential-review | Security-focused diff analysis |
+| code-maturity-assessor | Trail of Bits maturity framework |
+
+### Documentation
+
+| Skill | Description |
+|-------|-------------|
+| markdown-writer | Consistent markdown style (Paul Graham voice) |
+| blog-writer | Blog post creation for amarsingh.dev |
+
+### Frontend & UI
+
+| Skill | Description |
+|-------|-------------|
+| frontend-design | Distinctive, production-grade UI creation |
+| baseline-ui | Enforces opinionated UI baseline |
+| web-design-guidelines | Review against Web Interface Guidelines |
+| fixing-accessibility | Fix accessibility issues |
+| fixing-motion-performance | Fix animation performance issues |
+
+### Svelte & SvelteKit
+
+| Skill | Description |
+|-------|-------------|
+| svelte-runes | Svelte 5 runes guidance ($state, $derived, $effect) |
+| sveltekit-structure | File-based routing, layouts, error handling |
+| sveltekit-data-flow | Load functions, form actions, data flow |
+| _temp_claude-svelte5-skill | Comprehensive Svelte 5 reference |
+| _temp_sveltekit-svelte5-tailwind-skill | SvelteKit + Svelte 5 + Tailwind v4 integration |
 
 ## CLI Reference
 
@@ -90,6 +136,7 @@ Skills activate based on context, not manual invocation. The router scores your 
 |---------|-------------|
 | `scan` | Analyze project, recommend skills |
 | `scan --all` | Install all high-confidence recommendations |
+| `scan --show-alternatives` | Show all matches, not just top per category |
 | `add <name>` | Install a skill by name |
 | `add <name> from <source>` | Install from a specific source |
 | `list` | List installed skills |
@@ -125,6 +172,16 @@ Step-by-step guidance...
 ```
 
 See [SKILL_FORMAT.md](./docs/SKILL_FORMAT.md) for the full specification.
+
+## Packages
+
+This monorepo contains:
+
+| Package | Description |
+|---------|-------------|
+| `@4meta5/skills-cli` | CLI for scanning, installing, and managing skills |
+| `@4meta5/skills-library` | Core library for loading and parsing skills |
+| `@4meta5/skills-web` | Website for browsing and discovering skills |
 
 ## Contributing
 
