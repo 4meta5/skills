@@ -85,6 +85,35 @@ LOW    aws-cdk                AWS CDK patterns (detected: cloudflare)
 
 Skills activate based on context, not manual invocation. The router scores your prompt against skill descriptions and triggers the right one.
 
+### Skill Chaining
+
+Skills chain together automatically. When one skill completes, it triggers the next in the pipeline.
+
+**Testing Pipeline:**
+```
+tdd → suggest-tests → unit-test-workflow → property-based-testing → repo-hygiene
+```
+
+The TDD skill enforces RED/GREEN/REFACTOR phases. After you reach the REFACTOR phase, suggest-tests analyzes your changes for gaps. Then unit-test-workflow generates comprehensive tests. Property-based testing adds invariant checks. Finally, repo-hygiene cleans up test artifacts.
+
+**Feature Completion Chain:**
+```
+dogfood-skills → repo-hygiene → doc-maintenance
+```
+
+When you finish a feature, dogfood-skills runs `skills scan` to check for recommendations. Repo-hygiene cleans generated slop. Doc-maintenance updates PLAN.md to mark tasks complete.
+
+**Bug Fix Chain:**
+```
+tdd + no-workarounds → doc-maintenance
+```
+
+Bug fixes require TDD. The no-workarounds skill blocks manual fixes when you're building tools. After the fix, doc-maintenance updates documentation.
+
+**How Chaining Works:**
+
+Each skill defines what it chains to in its SKILL.md. The workflow-orchestrator skill detects context and activates the appropriate chain. Skills like repo-hygiene are terminal in testing flows but chain to doc-maintenance in feature flows.
+
 ## How Skills Get Activated
 
 Skills don't activate by magic. They need hooks.

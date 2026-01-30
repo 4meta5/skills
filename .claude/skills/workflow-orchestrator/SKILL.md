@@ -45,6 +45,11 @@ task complete → doc-maintenance → repo-hygiene
 bug detected → tdd (RED) → tdd (GREEN) → tdd (REFACTOR) → doc-maintenance
 ```
 
+### Feature Completion Flow
+```
+feature done → dogfood-skills → repo-hygiene → doc-maintenance
+```
+
 ### Feature Development Flow
 ```
 research-to-plan → tdd → doc-maintenance → dogfood-skills → repo-hygiene
@@ -78,7 +83,7 @@ The orchestrator detects context from:
 | suggest-tests | After tdd | unit-test-workflow |
 | unit-test-workflow | Test generation | property-based-testing |
 | property-based-testing | Serialization patterns | repo-hygiene |
-| repo-hygiene | Session end, cleanup | (terminal) |
+| repo-hygiene | Session end, cleanup | doc-maintenance (feature flows) |
 
 ## Standard Project Structure
 

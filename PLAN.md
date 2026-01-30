@@ -20,7 +20,7 @@
 ## Backlog
 
 ### Skills CLI Enhancements
-- [ ] Add skill validation command
+- [x] Add skill validation command
 - [ ] Add skill update command for version bumps
 - [ ] Improve semantic matching accuracy
 - [ ] Add skill dependency resolution

@@ -109,5 +109,5 @@ The **workflow-orchestrator** skill is always active. It detects context and cha
 | New project | project-init → dogfood-skills |
 | Task completion | doc-maintenance → repo-hygiene |
 | Testing | tdd → suggest-tests → unit-test-workflow → property-based-testing → repo-hygiene |
-| Feature done | dogfood-skills → repo-hygiene |
+| Feature done | dogfood-skills → repo-hygiene → doc-maintenance |
 | Bug fix | tdd + no-workarounds → doc-maintenance |

@@ -168,3 +168,13 @@ tdd → suggest-tests → unit-test-workflow → property-based-testing → repo
 ```
 
 All testing workflows should end with repo-hygiene to ensure clean state.
+
+### Feature Completion Flow
+
+In feature completion contexts, repo-hygiene chains to doc-maintenance:
+
+```
+feature done → dogfood-skills → repo-hygiene → doc-maintenance
+```
+
+After cleanup, doc-maintenance updates PLAN.md to mark tasks complete.
