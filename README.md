@@ -13,7 +13,7 @@ Manage Claude Code skills from the command line.
 1. Scans your project, recommends skills
 2. Installs skills to `.claude/skills/`
 3. Routes prompts to relevant skills
-4. Tracks skill usage
+4. Enforces workflow skills (tdd, no-workarounds)
 
 ## Quick Start
 
@@ -26,9 +26,9 @@ skills stats        # Check usage
 
 ## Documentation
 
-- [DONE.md](./DONE.md) - What's implemented (392 tests passing)
+- [DONE.md](./DONE.md) - What's implemented (732 tests)
 - [RESEARCH.md](./RESEARCH.md) - Architecture research
-- [PLAN.md](./PLAN.md) - Roadmap
+- [PLAN.md](./PLAN.md) - Remaining work
 
 ## Development
 

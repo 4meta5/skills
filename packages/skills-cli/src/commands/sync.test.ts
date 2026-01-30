@@ -211,4 +211,289 @@ NEW content with improvements!
       expect(contentB).toContain('NEW content with improvements!');
     });
   });
+
+  describe('syncCommand with --push', () => {
+    it('should install skill to projects that do not have it when using --push', async () => {
+      const { syncCommand } = await import('./sync.js');
+
+      // Create a third project WITHOUT the skill
+      const projectC = await mkdtemp(join(tmpdir(), 'skills-sync-project-c-'));
+      await mkdir(join(projectC, '.claude', 'skills'), { recursive: true });
+
+      // Track projectC with a different skill so it appears in tracked projects
+      const otherSkillName = `other-skill-${Date.now()}`;
+      await mkdir(join(projectC, '.claude', 'skills', otherSkillName), { recursive: true });
+      await writeFile(
+        join(projectC, '.claude', 'skills', otherSkillName, 'SKILL.md'),
+        `---\nname: ${otherSkillName}\ndescription: Another skill\n---\n\n# Other`,
+        'utf-8'
+      );
+      await trackProjectInstallation(projectC, otherSkillName, 'skill');
+
+      // Create source directory with the skill to push
+      const sourceDir = await mkdtemp(join(tmpdir(), 'skills-source-'));
+      await mkdir(join(sourceDir, '.claude', 'skills', testSkillName), { recursive: true });
+      await writeFile(
+        join(sourceDir, '.claude', 'skills', testSkillName, 'SKILL.md'),
+        sourceSkillContent,
+        'utf-8'
+      );
+
+      try {
+        // Sync with --push should install to projectC even though it doesn't have the skill
+        await syncCommand([testSkillName], { cwd: sourceDir, push: true });
+
+        // Verify projectC now has the skill
+        const contentC = await readFile(
+          join(projectC, '.claude', 'skills', testSkillName, 'SKILL.md'),
+          'utf-8'
+        );
+        expect(contentC).toContain('NEW content with improvements!');
+
+        // Verify skill is tracked in projectC
+        const installation = await getProjectInstallation(projectC);
+        expect(installation?.skills).toContain(testSkillName);
+      } finally {
+        await untrackProjectInstallation(projectC, otherSkillName, 'skill');
+        await untrackProjectInstallation(projectC, testSkillName, 'skill');
+        await rm(projectC, { recursive: true, force: true });
+        await rm(sourceDir, { recursive: true, force: true });
+      }
+    });
+
+    it('should respect existing skills in target project when using --push', async () => {
+      const { syncCommand } = await import('./sync.js');
+
+      // projectA already has testSkillName, so --push should update it, not duplicate
+      const sourceDir = await mkdtemp(join(tmpdir(), 'skills-source-'));
+      await mkdir(join(sourceDir, '.claude', 'skills', testSkillName), { recursive: true });
+      await writeFile(
+        join(sourceDir, '.claude', 'skills', testSkillName, 'SKILL.md'),
+        sourceSkillContent,
+        'utf-8'
+      );
+
+      try {
+        // Get initial skill count for projectA
+        const initialInstallation = await getProjectInstallation(projectA);
+        const initialSkillCount = initialInstallation?.skills.length || 0;
+
+        // Sync with --push
+        await syncCommand([testSkillName], { cwd: sourceDir, push: true });
+
+        // Verify content was updated
+        const contentA = await readFile(
+          join(projectA, '.claude', 'skills', testSkillName, 'SKILL.md'),
+          'utf-8'
+        );
+        expect(contentA).toContain('NEW content with improvements!');
+
+        // Verify skill count hasn't increased (no duplicates)
+        const updatedInstallation = await getProjectInstallation(projectA);
+        expect(updatedInstallation?.skills.filter(s => s === testSkillName).length).toBe(1);
+      } finally {
+        await rm(sourceDir, { recursive: true, force: true });
+      }
+    });
+
+    it('should update CLAUDE.md in target project when using --push', async () => {
+      const { syncCommand } = await import('./sync.js');
+
+      // Create a project without the skill and with a CLAUDE.md
+      const projectD = await mkdtemp(join(tmpdir(), 'skills-sync-project-d-'));
+      await mkdir(join(projectD, '.claude', 'skills'), { recursive: true });
+
+      // Create initial CLAUDE.md
+      const initialClaudeMd = `# Project D
+
+Some project documentation.
+
+## Installed Skills
+- @.claude/skills/existing-skill/SKILL.md
+`;
+      await writeFile(join(projectD, 'CLAUDE.md'), initialClaudeMd, 'utf-8');
+
+      // Track projectD with a placeholder skill so it appears in tracked projects
+      const placeholderSkill = `placeholder-${Date.now()}`;
+      await mkdir(join(projectD, '.claude', 'skills', placeholderSkill), { recursive: true });
+      await writeFile(
+        join(projectD, '.claude', 'skills', placeholderSkill, 'SKILL.md'),
+        `---\nname: ${placeholderSkill}\ndescription: Placeholder\n---\n\n# Placeholder`,
+        'utf-8'
+      );
+      await trackProjectInstallation(projectD, placeholderSkill, 'skill');
+
+      // Create source with the skill to push
+      const sourceDir = await mkdtemp(join(tmpdir(), 'skills-source-'));
+      await mkdir(join(sourceDir, '.claude', 'skills', testSkillName), { recursive: true });
+      await writeFile(
+        join(sourceDir, '.claude', 'skills', testSkillName, 'SKILL.md'),
+        sourceSkillContent,
+        'utf-8'
+      );
+
+      try {
+        // Push the skill to projectD
+        await syncCommand([testSkillName], { cwd: sourceDir, push: true });
+
+        // Verify CLAUDE.md was updated with the new skill reference
+        const updatedClaudeMd = await readFile(join(projectD, 'CLAUDE.md'), 'utf-8');
+        expect(updatedClaudeMd).toContain(`@.claude/skills/${testSkillName}/SKILL.md`);
+        // Should still have the existing skill
+        expect(updatedClaudeMd).toContain('@.claude/skills/existing-skill/SKILL.md');
+      } finally {
+        await untrackProjectInstallation(projectD, placeholderSkill, 'skill');
+        await untrackProjectInstallation(projectD, testSkillName, 'skill');
+        await rm(projectD, { recursive: true, force: true });
+        await rm(sourceDir, { recursive: true, force: true });
+      }
+    });
+
+    it('should sync bundled skills that exist in library but not in local .claude/skills', async () => {
+      const { syncCommand } = await import('./sync.js');
+
+      // Create a target project that has a skill installed
+      const targetProject = await mkdtemp(join(tmpdir(), 'skills-target-'));
+      const bundledSkillName = 'code-review'; // This exists in packages/skills-library/skills/
+
+      await mkdir(join(targetProject, '.claude', 'skills', bundledSkillName), { recursive: true });
+      await writeFile(
+        join(targetProject, '.claude', 'skills', bundledSkillName, 'SKILL.md'),
+        `---\nname: ${bundledSkillName}\ndescription: Old version\n---\n\n# Old content`,
+        'utf-8'
+      );
+      await trackProjectInstallation(targetProject, bundledSkillName, 'skill');
+
+      // Create source directory WITHOUT the bundled skill in .claude/skills/
+      // The skill only exists in the bundled library (packages/skills-library/skills/)
+      const sourceDir = await mkdtemp(join(tmpdir(), 'skills-source-'));
+      await mkdir(join(sourceDir, '.claude', 'skills'), { recursive: true });
+      // Note: bundledSkillName is NOT in sourceDir/.claude/skills/
+      // But it SHOULD be found in the bundled skills library
+
+      try {
+        // Sync should work because the skill exists in bundled library
+        // This currently crashes with ENOENT because it tries to copy from .claude/skills/
+        await expect(syncCommand([bundledSkillName], { cwd: sourceDir })).resolves.not.toThrow();
+
+        // Verify the skill was synced from the bundled library
+        const content = await readFile(
+          join(targetProject, '.claude', 'skills', bundledSkillName, 'SKILL.md'),
+          'utf-8'
+        );
+        // The bundled skill has different content than our "Old content"
+        expect(content).not.toContain('Old content');
+      } finally {
+        await untrackProjectInstallation(targetProject, bundledSkillName, 'skill');
+        await rm(targetProject, { recursive: true, force: true });
+        await rm(sourceDir, { recursive: true, force: true });
+      }
+    });
+
+    it('should gracefully skip skills that do not exist in source', async () => {
+      const { syncCommand } = await import('./sync.js');
+
+      // Create source directory WITHOUT the skill we're trying to sync
+      const sourceDir = await mkdtemp(join(tmpdir(), 'skills-source-'));
+      await mkdir(join(sourceDir, '.claude', 'skills'), { recursive: true });
+      // Note: testSkillName does NOT exist in sourceDir
+
+      try {
+        // Sync should NOT crash when source skill doesn't exist
+        // It should log an error message and continue
+        await expect(syncCommand([testSkillName], { cwd: sourceDir })).resolves.not.toThrow();
+      } finally {
+        await rm(sourceDir, { recursive: true, force: true });
+      }
+    });
+
+    it('should gracefully handle non-existent target project directories', async () => {
+      const { syncCommand } = await import('./sync.js');
+
+      // Create and track a project, then delete it to simulate stale tracking
+      const staleProject = await mkdtemp(join(tmpdir(), 'skills-stale-project-'));
+      await mkdir(join(staleProject, '.claude', 'skills', testSkillName), { recursive: true });
+      await writeFile(
+        join(staleProject, '.claude', 'skills', testSkillName, 'SKILL.md'),
+        `---\nname: ${testSkillName}\ndescription: Test\n---\n\n# Test`,
+        'utf-8'
+      );
+      await trackProjectInstallation(staleProject, testSkillName, 'skill');
+
+      // Delete the project directory to simulate stale tracking
+      await rm(staleProject, { recursive: true, force: true });
+
+      const sourceDir = await mkdtemp(join(tmpdir(), 'skills-source-'));
+      await mkdir(join(sourceDir, '.claude', 'skills', testSkillName), { recursive: true });
+      await writeFile(
+        join(sourceDir, '.claude', 'skills', testSkillName, 'SKILL.md'),
+        sourceSkillContent,
+        'utf-8'
+      );
+
+      try {
+        // Sync should NOT crash when tracked project directory doesn't exist
+        await expect(syncCommand([testSkillName], { cwd: sourceDir })).resolves.not.toThrow();
+
+        // Other projects (projectA, projectB) should still get updated
+        const contentA = await readFile(
+          join(projectA, '.claude', 'skills', testSkillName, 'SKILL.md'),
+          'utf-8'
+        );
+        expect(contentA).toContain('NEW content with improvements!');
+      } finally {
+        await untrackProjectInstallation(staleProject, testSkillName, 'skill');
+        await rm(sourceDir, { recursive: true, force: true });
+      }
+    });
+
+    it('should work with --push and --dry-run together', async () => {
+      const { syncCommand } = await import('./sync.js');
+
+      // Create a project without the skill
+      const projectE = await mkdtemp(join(tmpdir(), 'skills-sync-project-e-'));
+      await mkdir(join(projectE, '.claude', 'skills'), { recursive: true });
+
+      // Track projectE with a placeholder skill
+      const placeholderSkill = `placeholder-${Date.now()}`;
+      await mkdir(join(projectE, '.claude', 'skills', placeholderSkill), { recursive: true });
+      await writeFile(
+        join(projectE, '.claude', 'skills', placeholderSkill, 'SKILL.md'),
+        `---\nname: ${placeholderSkill}\ndescription: Placeholder\n---\n\n# Placeholder`,
+        'utf-8'
+      );
+      await trackProjectInstallation(projectE, placeholderSkill, 'skill');
+
+      const sourceDir = await mkdtemp(join(tmpdir(), 'skills-source-'));
+      await mkdir(join(sourceDir, '.claude', 'skills', testSkillName), { recursive: true });
+      await writeFile(
+        join(sourceDir, '.claude', 'skills', testSkillName, 'SKILL.md'),
+        sourceSkillContent,
+        'utf-8'
+      );
+
+      try {
+        // Push with dry-run should NOT create the skill
+        await syncCommand([testSkillName], { cwd: sourceDir, push: true, dryRun: true });
+
+        // Verify skill was NOT installed
+        let skillExists = false;
+        try {
+          await stat(join(projectE, '.claude', 'skills', testSkillName, 'SKILL.md'));
+          skillExists = true;
+        } catch {
+          skillExists = false;
+        }
+        expect(skillExists).toBe(false);
+
+        // Verify skill is NOT tracked
+        const installation = await getProjectInstallation(projectE);
+        expect(installation?.skills).not.toContain(testSkillName);
+      } finally {
+        await untrackProjectInstallation(projectE, placeholderSkill, 'skill');
+        await rm(projectE, { recursive: true, force: true });
+        await rm(sourceDir, { recursive: true, force: true });
+      }
+    });
+  });
 });

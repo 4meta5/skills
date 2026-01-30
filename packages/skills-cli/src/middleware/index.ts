@@ -25,3 +25,7 @@ export type {
 // Hookable middleware
 export { createHookableMiddleware, createEnhancedMiddleware } from './hooks.js';
 export type { HookFunctions, HookableMiddleware } from './hooks.js';
+
+// Error messages
+export { formatValidationError, formatRetryPrompt } from './error-messages.js';
+export type { ValidationError } from './error-messages.js';

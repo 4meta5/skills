@@ -1,280 +1,402 @@
 # Skills CLI - Implementation Plan
 
-Tasks for Claude Code parallel subagent delegation.
-TDD enforced: every implementation task requires RED phase first.
+Gaps identified in RESEARCH.md, organized for parallel subagent delegation.
+
+**Rules:**
+- Every task follows TDD (RED → GREEN → REFACTOR)
+- After each wave, run `skills sync` to update external projects
+- If sync fails, fix the CLI (no manual workarounds)
 
 ---
 
-## Phase 4: Permission Sandbox (NOT STARTED)
+## Wave 1: High Priority (Parallel) ✓ COMPLETE
 
-Permission-based enforcement for workflow skills (tdd, no-workarounds).
+**Status:** All tasks complete, 637 tests passing, synced to external projects.
 
-### Task 4.1: Sandbox Policy Types
-Define TypeScript types for sandbox policies.
+### Task 1.1: Exponential Backoff ✓
 
-- **File:** `src/sandbox/types.ts`
-- **Test:** `src/sandbox/policy.test.ts`
-- **TDD:** Required
-- **Parallel:** Yes (with 4.2)
+Add jitter and backoff to retry logic.
+
+**File:** `src/middleware/backoff.ts`
+**Test:** `src/middleware/backoff.test.ts`
+**TDD:** Required
+**Parallel:** Yes (with 1.2)
+**Status:** Complete (13 tests)
 
 ```typescript
-interface SandboxPolicy {
-  name: string;
-  allowCommands: string[];
-  denyCommands: string[];
-  allowWrite: string[];  // glob patterns
-  denyWrite: string[];
+interface BackoffConfig {
+  initialDelayMs: number;  // default 1000
+  maxDelayMs: number;      // default 30000
+  multiplier: number;      // default 2
+  jitterMs: number;        // default 1000
 }
 
-type WorkflowState = 'BLOCKED' | 'RED' | 'GREEN' | 'COMPLETE';
+function calculateDelay(attempt: number, config: BackoffConfig): number;
+function shouldRetry(error: Error, attempt: number, max: number): boolean;
 ```
 
-### Task 4.2: Policy Loader
-Parse sandbox config from SKILL.md frontmatter.
+**Tests:**
+- calculateDelay returns exponential values
+- calculateDelay respects maxDelayMs cap
+- calculateDelay adds jitter within range
+- shouldRetry returns false for auth errors (401/403)
+- shouldRetry returns true for 429/5xx
 
-- **File:** `src/sandbox/loader.ts`
-- **Test:** `src/sandbox/loader.test.ts`
-- **TDD:** Required
-- **Parallel:** Yes (with 4.1)
+---
 
-Frontmatter extension:
+### Task 1.2: Enhanced Error Messages ✓
+
+Improve rejection messages with specific details.
+
+**File:** `src/middleware/error-messages.ts`
+**Test:** `src/middleware/error-messages.test.ts`
+**TDD:** Required
+**Parallel:** Yes (with 1.1)
+**Status:** Complete (9 tests)
+
+```typescript
+interface ValidationError {
+  missingSkills: string[];
+  foundSkills: string[];
+  attemptNumber: number;
+  maxAttempts: number;
+}
+
+function formatValidationError(error: ValidationError): string;
+function formatRetryPrompt(error: ValidationError): string;
+```
+
+**Output format:**
+```
+VALIDATION FAILURE: Required skill invocation missing.
+
+Missing: tdd, no-workarounds
+Found: code-review
+Attempt: 2/3
+
+You MUST invoke:
+- Skill(skill: "tdd")
+- Skill(skill: "no-workarounds")
+```
+
+---
+
+### Task 1.3: Sync Command Enhancement ✓
+
+Fix sync to handle new skills (not just updates).
+
+**File:** `src/commands/sync.ts`
+**Test:** `src/commands/sync.test.ts`
+**TDD:** Required
+**Parallel:** Yes (with 1.1, 1.2)
+**Status:** Complete (7 tests, includes bundled skill sync fix)
+
+**Current behavior:** Only syncs skills that exist in target projects.
+**Desired behavior:** Option to push new skills to tracked projects.
+
+```typescript
+interface SyncOptions {
+  skillNames: string[];
+  dryRun?: boolean;
+  push?: boolean;  // NEW: install to projects that don't have it
+}
+```
+
+**Tests:**
+- sync --push installs skill to projects without it
+- sync --push respects project's existing skills
+- sync --push updates CLAUDE.md in target project
+
+---
+
+## Wave 1 Completion ✓
+
+Completed 2026-01-29:
+
+```bash
+# 1. Run all tests
+npm test -w @anthropic/skills-cli
+
+# 2. Dogfood scan
+./packages/skills-cli/bin/skills.js scan
+
+# 3. Sync to external projects
+./packages/skills-cli/bin/skills.js sync --all
+
+# 4. Verify external projects updated
+ls ~/OpenPawVet/web/.claude/skills/
+ls ~/AG1337v2/BobaMatchSolutions/web/amarsingh.dev/.claude/skills/
+```
+
+**If sync fails:** BLOCKED. Fix the CLI using TDD, then retry.
+
+---
+
+## Wave 2: Medium Priority (Parallel) ✓ COMPLETE
+
+**Status:** All tasks complete, 684 tests passing, synced to external projects.
+
+### Task 2.1: Zod Schema Validation ✓
+
+Add schema validation for tool call arguments.
+
+**File:** `src/middleware/schema-validator.ts`
+**Test:** `src/middleware/schema-validator.test.ts`
+**TDD:** Required
+**Parallel:** Yes (with 2.2)
+**Depends:** Wave 1
+**Status:** Complete (16 tests)
+
+```typescript
+import { z } from 'zod';
+
+const SkillInvocationSchema = z.object({
+  skill: z.string().min(1),
+  args: z.string().optional(),
+});
+
+function validateToolCall(call: unknown): ValidationResult;
+function formatSchemaError(error: z.ZodError): string;
+```
+
+**Tests:**
+- Validates skill name is non-empty
+- Rejects unknown fields
+- Formats Zod errors as actionable messages
+
+---
+
+### Task 2.2: Skill Dependency Resolution ✓
+
+Skills that depend on other skills.
+
+**File:** `src/dependencies/resolver.ts`
+**Test:** `src/dependencies/resolver.test.ts`
+**TDD:** Required
+**Parallel:** Yes (with 2.1)
+**Depends:** Wave 1
+**Status:** Complete (25 tests)
+
+```typescript
+interface SkillDependency {
+  skillName: string;
+  dependencies: string[];
+}
+
+function resolveDependencies(skill: string, installed: string[]): string[];
+function detectMissingDependencies(skill: string, installed: string[]): string[];
+```
+
+SKILL.md extension:
 ```yaml
 ---
 name: tdd
-sandbox:
-  state: BLOCKED
-  profiles:
-    BLOCKED:
-      allowCommands: ["git status", "npm test"]
-      allowWrite: ["**/*.test.ts", "**/*.spec.ts"]
-    GREEN:
-      allowCommands: ["*"]
-      allowWrite: ["**/*"]
+dependencies:
+  - no-workarounds
 ---
 ```
 
-### Task 4.3: isolated-vm Integration
-Create sandbox context from policy.
-
-- **File:** `src/sandbox/isolate.ts`
-- **Test:** `src/sandbox/isolate.test.ts`
-- **TDD:** Required
-- **Depends:** 4.1
-- **Parallel:** No
-
-Key functions:
-- `createIsolate(policy: SandboxPolicy): Isolate`
-- `executeInSandbox(code: string, context: object): Promise<any>`
-
-### Task 4.4: Permission State Machine
-Manage workflow state transitions.
-
-- **File:** `src/sandbox/state-machine.ts`
-- **Test:** `src/sandbox/state-machine.test.ts`
-- **TDD:** Required
-- **Depends:** 4.1, 4.3
-- **Parallel:** No
-
-States and transitions:
-```
-BLOCKED --[test written]--> RED
-RED --[test passes]--> GREEN
-GREEN --[refactor done]--> COMPLETE
-COMPLETE --[new feature]--> BLOCKED
-```
+**Tests:**
+- Resolves transitive dependencies
+- Detects missing dependencies on install
+- Warns on remove if depended upon
 
 ---
 
-## Phase 5: Response Validation
+### Task 2.3: Skill Conflict Detection ✓
 
-Close the response interception gap.
-
-### Task 5.1: API Research (No TDD)
-Investigate MCP response interception options.
-
-- **Output:** Update RESEARCH.md with findings
-- **TDD:** Not required (research only)
-- **Parallel:** Yes
-
-Questions to answer:
-1. Can MCP servers intercept client responses?
-2. What hooks does Claude Code expose post-response?
-3. Is there an SDK pattern for response middleware?
-
-### Task 5.2: Response Validator Hook
-Validate Skill() calls in Claude responses.
-
-- **File:** `src/middleware/response-validator.ts`
-- **Test:** `src/middleware/response-validator.test.ts`
-- **TDD:** Required
-- **Depends:** 5.1
-
-Extend existing middleware:
-```typescript
-interface ResponseValidation {
-  hasRequiredSkillCalls: boolean;
-  missingSkills: string[];
-  extraneousCalls: string[];
-  suggestedRetryPrompt?: string;
-}
-```
-
-### Task 5.3: Feedback Loop Hook
-Generate retry message on non-compliance.
-
-- **File:** `src/hooks/feedback-loop.sh`
-- **Test:** `src/hooks/feedback-loop.test.ts`
-- **TDD:** Required
-- **Depends:** 5.2
-
-Hook behavior:
-1. Read response from stdin (if supported)
-2. Validate against expected skill calls
-3. Output retry prompt if non-compliant
-
----
-
-## Integration Tasks
-
-### Task I.1: OpenPawVet Integration
-End-to-end validation with real project.
-
-- **Location:** `~/OpenPawVet/web`
-- **TDD:** Not required (integration test)
-- **Parallel:** Yes
-
-Steps:
-1. Run `skills scan` in OpenPawVet
-2. Install recommended skills
-3. Track 5 Claude Code sessions
-4. Generate activation rate report
-5. Document findings in RESEARCH.md
-
-### Task I.2: E2E Workflow Test
-Complete flow validation.
-
-- **File:** `src/e2e/workflow.test.ts`
-- **TDD:** Required
-- **Depends:** Phase 4 complete
-
-Test flow:
-```
-prompt -> router -> middleware -> [mock Claude] -> validation -> retry
-```
-
----
-
-## Parallel Execution Graph
-
-```
-Phase 4:
-┌───────┐  ┌───────┐
-│  4.1  │  │  4.2  │  (parallel)
-└───┬───┘  └───┬───┘
-    │          │
-    └────┬─────┘
-         ▼
-    ┌─────────┐
-    │   4.3   │
-    └────┬────┘
-         │
-         ▼
-    ┌─────────┐
-    │   4.4   │
-    └─────────┘
-
-Phase 5:
-┌───────┐
-│  5.1  │  (research, parallel with 4.x)
-└───┬───┘
-    │
-    ▼
-┌───────┐
-│  5.2  │
-└───┬───┘
-    │
-    ▼
-┌───────┐
-│  5.3  │
-└───────┘
-
-Integration:
-┌───────┐  ┌───────┐
-│  I.1  │  │  I.2  │  (I.2 depends on Phase 4)
-└───────┘  └───────┘
-```
-
----
-
-## TDD Enforcement
-
-Every task marked "TDD Required":
-
-1. **RED:** Write failing test first
-2. **GREEN:** Implement minimal code to pass
-3. **REFACTOR:** Clean up, tests still pass
-
-**BLOCKED if RED phase skipped.**
-
-Example workflow:
-```bash
-# 1. Write test
-vim src/sandbox/policy.test.ts
-
-# 2. Run test (must fail)
-npm test -w @anthropic/skills-cli -- src/sandbox/policy.test.ts
-# Expected: FAIL
-
-# 3. Implement
-vim src/sandbox/types.ts
-
-# 4. Run test (must pass)
-npm test -w @anthropic/skills-cli -- src/sandbox/policy.test.ts
-# Expected: PASS
-
-# 5. Refactor if needed
-```
-
----
-
-## Success Metrics
-
-| Metric | Current | Target |
-|--------|---------|--------|
-| Blocking skill activation | ~50% | >90% |
-| Reference skill activation | ~80% | >85% |
-| Router latency | ~50ms | <100ms |
-| Test count | 392 | >450 |
-
----
-
-## Medium Priority (Future)
-
-### Skill Dependency Resolution
-Skills that depend on other skills.
-
-- Add `dependencies` field to SKILL.md
-- Resolve on `skills add`
-- Warn on `skills remove` if depended upon
-
-### Skill Conflict Detection
 Prevent conflicting skills.
 
-- Add `conflicts` field to SKILL.md
-- Block install if conflict exists
-- `skills scan` excludes conflicting recommendations
+**File:** `src/dependencies/conflicts.ts`
+**Test:** `src/dependencies/conflicts.test.ts`
+**TDD:** Required
+**Parallel:** Yes (with 2.1, 2.2)
+**Depends:** Wave 1
+**Status:** Complete (6 tests)
 
-### Dynamic skill-forced-eval Hook
+```typescript
+interface SkillConflict {
+  skillName: string;
+  conflicts: string[];
+}
+
+function detectConflicts(skill: string, installed: string[]): string[];
+function blockInstallIfConflict(skill: string, installed: string[]): void;
+```
+
+SKILL.md extension:
+```yaml
+---
+name: strict-tdd
+conflicts:
+  - loose-tdd
+---
+```
+
+---
+
+## Wave 2 Completion ✓
+
+Completed 2026-01-29:
+
+```bash
+npm test -w @anthropic/skills-cli
+./packages/skills-cli/bin/skills.js scan
+./packages/skills-cli/bin/skills.js sync --all
+```
+
+---
+
+## Wave 3: Low Priority (Sequential) ✓ COMPLETE
+
+**Status:** All tasks complete, 732 tests passing, synced to external projects.
+
+### Task 3.1: Dynamic Skill Evaluation Hook ✓
+
 Read skills dynamically instead of hardcoded list.
+
+**File:** `src/hooks/dynamic-eval.ts`
+**Test:** `src/hooks/dynamic-eval.test.ts`
+**TDD:** Required
+**Depends:** Wave 2
+**Status:** Complete (22 tests)
 
 - Parse `.claude/skills/*/SKILL.md` at runtime
 - Generate evaluation prompt from descriptions
+- Cache parsed skills for performance
 
 ---
 
-## Low Priority (Backlog)
+### Task 3.2: Structured Outputs Migration ✓
 
-- `skills create <name>` - Scaffold new skill
-- `skills validate [path]` - Validate SKILL.md format
-- Remote skill registry - Central discovery mechanism
-- Skill auto-update - Check for updates on scan
+Replace regex with Claude structured outputs API.
+
+**File:** `src/middleware/structured-detector.ts`
+**Test:** `src/middleware/structured-detector.test.ts`
+**TDD:** Required
+**Depends:** Wave 2
+**Status:** Complete (26 tests)
+
+**Current:** Regex patterns to detect `Skill()` calls
+**Desired:** Claude API with `anthropic-beta: structured-outputs-2025-11-13`
+
+```typescript
+const ToolCallSchema = z.object({
+  action: z.enum(['invoke_skill', 'respond', 'request_info']),
+  skill: z.string().optional(),
+  response: z.string().optional(),
+});
+```
+
+**Note:** Requires API key configuration.
+
+---
+
+## Wave 3 Completion ✓
+
+Completed 2026-01-29:
+
+```bash
+npm test -w @anthropic/skills-cli  # 732 tests passing
+./packages/skills-cli/bin/skills.js scan  # No new recommendations
+./packages/skills-cli/bin/skills.js sync --all  # Synced 3521 projects
+```
+
+---
+
+## Execution Graph
+
+```
+Wave 1 (Parallel):
+┌───────┐  ┌───────┐  ┌───────┐
+│  1.1  │  │  1.2  │  │  1.3  │
+│Backoff│  │Errors │  │ Sync  │
+└───┬───┘  └───┬───┘  └───┬───┘
+    └──────────┼──────────┘
+               ▼
+         [Sync to projects]
+               │
+               ▼
+Wave 2 (Parallel):
+┌───────┐  ┌───────┐  ┌───────┐
+│  2.1  │  │  2.2  │  │  2.3  │
+│ Zod   │  │ Deps  │  │Conflict│
+└───┬───┘  └───┬───┘  └───┬───┘
+    └──────────┼──────────┘
+               ▼
+         [Sync to projects]
+               │
+               ▼
+Wave 3 (Sequential):
+┌───────┐
+│  3.1  │
+│Dynamic│
+└───┬───┘
+    │
+    ▼
+┌───────┐
+│  3.2  │
+│Struct │
+└───┬───┘
+    │
+    ▼
+         [Final sync]
+```
+
+---
+
+## Subagent Delegation Format
+
+For each task, spawn subagent with:
+
+```
+Task {N.M}: {Title}
+
+TDD REQUIRED: RED → GREEN → REFACTOR
+
+Files:
+- Implementation: {path}
+- Tests: {path}
+
+Requirements:
+{spec from above}
+
+Commands:
+- Test: npm test -w @anthropic/skills-cli -- --testNamePattern="{pattern}"
+
+BLOCKED until Phase 1 (RED) shows failing test.
+```
+
+---
+
+## External Project Sync
+
+After each wave:
+
+| Project | Path | Command |
+|---------|------|---------|
+| OpenPawVet | `~/OpenPawVet/web` | `skills sync --all` |
+| amarsingh.dev | `~/AG1337v2/BobaMatchSolutions/web/amarsingh.dev` | `skills sync --all` |
+
+**If sync fails:**
+1. BLOCKED: FIX THE TOOL
+2. Write failing test for the bug
+3. Fix the CLI code
+4. Verify sync works
+5. Continue
+
+---
+
+## Success Metrics ✓ ALL COMPLETE
+
+| Metric | Before | After Wave 3 |
+|--------|--------|--------------|
+| Tests | 599 | **732** |
+| Retry has backoff | No | **Yes** |
+| Error messages | Generic | **Detailed** |
+| Sync pushes new skills | No | **Yes** |
+| Schema validation | No | **Yes** |
+| Structured outputs | No | **Yes** |
+| Dynamic skill eval | No | **Yes** |
+| Dependency resolution | No | **Yes** |
+| Conflict detection | No | **Yes** |

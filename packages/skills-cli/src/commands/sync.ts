@@ -1,22 +1,60 @@
-import { cp, readdir, stat, readFile, writeFile } from 'fs/promises';
+import { cp, mkdir, stat, readFile, writeFile } from 'fs/promises';
 import { join, resolve } from 'path';
-import { createSkillsLibrary, loadSkillFromPath } from '@anthropic/skills-library';
+import { createSkillsLibrary } from '@anthropic/skills-library';
 import {
   getProjectsWithSkill,
   getAllTrackedProjects,
   getProjectInstallation,
   loadConfig,
-  saveConfig
+  saveConfig,
+  trackProjectInstallation
 } from '../config.js';
 
 interface SyncOptions {
   all?: boolean;
   dryRun?: boolean;
   cwd?: string;
+  push?: boolean;  // NEW: install to projects that don't have it
 }
 
 /**
- * Sync skills to all tracked projects that have them installed
+ * Update CLAUDE.md in a project to include a skill reference
+ */
+async function updateClaudeMdWithSkill(projectPath: string, skillName: string): Promise<void> {
+  const claudeMdPath = join(projectPath, 'CLAUDE.md');
+  const skillRef = `- @.claude/skills/${skillName}/SKILL.md`;
+
+  try {
+    let content = await readFile(claudeMdPath, 'utf-8');
+
+    // Skip if skill reference already exists
+    if (content.includes(skillRef)) {
+      return;
+    }
+
+    // Add skills section if not present
+    if (!content.includes('## Installed Skills')) {
+      content += '\n\n## Installed Skills\n';
+    }
+
+    // Add skill reference after the header
+    content = content.replace(
+      '## Installed Skills\n',
+      `## Installed Skills\n${skillRef}\n`
+    );
+
+    await writeFile(claudeMdPath, content, 'utf-8');
+  } catch {
+    // CLAUDE.md doesn't exist, create it
+    const content = `# Project\n\n## Installed Skills\n${skillRef}\n`;
+    await writeFile(claudeMdPath, content, 'utf-8');
+  }
+}
+
+/**
+ * Sync skills to tracked projects.
+ * Without --push: only updates projects that already have the skill installed.
+ * With --push: installs the skill to all tracked projects (even those without it).
  */
 export async function syncCommand(names: string[], options: SyncOptions = {}): Promise<void> {
   const sourceDir = resolve(options.cwd || process.cwd());
@@ -25,6 +63,7 @@ export async function syncCommand(names: string[], options: SyncOptions = {}): P
     console.log('Usage: skills sync <skill-names...>');
     console.log('       skills sync --all');
     console.log('       skills sync <skill-names...> --dry-run');
+    console.log('       skills sync <skill-names...> --push');
     return;
   }
 
@@ -55,21 +94,22 @@ export async function syncCommand(names: string[], options: SyncOptions = {}): P
   let totalSynced = 0;
 
   for (const skillName of skillsToSync) {
-    // Get the source skill content
-    const sourceSkillPath = join(sourceDir, '.claude', 'skills', skillName);
-    const sourceSkillMdPath = join(sourceSkillPath, 'SKILL.md');
+    // Get the source skill content - prefer local .claude/skills/, fall back to bundled
+    let sourceSkillPath = join(sourceDir, '.claude', 'skills', skillName);
+    const localSkillMdPath = join(sourceSkillPath, 'SKILL.md');
 
     let sourceExists = false;
     try {
-      await stat(sourceSkillMdPath);
+      await stat(localSkillMdPath);
       sourceExists = true;
     } catch {
       // Try loading from bundled skills
       const library = createSkillsLibrary({ cwd: sourceDir });
       try {
         const skill = await library.loadSkill(skillName);
-        // Use the skill path as source if found
+        // Use the bundled skill path as source if found
         if (skill.path) {
+          sourceSkillPath = skill.path;
           sourceExists = true;
         }
       } catch {
@@ -82,8 +122,15 @@ export async function syncCommand(names: string[], options: SyncOptions = {}): P
       continue;
     }
 
-    // Get all projects that have this skill
-    const projects = await getProjectsWithSkill(skillName);
+    // Get projects to sync to:
+    // - With --push: all tracked projects
+    // - Without --push: only projects that already have this skill
+    let projects: string[];
+    if (options.push) {
+      projects = await getAllTrackedProjects();
+    } else {
+      projects = await getProjectsWithSkill(skillName);
+    }
 
     if (projects.length === 0) {
       console.log(`  ${skillName}: no projects to update`);
@@ -100,19 +147,43 @@ export async function syncCommand(names: string[], options: SyncOptions = {}): P
 
       const targetSkillPath = join(projectPath, '.claude', 'skills', skillName);
 
-      // Check if target project still exists and has the skill directory
+      // Check if skill already exists in target project
+      let skillExistsInTarget = false;
       try {
         await stat(targetSkillPath);
+        skillExistsInTarget = true;
       } catch {
+        skillExistsInTarget = false;
+      }
+
+      // Without --push, skip projects that don't have the skill directory
+      if (!options.push && !skillExistsInTarget) {
         console.log(`  - ${projectPath} (skipped - directory not found)`);
         continue;
       }
 
       if (options.dryRun) {
-        console.log(`  ~ ${projectPath} (would update)`);
+        if (skillExistsInTarget) {
+          console.log(`  ~ ${projectPath} (would update)`);
+        } else {
+          console.log(`  ~ ${projectPath} (would install)`);
+        }
       } else {
+        // Create directory if it doesn't exist (for --push)
+        if (!skillExistsInTarget) {
+          await mkdir(targetSkillPath, { recursive: true });
+        }
+
         // Copy the entire skill directory
         await cp(sourceSkillPath, targetSkillPath, { recursive: true });
+
+        // Track the skill installation if it's a new install
+        if (!skillExistsInTarget) {
+          await trackProjectInstallation(projectPath, skillName, 'skill');
+
+          // Update CLAUDE.md in target project
+          await updateClaudeMdWithSkill(projectPath, skillName);
+        }
 
         // Update lastUpdated timestamp
         const config = await loadConfig();
@@ -121,7 +192,11 @@ export async function syncCommand(names: string[], options: SyncOptions = {}): P
           await saveConfig(config);
         }
 
-        console.log(`  + ${projectPath}`);
+        if (skillExistsInTarget) {
+          console.log(`  + ${projectPath}`);
+        } else {
+          console.log(`  + ${projectPath} (installed)`);
+        }
         totalSynced++;
       }
     }
