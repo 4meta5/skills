@@ -6,6 +6,7 @@ description: |
   notes to tasks. Searches web for 2026 SOTA, writes RESEARCH.md, generates
   PLAN.md tasks.
 category: development
+user-invocable: true
 ---
 
 # Research to Plan
@@ -21,7 +22,7 @@ Invoke when:
 - User provides research text or topic
 
 Also invoke explicitly with:
-- `/workflow research [topic]`
+- `/research-to-plan [topic]`
 - "research and plan"
 - "find best practices for"
 
@@ -31,18 +32,18 @@ Also invoke explicitly with:
 
 **Option A: Topic provided**
 ```
-/workflow research OAuth authentication
+/research-to-plan OAuth authentication
 ```
 
 **Option B: Research text provided**
 ```
-/workflow research
+/research-to-plan
 [paste research notes or context]
 ```
 
 **Option C: Existing RESEARCH.md**
 ```
-/workflow research --from-file
+/research-to-plan --from-file
 ```
 
 ### Step 2: Search for SOTA (2026)
@@ -217,7 +218,7 @@ Focus on:
 - Framework conventions
 - Deployment patterns
 
-## Integration
+## Skill Chaining
 
 ### With web search
 
@@ -251,7 +252,7 @@ After implementation:
 ## Example Session
 
 ```
-/workflow research "implement real-time notifications"
+/research-to-plan "implement real-time notifications"
 
 Searching for SOTA 2026...
 

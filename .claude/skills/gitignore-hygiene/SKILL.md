@@ -6,6 +6,7 @@ description: |
   (4) before pushing to remote. Scans for unwanted files and suggests
   gitignore additions.
 category: development
+user-invocable: true
 ---
 
 # Gitignore Hygiene
@@ -21,7 +22,7 @@ Invoke when:
 - User says "check gitignore", "clean git"
 
 Also invoke explicitly with:
-- `/workflow gitignore`
+- `/gitignore-hygiene`
 - "clean up gitignore"
 - "check for unwanted files"
 
@@ -235,7 +236,7 @@ Never ignore these (warn if present):
 | `package.json` | Ignoring manifest |
 | `.gitignore` | Recursive ignore |
 
-## Integration
+## Skill Chaining
 
 ### After Commits
 
@@ -253,6 +254,10 @@ Run hygiene check before pushing:
 
 project-init creates comprehensive .gitignore. This skill maintains it over time.
 
+### Terminal Chain
+
+After any commit session: **repo-hygiene** (final cleanup)
+
 ## Rationalizations (Do Not Skip)
 
 | Rationalization | Why It's Wrong | Required Action |
@@ -265,7 +270,7 @@ project-init creates comprehensive .gitignore. This skill maintains it over time
 ## Example Session
 
 ```
-/workflow gitignore
+/gitignore-hygiene
 
 Scanning project...
 

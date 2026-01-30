@@ -60,3 +60,33 @@ Return Markdown structured as follows:
 - Analyze only within the given code. Do not invent missing context or external APIs
 - Be deterministic and concise
 - Return only recommendations
+
+## Skill Chaining
+
+### After Analysis
+
+| Chain To | When | Action |
+|----------|------|--------|
+| unit-test-workflow | HIGH risk identified | Generate comprehensive tests |
+| property-based-testing | Serialization patterns | Add PBT coverage |
+
+### Chains From
+
+| Source | Condition |
+|--------|-----------|
+| tdd | After REFACTOR phase |
+| workflow-orchestrator | Code review context |
+
+### Terminal Chain
+
+After completion: **repo-hygiene** (clean analysis artifacts)
+
+### Testing Pipeline Position
+
+suggest-tests is step 2 in the testing pipeline:
+
+```
+tdd → suggest-tests → unit-test-workflow → property-based-testing → repo-hygiene
+         ↑
+     (you are here)
+```

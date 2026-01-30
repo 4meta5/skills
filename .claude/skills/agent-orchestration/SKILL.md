@@ -6,6 +6,7 @@ description: |
   (3) research and implementation can happen concurrently. Updates AGENTS.md
   with status and results.
 category: development
+user-invocable: true
 ---
 
 # Agent Orchestration
@@ -21,7 +22,7 @@ Invoke when:
 - Complex task benefits from divide-and-conquer
 
 Also invoke explicitly with:
-- `/workflow agents [task]`
+- `/agent-orchestration [task]`
 - "coordinate agents"
 - "run in parallel"
 
@@ -212,7 +213,7 @@ Research Agent ─> Design Agent ─> Implementation Agent ─> Review Agent
 | **Implement** | Write code, make changes | Edit, Write, Bash |
 | **Review** | Check quality, security, tests | Read, Grep, Bash |
 
-## Integration
+## Skill Chaining
 
 ### With TDD
 
@@ -245,7 +246,7 @@ Research agents output feeds into planning:
 ## Example Session
 
 ```
-/workflow agents "Add OAuth authentication"
+/agent-orchestration "Add OAuth authentication"
 
 Analyzing task...
 
@@ -277,3 +278,9 @@ Launch phase 1? [y/n]
 - Use AGENTS.md for all context handoff
 - Prefer explicit over implicit dependencies
 - Document agent outputs even if "obvious"
+
+## References
+
+For detailed guidance, see:
+- [context-handoff.md](references/context-handoff.md) - Agent communication patterns
+- [parallel-patterns.md](references/parallel-patterns.md) - When to parallelize

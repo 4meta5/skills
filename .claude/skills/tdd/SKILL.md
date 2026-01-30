@@ -115,14 +115,25 @@ When implementing multiple features:
 | "I know this works" | Confidence ≠ proof | Write the test |
 | "Just this once" | That's what you said last time | Write the test |
 
-## Related Skills (Chaining)
+## Skill Chaining
 
-This skill chains with other skills when activated together:
+### After REFACTOR Phase
 
-| Combined With | When This Happens | Workflow |
-|---------------|-------------------|----------|
-| **no-workarounds** | Fixing a bug in a tool you're building | RED → GREEN → REFACTOR, no workarounds |
-| **dogfood-skills** | Bug fix completes a feature | RED → GREEN → REFACTOR → Run scan |
+| Chain To | When | Action |
+|----------|------|--------|
+| suggest-tests | Tests written | Verify coverage gaps |
+| doc-maintenance | Feature complete | Update PLAN.md |
+| repo-hygiene | Session end | Clean test-skill-* artifacts |
+
+### Chains From
+
+| Source | Condition |
+|--------|-----------|
+| no-workarounds | Bug fix in tool |
+| workflow-orchestrator | New feature |
+| research-to-plan | Implementation phase |
+
+### Combined With no-workarounds
 
 **When both tdd AND no-workarounds are activated:**
 1. You are BLOCKED from implementing ANY fix until Phase 1 (RED) is complete
@@ -130,3 +141,26 @@ This skill chains with other skills when activated together:
 3. The ONLY valid path: RED → GREEN → REFACTOR → Verify tool works
 
 This ensures tool fixes are both test-driven AND actually fix the tool (not worked around).
+
+### Combined With dogfood-skills
+
+When bug fix completes a feature:
+1. Complete TDD cycle: RED → GREEN → REFACTOR
+2. Run `skills scan` to check for recommendations
+3. Install any HIGH confidence skills
+
+### Testing Pipeline
+
+TDD is the entry point to the testing pipeline:
+
+```
+tdd (RED → GREEN → REFACTOR)
+  ↓
+suggest-tests (identify gaps)
+  ↓
+unit-test-workflow (generate tests)
+  ↓
+property-based-testing (invariants)
+  ↓
+repo-hygiene (cleanup) ← TERMINAL
+```

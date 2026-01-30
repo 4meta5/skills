@@ -6,6 +6,7 @@ description: |
   (4) refactoring code. Updates PLAN.md with completed items and
   README.md when features change.
 category: documentation
+user-invocable: true
 ---
 
 # Documentation Maintenance
@@ -22,7 +23,7 @@ Invoke after:
 - Resolving a blocked item
 
 Also invoke explicitly with:
-- `/workflow docs`
+- `/doc-maintenance`
 - "update documentation"
 - "sync docs"
 
@@ -148,7 +149,7 @@ When adding a feature to README.md:
 - **Password Reset**: Email-based password recovery
 ```
 
-## Integration with Other Skills
+## Skill Chaining
 
 ### After TDD Completion
 
@@ -168,6 +169,10 @@ When refactoring completes:
 1. Mark refactoring task as complete
 2. Update any affected API documentation
 
+### Terminal Chain
+
+After any documentation update: **repo-hygiene** (clean stale references)
+
 ## Rationalizations (Do Not Skip)
 
 | Rationalization | Why It's Wrong | Required Action |
@@ -184,7 +189,7 @@ When refactoring completes:
 **After completion:**
 
 ```
-/workflow docs
+/doc-maintenance
 
 Analyzing changes...
 

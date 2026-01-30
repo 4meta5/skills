@@ -14,8 +14,8 @@
     "lint": "npm run lint -w @4meta5/skills",
     "typecheck": "npm run typecheck -w @4meta5/skills && npm run typecheck -w @4meta5/skills-cli",
     "prepare": "lefthook install",
-    "skills": "node packages/skills-cli/bin/skills.js",
-    "sk": "node packages/skills-cli/bin/skills.js"
+    "skills": "node packages/cli/bin/skills.js",
+    "sk": "node packages/cli/bin/skills.js"
   },
   "devDependencies": {
     "lefthook": "^2.0.16"

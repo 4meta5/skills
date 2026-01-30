@@ -138,4 +138,33 @@ Found test-skill-*?
 Works with:
 - **skill-maker**: Create clean skills to replace slop
 - **claudeception**: Extract learnings before deleting temp skills
-- **workflow**: Include hygiene in project workflow
+- **workflow-orchestrator**: Include hygiene in project workflow
+
+## Terminal Chain (Always Run Last)
+
+This skill runs after testing workflows complete:
+
+| After Skill | Cleanup Needed |
+|-------------|----------------|
+| tdd | test-skill-* directories |
+| suggest-tests | Analysis artifacts |
+| unit-test-workflow | Generated test stubs |
+| property-based-testing | Fast-check artifacts |
+| doc-maintenance | Stale references |
+| gitignore-hygiene | Final verification |
+
+When any testing skill completes, run:
+- `skills hygiene scan`
+- `skills hygiene clean --confirm` (if slop detected)
+
+### Testing Pipeline Position
+
+repo-hygiene is the terminal step in the testing pipeline:
+
+```
+tdd → suggest-tests → unit-test-workflow → property-based-testing → repo-hygiene
+                                                                         ↑
+                                                                    (TERMINAL)
+```
+
+All testing workflows should end with repo-hygiene to ensure clean state.

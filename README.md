@@ -280,11 +280,11 @@ Use `skills list --provenance` to see which is which.
 
 This monorepo contains:
 
-| Package | Description |
-|---------|-------------|
-| `@4meta5/skills-cli` | CLI for scanning, installing, and managing skills |
-| `@4meta5/skills-library` | Core library for loading and parsing skills |
-| `@4meta5/skills-web` | Website for browsing and discovering skills |
+| Package | Path | Description |
+|---------|------|-------------|
+| `@4meta5/skills-cli` | `packages/cli` | CLI for scanning, installing, and managing skills |
+| `@4meta5/skills` | `packages/skills` | Core library for loading and parsing skills |
+| `web` (private) | `packages/web` | Website for browsing and discovering skills |
 
 ## Contributing
 

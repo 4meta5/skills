@@ -6,6 +6,7 @@ description: |
   (3) need consistent project layout. Creates CLAUDE.md, README.md, PLAN.md,
   RESEARCH.md, AGENTS.md, .gitignore, and .claude/skills/ directory.
 category: development
+user-invocable: true
 ---
 
 # Project Initialization
@@ -199,15 +200,15 @@ User can specify:
 
 **Basic:**
 ```
-/workflow project-init my-app
+/project-init my-app
 ```
 
 **With options:**
 ```
-/workflow project-init my-app --language typescript --framework sveltekit
+/project-init my-app --language typescript --framework sveltekit
 ```
 
-## Integration
+## Skill Chaining
 
 After scaffolding:
 1. **dogfood-skills** runs `skills scan` to recommend skills

@@ -263,6 +263,70 @@ This is real content that provides value.
     });
   });
 
+  describe('scan output message', () => {
+    it('should suggest clean with -r flag when scan was run with recursive', async () => {
+      // Setup: Create slop in a package directory
+      const pkgSkillsDir = join(tempDir, 'packages', 'my-pkg', '.claude', 'skills');
+      await mkdir(join(pkgSkillsDir, 'test-skill-recursive-test'), { recursive: true });
+      await writeFile(
+        join(pkgSkillsDir, 'test-skill-recursive-test', 'SKILL.md'),
+        '# Test Skill',
+        'utf-8'
+      );
+
+      // Capture console output
+      const logs: string[] = [];
+      const originalLog = console.log;
+      console.log = (...args: unknown[]) => {
+        logs.push(args.map(a => String(a)).join(' '));
+      };
+
+      try {
+        // Run scan with recursive flag
+        await hygieneCommand('scan', { cwd: tempDir, recursive: true });
+
+        // Verify the suggestion includes -r flag
+        const suggestionLine = logs.find(line => line.includes('skills hygiene clean'));
+        expect(suggestionLine).toBeDefined();
+        expect(suggestionLine).toContain('-r');
+        expect(suggestionLine).toContain('--confirm');
+      } finally {
+        console.log = originalLog;
+      }
+    });
+
+    it('should suggest clean without -r flag when scan was run without recursive', async () => {
+      // Setup: Create slop in root skills directory
+      const skillsDir = join(tempDir, '.claude', 'skills');
+      await mkdir(join(skillsDir, 'test-skill-nonrecursive-test'), { recursive: true });
+      await writeFile(
+        join(skillsDir, 'test-skill-nonrecursive-test', 'SKILL.md'),
+        '# Test Skill',
+        'utf-8'
+      );
+
+      // Capture console output
+      const logs: string[] = [];
+      const originalLog = console.log;
+      console.log = (...args: unknown[]) => {
+        logs.push(args.map(a => String(a)).join(' '));
+      };
+
+      try {
+        // Run scan without recursive flag
+        await hygieneCommand('scan', { cwd: tempDir, recursive: false });
+
+        // Verify the suggestion does NOT include -r flag
+        const suggestionLine = logs.find(line => line.includes('skills hygiene clean'));
+        expect(suggestionLine).toBeDefined();
+        expect(suggestionLine).not.toContain('-r');
+        expect(suggestionLine).toContain('--confirm');
+      } finally {
+        console.log = originalLog;
+      }
+    });
+  });
+
   describe('CLAUDE.md cleanup', () => {
     it('should detect stale skill references in CLAUDE.md', async () => {
       const skillsDir = join(tempDir, '.claude', 'skills');

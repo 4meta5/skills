@@ -41,6 +41,7 @@ export interface ScanResult {
   items: SlopItem[];
   claudemdIssues?: ClaudeMdIssues;
   scannedPaths: string[];
+  recursive: boolean;
 }
 
 /**
@@ -246,7 +247,8 @@ export async function scanForSlop(
   return {
     items,
     claudemdIssues,
-    scannedPaths
+    scannedPaths,
+    recursive: options.recursive ?? false
   };
 }
 
@@ -452,7 +454,8 @@ function printScanResults(result: ScanResult): void {
     }
   }
 
-  console.log('Run `skills hygiene clean --confirm` to delete slop.');
+  const recursiveFlag = result.recursive ? '-r ' : '';
+  console.log(`Run \`skills hygiene clean ${recursiveFlag}--confirm\` to delete slop.`);
 }
 
 /**
