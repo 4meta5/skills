@@ -25,10 +25,20 @@
     "ai",
     "skills",
     "anthropic",
-    "cli"
+    "cli",
+    "claude-code"
   ],
-  "author": "",
+  "author": "Amar Singh",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/4meta5/skills.git",
+    "directory": "packages/skills-cli"
+  },
+  "homepage": "https://github.com/4meta5/skills#readme",
+  "bugs": {
+    "url": "https://github.com/4meta5/skills/issues"
+  },
   "dependencies": {
     "@anthropic/skills-library": "*",
     "@inquirer/prompts": "^7.2.1",

@@ -2,6 +2,10 @@
 
 This project provides a TypeScript library for managing Claude AI skills.
 
+## Git Policy
+
+**NEVER push to the remote repository.** The user will handle all pushes manually. You may commit locally, but do not run `git push` under any circumstances.
+
 ## Project Structure
 - `packages/skills-library/` - Main TypeScript library
 - `.claude/skills/` - Local skill definitions
