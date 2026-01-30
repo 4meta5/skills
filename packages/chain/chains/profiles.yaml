@@ -1,0 +1,158 @@
+# Workflow Profile Specifications
+# Defines task patterns, required capabilities, and completion criteria
+
+version: "1.0"
+
+# Default profile when no patterns match
+default_profile: permissive
+
+profiles:
+  # Bug fix workflow - strict TDD enforcement
+  - name: bug-fix
+    description: >
+      Workflow for fixing bugs. Requires TDD (RED → GREEN → REFACTOR),
+      documentation updates, and cleanup. Strict enforcement.
+    match:
+      - "fix"
+      - "bug"
+      - "broken"
+      - "failing test"
+      - "error"
+      - "issue"
+      - "regression"
+    capabilities_required:
+      - test_written        # TDD RED
+      - test_green          # TDD GREEN
+      - test_refactored     # TDD REFACTOR
+      - docs_updated        # Update PLAN.md
+      - repo_clean          # Clean up artifacts
+    strictness: strict
+    priority: 10
+    completion_requirements:
+      - name: test_exists
+        type: file_exists
+        pattern: "**/*.test.ts"
+        description: "Test file must exist for the fix"
+      - name: plan_marked
+        type: marker_found
+        file: PLAN.md
+        pattern: "\\[x\\].*fix"
+        description: "Fix must be marked complete in PLAN.md"
+
+  # New feature workflow - strict with full testing pipeline
+  - name: new-feature
+    description: >
+      Workflow for implementing new features. Full testing pipeline
+      including TDD, test suggestions, and property-based testing.
+    match:
+      - "add"
+      - "implement"
+      - "create"
+      - "build"
+      - "new feature"
+      - "feature"
+    capabilities_required:
+      - test_written
+      - test_green
+      - test_refactored
+      - test_recommendations
+      - tests_generated
+      - docs_updated
+      - dogfood_verified
+      - repo_clean
+    strictness: strict
+    priority: 5
+    completion_requirements:
+      - name: tests_pass
+        type: command_success
+        command: npm test
+        description: "All tests must pass"
+      - name: feature_documented
+        type: marker_found
+        file: README.md
+        pattern: "##.*Features?"
+        description: "Feature should be documented in README"
+
+  # Documentation-only workflow - advisory, minimal requirements
+  - name: docs-only
+    description: >
+      Workflow for documentation updates only. No code changes expected.
+      Advisory enforcement, just ensures docs are consistent.
+    match:
+      - "document"
+      - "readme"
+      - "update docs"
+      - "write documentation"
+      - "PLAN\\.md"
+      - "RESEARCH\\.md"
+    capabilities_required:
+      - docs_updated
+      - repo_clean
+    strictness: advisory
+    priority: 3
+    completion_requirements:
+      - name: docs_exist
+        type: file_exists
+        pattern: "**/*.md"
+        description: "Documentation files should exist"
+
+  # Refactoring workflow - tests must exist and remain green
+  - name: refactor
+    description: >
+      Workflow for refactoring code. Tests must exist before refactoring
+      and remain passing throughout. No new features.
+    match:
+      - "refactor"
+      - "clean up"
+      - "reorganize"
+      - "restructure"
+      - "simplify"
+    capabilities_required:
+      - test_green          # Tests must pass before refactoring
+      - test_refactored     # Clean up after changes
+      - docs_updated
+      - repo_clean
+    strictness: strict
+    priority: 7
+    completion_requirements:
+      - name: tests_still_pass
+        type: command_success
+        command: npm test
+        description: "Tests must still pass after refactoring"
+
+  # Tool development - includes no-workarounds and dogfooding
+  - name: tool-dev
+    description: >
+      Workflow for developing CLI tools or automation. Enforces
+      no-workarounds and dogfooding the tools you build.
+    match:
+      - "cli"
+      - "command"
+      - "tool"
+      - "automation"
+      - "script"
+    capabilities_required:
+      - test_written
+      - test_green
+      - tool_verified
+      - dogfood_verified
+      - docs_updated
+      - repo_clean
+    strictness: strict
+    priority: 8
+    completion_requirements:
+      - name: tool_runs
+        type: command_success
+        command: npm run build
+        description: "Tool must build successfully"
+
+  # Permissive default - no enforcement
+  - name: permissive
+    description: >
+      Default permissive workflow. No enforcement, just advisory hints.
+      Used when no specific pattern matches.
+    match: []
+    capabilities_required: []
+    strictness: permissive
+    priority: 0
+    completion_requirements: []
