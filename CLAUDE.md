@@ -51,6 +51,16 @@ Pre-commit hook runs typecheck + unit tests in parallel. Property tests are excl
 If you skip this, respond: **"BLOCKED: DOGFOODING REQUIRED"**
 
 ## Installed Skills
+- @.claude/skills/fixing-accessibility/SKILL.md
+- @.claude/skills/fixing-motion-performance/SKILL.md
+- @.claude/skills/frontend-design/SKILL.md
+- @.claude/skills/baseline-ui/SKILL.md
+- @.claude/skills/web-design-guidelines/SKILL.md
+- @.claude/skills/_temp_claude-svelte5-skill/SKILL.md
+- @.claude/skills/svelte-runes/SKILL.md
+- @.claude/skills/sveltekit-structure/SKILL.md
+- @.claude/skills/sveltekit-data-flow/SKILL.md
+- @.claude/skills/_temp_sveltekit-svelte5-tailwind-skill/SKILL.md
 - @.claude/skills/test-skill-1769789239272/SKILL.md
 - @.claude/skills/test-skill-1769789238849/SKILL.md
 - @.claude/skills/test-skill-1769789238381/SKILL.md

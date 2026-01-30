@@ -1,0 +1,50 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e3]:
+  - generic [ref=e4]:
+    - heading "Skills for Claude Code" [level=1] [ref=e5]
+    - paragraph [ref=e6]: Discover, install, and share reusable skills that enhance Claude's capabilities in your projects.
+    - generic [ref=e7]:
+      - code [ref=e8]: npm i -g @4meta5/skills-cli
+      - link "GitHub" [ref=e9] [cursor=pointer]:
+        - /url: https://github.com/4meta5/skills
+        - img [ref=e10]
+        - text: GitHub
+  - generic [ref=e13]:
+    - heading "What You Get" [level=2] [ref=e14]
+    - generic [ref=e15]:
+      - generic [ref=e16]:
+        - img [ref=e18]
+        - heading "Discover Skills" [level=3] [ref=e20]
+        - paragraph [ref=e21]: Scan your project and get smart recommendations for skills that match your stack.
+      - generic [ref=e22]:
+        - img [ref=e24]
+        - heading "Install Instantly" [level=3] [ref=e26]
+        - paragraph [ref=e27]: Add skills to your project with one command. No configuration needed.
+      - generic [ref=e28]:
+        - img [ref=e30]
+        - heading "Open Source" [level=3] [ref=e32]
+        - paragraph [ref=e33]: MIT licensed and community driven. Create and share your own skills.
+  - generic [ref=e35]:
+    - heading "Quick Start" [level=2] [ref=e36]
+    - generic [ref=e37]:
+      - generic [ref=e38]: "# Scan your project for recommended skills"
+      - generic [ref=e39]: $ npx @4meta5/skills-cli scan
+      - generic [ref=e40]: "# Add a skill to your project"
+      - generic [ref=e41]: $ npx @4meta5/skills-cli add tdd
+    - link "Read the documentation" [ref=e43] [cursor=pointer]:
+      - /url: /docs
+      - text: Read the documentation
+      - img [ref=e44]
+  - contentinfo [ref=e46]:
+    - generic [ref=e47]:
+      - generic [ref=e48]: MIT License
+      - generic [ref=e49]:
+        - link "Docs" [ref=e50] [cursor=pointer]:
+          - /url: /docs
+        - link "Skills" [ref=e51] [cursor=pointer]:
+          - /url: /skills
+        - link "GitHub" [ref=e52] [cursor=pointer]:
+          - /url: https://github.com/4meta5/skills
+```
