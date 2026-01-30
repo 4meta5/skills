@@ -1,12 +1,16 @@
 import { createSkillsLibrary, type Skill, type SkillCategory } from '@4meta5/skills';
 import { getSources } from '../config.js';
 import { listRemoteSkills, loadAllRemoteSkills, type SkillWithSource } from '../registry.js';
+import { readProvenance, isUpstreamSkill, isCustomSkill, type Provenance } from '../provenance.js';
 
 interface ListOptions {
   category?: string;
   json?: boolean;
   remote?: boolean;  // List skills from remote sources
   all?: boolean;     // List both local and remote
+  custom?: boolean;  // List only custom skills (provenance type: custom or no provenance)
+  upstream?: boolean; // List only upstream skills (provenance type: git)
+  provenance?: boolean; // Show provenance type for each skill
 }
 
 export async function listCommand(options: ListOptions = {}): Promise<void> {
@@ -23,19 +27,42 @@ export async function listCommand(options: ListOptions = {}): Promise<void> {
   const library = createSkillsLibrary();
   const category = options.category as SkillCategory | undefined;
 
-  const skills = await library.listSkills(category);
+  let skills = await library.listSkills(category);
+
+  // Filter by provenance type
+  if (options.custom || options.upstream) {
+    const filteredSkills: Skill[] = [];
+    for (const skill of skills) {
+      if (options.custom && await isCustomSkill(skill.path)) {
+        filteredSkills.push(skill);
+      } else if (options.upstream && await isUpstreamSkill(skill.path)) {
+        filteredSkills.push(skill);
+      }
+    }
+    skills = filteredSkills;
+  }
 
   if (skills.length === 0) {
-    console.log(category ? `No skills found in category: ${category}` : 'No skills found.');
+    const filterLabel = options.custom ? 'custom ' : options.upstream ? 'upstream ' : '';
+    console.log(category ? `No ${filterLabel}skills found in category: ${category}` : `No ${filterLabel}skills found.`);
     return;
+  }
+
+  // Get provenance info if needed
+  const provenanceMap = new Map<string, Provenance | null>();
+  if (options.provenance || options.json) {
+    for (const skill of skills) {
+      provenanceMap.set(skill.path, await readProvenance(skill.path));
+    }
   }
 
   if (options.json) {
-    console.log(JSON.stringify(skills.map(formatSkillJson), null, 2));
+    console.log(JSON.stringify(skills.map(s => formatSkillJsonWithProvenance(s, provenanceMap.get(s.path))), null, 2));
     return;
   }
 
-  console.log(`\nAvailable skills${category ? ` (${category})` : ''}:\n`);
+  const filterLabel = options.custom ? ' (custom only)' : options.upstream ? ' (upstream only)' : '';
+  console.log(`\nAvailable skills${category ? ` (${category})` : ''}${filterLabel}:\n`);
 
   const byCategory = groupByCategory(skills);
 
@@ -43,7 +70,8 @@ export async function listCommand(options: ListOptions = {}): Promise<void> {
     console.log(`  ${cat || 'uncategorized'}:`);
     for (const skill of catSkills) {
       const invocable = skill.metadata['user-invocable'] ? ' [invocable]' : '';
-      console.log(`    - ${skill.metadata.name}${invocable}`);
+      const provenanceLabel = options.provenance ? getProvenanceLabel(provenanceMap.get(skill.path)) : '';
+      console.log(`    - ${skill.metadata.name}${invocable}${provenanceLabel}`);
       console.log(`      ${skill.metadata.description}`);
     }
     console.log();
@@ -211,4 +239,35 @@ function groupBySource(skills: SkillWithSource[]): Record<string, SkillWithSourc
   }
 
   return groups;
+}
+
+function getProvenanceLabel(provenance: Provenance | null | undefined): string {
+  if (!provenance) {
+    return ' [custom]';
+  }
+  switch (provenance.source.type) {
+    case 'git':
+      return ' [upstream]';
+    case 'bundled':
+      return ' [bundled]';
+    case 'custom':
+    default:
+      return ' [custom]';
+  }
+}
+
+function formatSkillJsonWithProvenance(skill: Skill, provenance: Provenance | null | undefined) {
+  return {
+    name: skill.metadata.name,
+    description: skill.metadata.description,
+    category: skill.metadata.category,
+    userInvocable: skill.metadata['user-invocable'] || false,
+    path: skill.path,
+    provenance: provenance ? {
+      type: provenance.source.type,
+      url: provenance.source.url,
+      ref: provenance.source.ref,
+      commit: provenance.source.commit
+    } : { type: 'custom' }
+  };
 }

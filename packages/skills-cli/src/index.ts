@@ -18,13 +18,15 @@ import { embedCommand } from './commands/embed.js';
 import { evaluateCommand } from './commands/evaluate.js';
 import { validateCommand } from './commands/validate.js';
 import { hygieneCommand } from './commands/hygiene.js';
-import { migrateCommand } from './commands/migrate.js';
 
 interface ListOptions {
   category?: string;
   json?: boolean;
   remote?: boolean;
   all?: boolean;
+  custom?: boolean;
+  upstream?: boolean;
+  provenance?: boolean;
 }
 
 interface AddOptions {
@@ -120,13 +122,6 @@ interface HygieneCommandOptions {
   recursive?: boolean;
 }
 
-interface MigrateCommandOptions {
-  cwd?: string;
-  dryRun?: boolean;
-  confirm?: boolean;
-  json?: boolean;
-}
-
 const cli = cac('skills');
 
 cli
@@ -136,6 +131,9 @@ cli
   .option('--json', 'Output as JSON')
   .option('-r, --remote', 'List skills from remote sources')
   .option('-a, --all', 'List both local and remote skills')
+  .option('--custom', 'List only custom skills (no git provenance)')
+  .option('--upstream', 'List only upstream skills (git provenance)')
+  .option('--provenance', 'Show provenance type for each skill')
   .action(async (options: ListOptions) => {
     await listCommand(options);
   });
@@ -308,16 +306,6 @@ cli
       (subcommand as 'scan' | 'clean') || 'scan',
       options
     );
-  });
-
-cli
-  .command('migrate', 'Migrate skills to custom/upstream directory structure')
-  .option('-C, --cwd <path>', 'Target project directory (default: current directory)')
-  .option('-d, --dry-run', 'Show what would be migrated without changes')
-  .option('--confirm', 'Actually migrate skills')
-  .option('--json', 'Output as JSON')
-  .action(async (options: MigrateCommandOptions) => {
-    await migrateCommand(options);
   });
 
 cli.help();

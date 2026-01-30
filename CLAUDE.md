@@ -51,42 +51,30 @@ Pre-commit hook runs typecheck + unit tests in parallel. Property tests are excl
 If you skip this, respond: **"BLOCKED: DOGFOODING REQUIRED"**
 
 ## Installed Skills
-- @.claude/skills/test-skill-1769801615776/SKILL.md
-- @.claude/skills/test-skill-1769801615120/SKILL.md
-- @.claude/skills/test-skill-1769801614495/SKILL.md
-- @.claude/skills/test-skill-1769801237692/SKILL.md
-- @.claude/skills/test-skill-1769801237092/SKILL.md
-- @.claude/skills/test-skill-1769801236500/SKILL.md
-- @.claude/skills/test-skill-1769801199370/SKILL.md
-- @.claude/skills/test-skill-1769801198829/SKILL.md
-- @.claude/skills/test-skill-1769801198295/SKILL.md
-- @.claude/skills/test-skill-1769800840523/SKILL.md
-- @.claude/skills/test-skill-1769800840025/SKILL.md
-- @.claude/skills/test-skill-1769800839531/SKILL.md
-- @.claude/skills/custom/blog-writer/SKILL.md
-- @.claude/skills/custom/repo-hygiene/SKILL.md
-- @.claude/skills/custom/skill-maker/SKILL.md
-- @.claude/skills/custom/fixing-accessibility/SKILL.md
-- @.claude/skills/custom/fixing-motion-performance/SKILL.md
-- @.claude/skills/custom/frontend-design/SKILL.md
-- @.claude/skills/custom/baseline-ui/SKILL.md
-- @.claude/skills/custom/web-design-guidelines/SKILL.md
-- @.claude/skills/custom/claude-svelte5-skill/SKILL.md
-- @.claude/skills/custom/svelte-runes/SKILL.md
-- @.claude/skills/custom/sveltekit-structure/SKILL.md
-- @.claude/skills/custom/sveltekit-data-flow/SKILL.md
-- @.claude/skills/custom/sveltekit-svelte5-tailwind-skill/SKILL.md
-- @.claude/skills/custom/markdown-writer/SKILL.md
-- @.claude/skills/custom/property-based-testing/SKILL.md
-- @.claude/skills/custom/code-maturity-assessor/SKILL.md
-- @.claude/skills/custom/typescript-circular-dependency/SKILL.md
-- @.claude/skills/custom/dogfood-skills/SKILL.md - **Enforces dogfooding (READ THIS)**
-- @.claude/skills/custom/no-workarounds/SKILL.md - **Prevents manual workarounds when building tools**
-- @.claude/skills/custom/differential-review/SKILL.md
-- @.claude/skills/custom/claudeception/SKILL.md
-- @.claude/skills/custom/code-review-ts/SKILL.md
-- @.claude/skills/custom/security-analysis/SKILL.md
-- @.claude/skills/custom/suggest-tests/SKILL.md
-- @.claude/skills/custom/unit-test-workflow/SKILL.md
-- @.claude/skills/custom/tdd/SKILL.md
-- @.claude/skills/custom/workflow/SKILL.md - **Workflow orchestration (chains with tdd, no-workarounds, dogfood-skills)**
+- @.claude/skills/blog-writer/SKILL.md
+- @.claude/skills/repo-hygiene/SKILL.md
+- @.claude/skills/skill-maker/SKILL.md
+- @.claude/skills/fixing-accessibility/SKILL.md
+- @.claude/skills/fixing-motion-performance/SKILL.md
+- @.claude/skills/frontend-design/SKILL.md
+- @.claude/skills/baseline-ui/SKILL.md
+- @.claude/skills/web-design-guidelines/SKILL.md
+- @.claude/skills/claude-svelte5-skill/SKILL.md
+- @.claude/skills/svelte-runes/SKILL.md
+- @.claude/skills/sveltekit-structure/SKILL.md
+- @.claude/skills/sveltekit-data-flow/SKILL.md
+- @.claude/skills/sveltekit-svelte5-tailwind-skill/SKILL.md
+- @.claude/skills/markdown-writer/SKILL.md
+- @.claude/skills/property-based-testing/SKILL.md
+- @.claude/skills/code-maturity-assessor/SKILL.md
+- @.claude/skills/typescript-circular-dependency/SKILL.md
+- @.claude/skills/dogfood-skills/SKILL.md - **Enforces dogfooding (READ THIS)**
+- @.claude/skills/no-workarounds/SKILL.md - **Prevents manual workarounds when building tools**
+- @.claude/skills/differential-review/SKILL.md
+- @.claude/skills/claudeception/SKILL.md
+- @.claude/skills/code-review-ts/SKILL.md
+- @.claude/skills/security-analysis/SKILL.md
+- @.claude/skills/suggest-tests/SKILL.md
+- @.claude/skills/unit-test-workflow/SKILL.md
+- @.claude/skills/tdd/SKILL.md
+- @.claude/skills/workflow/SKILL.md - **Workflow orchestration (chains with tdd, no-workarounds, dogfood-skills)**

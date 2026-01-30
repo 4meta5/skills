@@ -107,18 +107,16 @@ export async function extractSkillTriggers(skillMdPath: string): Promise<SkillTr
 }
 
 /**
- * Discover all installed skills in a directory
+ * Discover skills in a single directory (non-recursive helper)
  */
-export async function discoverInstalledSkills(skillsDir: string): Promise<SkillTriggerInfo[]> {
-  const skills: SkillTriggerInfo[] = [];
-
+async function discoverSkillsInDir(dir: string, skills: SkillTriggerInfo[]): Promise<void> {
   try {
-    const entries = await readdir(skillsDir, { withFileTypes: true });
+    const entries = await readdir(dir, { withFileTypes: true });
 
     for (const entry of entries) {
       if (!entry.isDirectory()) continue;
 
-      const skillPath = join(skillsDir, entry.name);
+      const skillPath = join(dir, entry.name);
       const skillMdPath = join(skillPath, 'SKILL.md');
 
       try {
@@ -130,8 +128,18 @@ export async function discoverInstalledSkills(skillsDir: string): Promise<SkillT
       }
     }
   } catch {
-    // Skills directory doesn't exist
+    // Directory doesn't exist or not readable
   }
+}
+
+/**
+ * Discover all installed skills in a directory
+ * Scans the flat .claude/skills/ directory for skill folders
+ */
+export async function discoverInstalledSkills(skillsDir: string): Promise<SkillTriggerInfo[]> {
+  const skills: SkillTriggerInfo[] = [];
+
+  await discoverSkillsInDir(skillsDir, skills);
 
   return skills;
 }

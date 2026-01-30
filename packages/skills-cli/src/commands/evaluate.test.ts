@@ -137,6 +137,7 @@ description: Valid skill
       expect(skills).toHaveLength(1);
       expect(skills[0].skillName).toBe('valid');
     });
+
   });
 
   describe('generateEvaluationPrompt', () => {

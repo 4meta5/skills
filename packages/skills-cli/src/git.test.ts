@@ -1,5 +1,10 @@
-import { describe, it, expect } from 'vitest';
-import { parseGitUrl, extractSourceName } from './git.js';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
+import { parseGitUrl, extractSourceName, copySkillFromSource, type DiscoveredSkill } from './git.js';
+import { readProvenance } from './provenance.js';
+import { mkdir, rm, writeFile, readdir, stat } from 'fs/promises';
+import { join } from 'path';
+import { tmpdir } from 'os';
+import * as configModule from './config.js';
 
 describe('parseGitUrl', () => {
   describe('basic URLs', () => {
@@ -129,5 +134,60 @@ describe('extractSourceName', () => {
 
   it('returns "unknown" for malformed URL', () => {
     expect(extractSourceName('')).toBe('unknown');
+  });
+});
+
+describe('copySkillFromSource', () => {
+  let tempDir: string;
+  let cacheDir: string;
+  let targetDir: string;
+
+  beforeEach(async () => {
+    // Create temp directories for testing
+    tempDir = join(tmpdir(), `skills-test-${Date.now()}`);
+    cacheDir = join(tempDir, 'cache');
+    targetDir = join(tempDir, 'target');
+
+    // Create the mock source cache structure
+    // The skill would be in: cache/test-source/test-skill/SKILL.md
+    const skillDir = join(cacheDir, 'test-source', 'test-skill');
+    await mkdir(skillDir, { recursive: true });
+    await mkdir(targetDir, { recursive: true });
+    await writeFile(
+      join(skillDir, 'SKILL.md'),
+      '---\nname: test-skill\ndescription: A test skill\n---\n\n# Test Skill'
+    );
+
+    // Mock getSourcesCacheDir to return our temp cache directory
+    vi.spyOn(configModule, 'getSourcesCacheDir').mockReturnValue(cacheDir);
+  });
+
+  afterEach(async () => {
+    // Clean up temp directories
+    await rm(tempDir, { recursive: true, force: true });
+    vi.restoreAllMocks();
+  });
+
+  it('creates provenance with type: git when copying from git source', async () => {
+    const source = {
+      name: 'test-source',
+      url: 'https://github.com/user/repo',
+      ref: 'main',
+      type: 'git' as const
+    };
+
+    await copySkillFromSource(source, 'test-skill', targetDir);
+
+    // Check the target skill exists
+    const targetSkillDir = join(targetDir, 'test-skill');
+    const skillMdStat = await stat(join(targetSkillDir, 'SKILL.md'));
+    expect(skillMdStat.isFile()).toBe(true);
+
+    // BUG: This should pass but will fail because provenance is NOT created
+    const provenance = await readProvenance(targetSkillDir);
+    expect(provenance).not.toBeNull();
+    expect(provenance?.source.type).toBe('git');
+    expect(provenance?.source.url).toBe('https://github.com/user/repo');
+    expect(provenance?.source.ref).toBe('main');
   });
 });

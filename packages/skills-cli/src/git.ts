@@ -2,6 +2,7 @@ import { simpleGit, type SimpleGit } from 'simple-git';
 import { mkdir, rm, stat, readdir, copyFile } from 'fs/promises';
 import { join, dirname, basename } from 'path';
 import { getSourcesCacheDir, type SkillSource } from './config.js';
+import { createProvenance, type ProvenanceSource } from './provenance.js';
 
 /**
  * Parsed git URL components
@@ -281,7 +282,7 @@ export async function getSkillPathInSource(source: SkillSource, skillName: strin
 }
 
 /**
- * Copy a skill from source to target directory
+ * Copy a skill from source to target directory and create provenance
  */
 export async function copySkillFromSource(
   source: SkillSource,
@@ -293,13 +294,13 @@ export async function copySkillFromSource(
 
   await mkdir(targetPath, { recursive: true });
 
-  // Recursively copy all files, excluding .git directory
+  // Recursively copy all files, excluding .git directory and existing .provenance.json
   async function copyDir(src: string, dest: string): Promise<void> {
     const entries = await readdir(src, { withFileTypes: true });
 
     for (const entry of entries) {
-      // Skip .git directory
-      if (entry.name === '.git') continue;
+      // Skip .git directory and .provenance.json (we'll create our own)
+      if (entry.name === '.git' || entry.name === '.provenance.json') continue;
 
       const srcPath = join(src, entry.name);
       const destPath = join(dest, entry.name);
@@ -314,6 +315,17 @@ export async function copySkillFromSource(
   }
 
   await copyDir(skillPath, targetPath);
+
+  // Create provenance with git source information
+  const commit = await getSourceCommit(source);
+  const provenanceSource: ProvenanceSource = {
+    type: 'git',
+    url: source.url,
+    ref: source.ref,
+    commit
+  };
+
+  await createProvenance(targetPath, provenanceSource);
 }
 
 /**
