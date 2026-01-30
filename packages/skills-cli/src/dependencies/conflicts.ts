@@ -13,7 +13,7 @@
  * ```
  */
 
-import { loadSkillFromPath } from '@anthropic/skills-library';
+import { loadSkillFromPath } from '@4meta5/skills';
 import { join } from 'path';
 
 /**

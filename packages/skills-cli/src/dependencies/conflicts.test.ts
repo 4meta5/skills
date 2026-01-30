@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { detectConflicts, blockInstallIfConflict } from './conflicts.js';
 
 // Mock the skills-library for loading skill metadata
-vi.mock('@anthropic/skills-library', () => ({
+vi.mock('@4meta5/skills', () => ({
   loadSkillFromPath: vi.fn()
 }));
 
@@ -13,7 +13,7 @@ describe('conflicts', () => {
 
   describe('detectConflicts', () => {
     it('detects conflict when installing conflicting skill', async () => {
-      const { loadSkillFromPath } = await import('@anthropic/skills-library');
+      const { loadSkillFromPath } = await import('@4meta5/skills');
 
       // Mock to return different skills based on path
       vi.mocked(loadSkillFromPath).mockImplementation(async (path: string) => {
@@ -47,7 +47,7 @@ describe('conflicts', () => {
     });
 
     it('returns empty array when no conflicts', async () => {
-      const { loadSkillFromPath } = await import('@anthropic/skills-library');
+      const { loadSkillFromPath } = await import('@4meta5/skills');
 
       vi.mocked(loadSkillFromPath).mockImplementation(async (path: string) => {
         if (path.endsWith('/tdd')) {
@@ -80,7 +80,7 @@ describe('conflicts', () => {
     });
 
     it('handles skill without conflicts field gracefully', async () => {
-      const { loadSkillFromPath } = await import('@anthropic/skills-library');
+      const { loadSkillFromPath } = await import('@4meta5/skills');
 
       vi.mocked(loadSkillFromPath).mockImplementation(async (path: string) => {
         if (path.endsWith('/simple-skill')) {
@@ -113,7 +113,7 @@ describe('conflicts', () => {
     });
 
     it('detects bidirectional conflicts (if A conflicts B, then B conflicts A)', async () => {
-      const { loadSkillFromPath } = await import('@anthropic/skills-library');
+      const { loadSkillFromPath } = await import('@4meta5/skills');
 
       // Skill B does not declare conflict with A, but A declares conflict with B
       // When installing B, we should check if any installed skill (A) conflicts with B
@@ -153,7 +153,7 @@ describe('conflicts', () => {
 
   describe('blockInstallIfConflict', () => {
     it('throws error with conflicting skill names', async () => {
-      const { loadSkillFromPath } = await import('@anthropic/skills-library');
+      const { loadSkillFromPath } = await import('@4meta5/skills');
 
       vi.mocked(loadSkillFromPath).mockImplementation(async (path: string) => {
         if (path.endsWith('/strict-tdd')) {
@@ -186,7 +186,7 @@ describe('conflicts', () => {
     });
 
     it('does not throw when no conflicts exist', async () => {
-      const { loadSkillFromPath } = await import('@anthropic/skills-library');
+      const { loadSkillFromPath } = await import('@4meta5/skills');
 
       vi.mocked(loadSkillFromPath).mockImplementation(async (path: string) => {
         if (path.endsWith('/tdd')) {

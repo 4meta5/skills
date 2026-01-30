@@ -1,5 +1,5 @@
 import { checkbox, confirm } from '@inquirer/prompts';
-import type { Skill } from '@anthropic/skills-library';
+import type { Skill } from '@4meta5/skills';
 
 export interface SkillChoice {
   name: string;

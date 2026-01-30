@@ -1,6 +1,6 @@
 import { cp, mkdir, stat, readFile, writeFile } from 'fs/promises';
 import { join, resolve } from 'path';
-import { createSkillsLibrary } from '@anthropic/skills-library';
+import { createSkillsLibrary } from '@4meta5/skills';
 import {
   getProjectsWithSkill,
   getAllTrackedProjects,

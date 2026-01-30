@@ -1,4 +1,4 @@
-import { createSkillsLibrary } from '@anthropic/skills-library';
+import { createSkillsLibrary } from '@4meta5/skills';
 import {
   getDefaults,
   setDefaults,

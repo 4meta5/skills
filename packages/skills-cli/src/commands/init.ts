@@ -1,4 +1,4 @@
-import { createSkillsLibrary } from '@anthropic/skills-library';
+import { createSkillsLibrary } from '@4meta5/skills';
 import { stat } from 'fs/promises';
 import { join, resolve } from 'path';
 import { selectSkills, confirmAction } from '../interactive.js';

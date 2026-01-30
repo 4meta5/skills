@@ -1,4 +1,4 @@
-import { createSkillsLibrary, type Skill, type SkillCategory } from '@anthropic/skills-library';
+import { createSkillsLibrary, type Skill, type SkillCategory } from '@4meta5/skills';
 import { getSources } from '../config.js';
 import { listRemoteSkills, loadAllRemoteSkills, type SkillWithSource } from '../registry.js';
 

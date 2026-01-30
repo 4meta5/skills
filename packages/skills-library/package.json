@@ -1,5 +1,5 @@
 {
-  "name": "@anthropic/skills-library",
+  "name": "@4meta5/skills",
   "version": "1.0.0",
   "description": "TypeScript library for managing Claude AI skills",
   "type": "module",

@@ -3,7 +3,7 @@
 Intelligent skill discovery and workflow enforcement for Claude Code.
 
 ```bash
-npx @anthropic/skills-cli scan
+npx @4meta5/skills-cli scan
 ```
 
 ## What It Does
@@ -19,7 +19,7 @@ npx @anthropic/skills-cli scan
 
 ```bash
 # Install globally
-npm install -g @anthropic/skills-cli
+npm install -g @4meta5/skills-cli
 
 # Scan your project for recommended skills
 skills scan

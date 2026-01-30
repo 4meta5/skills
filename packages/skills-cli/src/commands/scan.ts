@@ -1,5 +1,5 @@
 import { checkbox, confirm } from '@inquirer/prompts';
-import { createSkillsLibrary } from '@anthropic/skills-library';
+import { createSkillsLibrary } from '@4meta5/skills';
 import { analyzeProject, getAllTechnologies, type ProjectAnalysis } from '../detector/index.js';
 import type { Confidence, DetectedTechnology } from '../detector/types.js';
 import {

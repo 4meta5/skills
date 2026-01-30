@@ -39,7 +39,7 @@ vi.mock('./git.js', () => ({
   })
 }));
 
-vi.mock('@anthropic/skills-library', () => ({
+vi.mock('@4meta5/skills', () => ({
   loadSkillFromPath: vi.fn()
 }));
 
@@ -312,7 +312,7 @@ describe('listRemoteSkills', async () => {
 describe('loadRemoteSkill', async () => {
   const { getSource } = await import('./config.js');
   const { cloneOrUpdateSource, getSkillPathInSource } = await import('./git.js');
-  const { loadSkillFromPath } = await import('@anthropic/skills-library');
+  const { loadSkillFromPath } = await import('@4meta5/skills');
   const { loadRemoteSkill } = await import('./registry.js');
 
   beforeEach(() => {
@@ -379,7 +379,7 @@ describe('loadRemoteSkill', async () => {
 describe('resolveSkillRef', async () => {
   const { getSource, getSources } = await import('./config.js');
   const { getSkillPathInSource } = await import('./git.js');
-  const { loadSkillFromPath } = await import('@anthropic/skills-library');
+  const { loadSkillFromPath } = await import('@4meta5/skills');
   const { resolveSkillRef } = await import('./registry.js');
 
   beforeEach(() => {

@@ -115,7 +115,7 @@ Completed 2026-01-29:
 
 ```bash
 # 1. Run all tests
-npm test -w @anthropic/skills-cli
+npm test -w @4meta5/skills-cli
 
 # 2. Dogfood scan
 ./packages/skills-cli/bin/skills.js scan
@@ -240,7 +240,7 @@ conflicts:
 Completed 2026-01-29:
 
 ```bash
-npm test -w @anthropic/skills-cli
+npm test -w @4meta5/skills-cli
 ./packages/skills-cli/bin/skills.js scan
 ./packages/skills-cli/bin/skills.js sync --all
 ```
@@ -297,7 +297,7 @@ const ToolCallSchema = z.object({
 Completed 2026-01-29:
 
 ```bash
-npm test -w @anthropic/skills-cli  # 732 tests passing
+npm test -w @4meta5/skills-cli  # 732 tests passing
 ./packages/skills-cli/bin/skills.js scan  # No new recommendations
 ./packages/skills-cli/bin/skills.js sync --all  # Synced 3521 projects
 ```
@@ -362,7 +362,7 @@ Requirements:
 {spec from above}
 
 Commands:
-- Test: npm test -w @anthropic/skills-cli -- --testNamePattern="{pattern}"
+- Test: npm test -w @4meta5/skills-cli -- --testNamePattern="{pattern}"
 
 BLOCKED until Phase 1 (RED) shows failing test.
 ```

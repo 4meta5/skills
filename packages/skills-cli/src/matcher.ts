@@ -1,5 +1,5 @@
-import { createSkillsLibrary } from '@anthropic/skills-library';
-import type { Skill } from '@anthropic/skills-library';
+import { createSkillsLibrary } from '@4meta5/skills';
+import type { Skill } from '@4meta5/skills';
 import type { ProjectAnalysis, Confidence, DetectedTechnology, SkillCategory } from './detector/types.js';
 import { getAllTags, getAllTechnologies } from './detector/index.js';
 import {

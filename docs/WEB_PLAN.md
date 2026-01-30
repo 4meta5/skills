@@ -15,7 +15,7 @@ Build a website and optional cloud services for the Claude Code Skills Platform.
 | Factor | Why It Matters |
 |--------|----------------|
 | **Trust** | A CLI with hooks into Claude responses needs transparency. Devs want to audit it. |
-| **Adoption** | Lower barrier. `npm i -g skills-cli` beats "sign up first" |
+| **Adoption** | Lower barrier. `npm i -g @4meta5/skills-cli` beats "sign up first" |
 | **Network effects** | Skills are community-driven. Open source = more contributors = more skills |
 | **Target audience** | Claude Code users are developers. They prefer open source tooling. |
 | **Precedent** | Prettier, ESLint, Husky, Git are all open source. Money comes from services. |
@@ -232,3 +232,98 @@ This is exactly how Git/GitHub, Terraform/Terraform Cloud, and VS Code/Copilot w
 - [Turso](https://turso.tech/)
 - [Lemon Squeezy](https://www.lemonsqueezy.com/)
 - [Cloudflare Pages](https://pages.cloudflare.com/)
+
+---
+
+## Part 10: Publishing to npm
+
+Publish when ready for others to install via `npm install`.
+
+### Prerequisites
+
+1. npm account (you have: `4meta5`)
+2. Logged in: `npm whoami` returns your username
+3. Build passes: `npm run build`
+4. Tests pass: `npm test`
+
+### Publish Order
+
+Library first, then CLI. The CLI depends on the library.
+
+```bash
+# 1. Build everything
+npm run build
+
+# 2. Publish library
+cd packages/skills-library
+npm publish --access public
+
+# 3. Update CLI dependency (change * to actual version)
+cd ../skills-cli
+# Edit package.json: "@4meta5/skills": "^1.0.0"
+
+# 4. Publish CLI
+npm publish --access public
+```
+
+### Why `--access public`?
+
+Scoped packages (`@4meta5/...`) default to private. Private packages require a paid npm plan. `--access public` makes them free.
+
+### Version Bumping
+
+Before each publish, bump the version:
+
+```bash
+npm version patch  # 1.0.0 → 1.0.1 (bug fixes)
+npm version minor  # 1.0.0 → 1.1.0 (new features)
+npm version major  # 1.0.0 → 2.0.0 (breaking changes)
+```
+
+### Verify Publication
+
+```bash
+# Check it exists
+npm view @4meta5/skills
+npm view @4meta5/skills-cli
+
+# Test install
+npx @4meta5/skills-cli --version
+```
+
+### Unpublish (Emergency Only)
+
+You have 72 hours to unpublish. After that, the version is permanent.
+
+```bash
+npm unpublish @4meta5/skills@1.0.0
+```
+
+### Automate Later
+
+Add GitHub Actions for CI/CD:
+
+```yaml
+# .github/workflows/publish.yml
+name: Publish
+on:
+  release:
+    types: [published]
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          registry-url: 'https://registry.npmjs.org'
+      - run: npm ci
+      - run: npm run build
+      - run: npm test
+      - run: npm publish --access public -w @4meta5/skills
+      - run: npm publish --access public -w @4meta5/skills-cli
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+```
+
+Store `NPM_TOKEN` in GitHub repo secrets. Generate it at npmjs.com > Access Tokens.

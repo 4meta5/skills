@@ -14,8 +14,8 @@
 import { writeFile, mkdir } from 'fs/promises';
 import { dirname, join } from 'path';
 import { fileURLToPath } from 'url';
-import { createSkillsLibrary } from '@anthropic/skills-library';
-import type { Skill } from '@anthropic/skills-library';
+import { createSkillsLibrary } from '@4meta5/skills';
+import type { Skill } from '@4meta5/skills';
 import {
   initializeModel,
   generateEmbedding,

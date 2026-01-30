@@ -11,7 +11,7 @@ import {
 } from './matcher.js';
 
 // Mock the skills library
-vi.mock('@anthropic/skills-library', () => ({
+vi.mock('@4meta5/skills', () => ({
   createSkillsLibrary: () => ({
     loadSkill: vi.fn().mockImplementation(async (name: string) => {
       // Return mock skills for bundled skills

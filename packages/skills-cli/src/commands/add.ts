@@ -1,6 +1,6 @@
-import { createSkillsLibrary, loadSkillFromPath } from '@anthropic/skills-library';
+import { createSkillsLibrary, loadSkillFromPath } from '@4meta5/skills';
 import { updateClaudeMd } from '../claudemd.js';
-import type { Skill } from '@anthropic/skills-library';
+import type { Skill } from '@4meta5/skills';
 import { selectSkills } from '../interactive.js';
 import { getDefaults, trackInstalledSkill, getSource, getSources, trackProjectInstallation } from '../config.js';
 import {

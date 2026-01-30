@@ -20,11 +20,11 @@ INPUT=$(cat)
 # Look for vector store in common locations
 VECTOR_STORE=""
 for dir in \
-  "${HOME}/.npm-global/lib/node_modules/@anthropic/skills-cli/data" \
-  "${HOME}/.local/lib/node_modules/@anthropic/skills-cli/data" \
-  "$(npm root -g 2>/dev/null)/@anthropic/skills-cli/data" \
-  "$(dirname "$(which skills 2>/dev/null)")/../lib/node_modules/@anthropic/skills-cli/data" \
-  "${CLAUDE_PROJECT_DIR}/node_modules/@anthropic/skills-cli/data" \
+  "${HOME}/.npm-global/lib/node_modules/@4meta5/skills-cli/data" \
+  "${HOME}/.local/lib/node_modules/@4meta5/skills-cli/data" \
+  "$(npm root -g 2>/dev/null)/@4meta5/skills-cli/data" \
+  "$(dirname "$(which skills 2>/dev/null)")/../lib/node_modules/@4meta5/skills-cli/data" \
+  "${CLAUDE_PROJECT_DIR}/node_modules/@4meta5/skills-cli/data" \
   "${CLAUDE_PROJECT_DIR}/.skills/data"
 do
   if [ -f "${dir}/vector_store.json" ]; then
@@ -50,9 +50,9 @@ export SKILLS_VECTOR_STORE="$VECTOR_STORE"
 ACTIVATE_SCRIPT=""
 for script_dir in \
   "${CLAUDE_PROJECT_DIR}/packages/skills-cli/src/router" \
-  "${CLAUDE_PROJECT_DIR}/node_modules/@anthropic/skills-cli/dist/src/router" \
-  "$(npm root -g 2>/dev/null)/@anthropic/skills-cli/dist/src/router" \
-  "${HOME}/.npm-global/lib/node_modules/@anthropic/skills-cli/dist/src/router"
+  "${CLAUDE_PROJECT_DIR}/node_modules/@4meta5/skills-cli/dist/src/router" \
+  "$(npm root -g 2>/dev/null)/@4meta5/skills-cli/dist/src/router" \
+  "${HOME}/.npm-global/lib/node_modules/@4meta5/skills-cli/dist/src/router"
 do
   if [ -f "${script_dir}/activate.js" ]; then
     ACTIVATE_SCRIPT="${script_dir}/activate.js"
