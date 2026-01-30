@@ -12,8 +12,24 @@ dist/
 !src/**/*.ts
 !skills/**/*.ts
 
-# Test coverage
+# Keep config files (both root and nested)
+!*.config.ts
+!*.config.js
+!**/*.config.ts
+!**/*.config.js
+!**/svelte.config.js
+!**/vite.config.ts
+!**/vitest.config.ts
+
+# Test coverage and reports
 coverage/
+.nyc_output/
+playwright-report/
+test-results/
+
+# SvelteKit
+.svelte-kit/
+build/
 
 # IDE
 .idea/
@@ -32,6 +48,14 @@ npm-debug.log*
 # Environment
 .env
 .env.local
+.env.*.local
 
 # Lock files (optional - uncomment if you want to ignore)
 # package-lock.json
+
+# Vite
+vite.config.js.timestamp-*
+vite.config.ts.timestamp-*
+
+# Playwright
+playwright/.cache/
