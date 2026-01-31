@@ -52,10 +52,18 @@ Chain owns session state. Tool-time enforcement is truth. Prompt-time is optimiz
 - [ ] Usage tracker records: decision, activation, blocks, retries, completions
 - [ ] Tests: blocked tool returns deterministic short reason
 
-**6.5: Event Bus (Later)**
+**6.5: Polyglot Test Discovery (HIGH VALUE)**
+- [ ] Auto-detect test framework from project files (jest.config, pytest.ini, go.mod, Cargo.toml)
+- [ ] Language-agnostic test file patterns (see docs/4-LAYER-ARCHITECTURE.md)
+- [ ] `chain detect-tests` command for discovery
+- [ ] Update TDD skill to use detected runner instead of hardcoded `npm test`
+- [ ] Support: Jest, Vitest, Mocha, Pytest, Go test, Cargo test
+
+**6.6: Event Bus (Later)**
 - [ ] Replace direct calls with internal event dispatcher
 - [ ] Keep payloads same (prompt:received, skill:matched, tool:requested)
 - [ ] Same behavior, pluggable integrations
+- [ ] Trigger: need parallel consumers (security scanner, linter, test runner)
 
 ### Phase 5: Integration + Polish (Deferred)
 
