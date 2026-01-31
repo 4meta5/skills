@@ -29,3 +29,7 @@ export type { HookFunctions, HookableMiddleware } from './hooks.js';
 // Error messages
 export { formatValidationError, formatRetryPrompt } from './error-messages.js';
 export type { ValidationError } from './error-messages.js';
+
+// Chain integration
+export { createChainIntegration } from './chain-integration.js';
+export type { ChainIntegrationOptions, ChainIntegration } from './chain-integration.js';

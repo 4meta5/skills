@@ -51,7 +51,8 @@
     "smol-toml": "^1.6.0",
     "xstate": "^5.26.0",
     "yaml": "^2.3.0",
-    "zod": "^4.3.6"
+    "zod": "^4.3.6",
+    "@4meta5/chain": "*"
   },
   "devDependencies": {
     "@types/node": "^20.0.0",

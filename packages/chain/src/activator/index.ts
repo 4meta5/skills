@@ -91,6 +91,9 @@ export class ChainActivator {
         activated: false,
         session_id: '',
         is_new: false,
+        idempotent: false,
+        chain: [],
+        blocked_intents: {},
         error: 'Chat mode does not activate skill chains',
       };
     }
@@ -117,6 +120,9 @@ export class ChainActivator {
         activated: false,
         session_id: '',
         is_new: false,
+        idempotent: false,
+        chain: [],
+        blocked_intents: {},
         error: 'No matching profile found for activation',
       };
     }
@@ -128,6 +134,9 @@ export class ChainActivator {
         activated: false,
         session_id: '',
         is_new: false,
+        idempotent: false,
+        chain: [],
+        blocked_intents: {},
         error: `Profile "${profileId}" not found`,
       };
     }

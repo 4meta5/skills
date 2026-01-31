@@ -20,7 +20,11 @@ Chain owns session state. Tool-time enforcement is truth. Prompt-time is optimiz
 - [x] Add `chain activate-route` CLI command for router integration
 - [x] Chain state shows active enforcement immediately after routing (before any Skill() call)
 - [x] Tests: 17 new tests for ChainActivator, 13 for RouteDecision types
-- [ ] Middleware calls activate when router mode is `immediate` or `suggestion` (next: integrate with CLI middleware)
+- [x] Middleware calls activate when router mode is `immediate` or `suggestion`
+- [x] Added `createChainIntegration()` for router→chain bridging
+- [x] Updated `createCorrectiveLoop()` to accept optional chainIntegration
+- [x] Made `initializeFromRouting()` async to support chain activation
+- [x] Tests: 9 new chain-integration tests, 805 total CLI tests passing
 
 **6.2: Intent Mapping (Unblock Smarter Blocking)** ✅
 - [x] Define canonical intents: write_test, write_impl, write_docs, write_config, edit_test, edit_impl, etc.
