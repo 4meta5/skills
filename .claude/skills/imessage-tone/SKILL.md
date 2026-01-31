@@ -80,7 +80,14 @@ Write like a chill teenager texting — casual, abbreviated, can have typos.
 | okay | ok |
 | let me know | lmk |
 | tomorrow | tmrw |
-| tonight | tnght |
+| tonight | tn |
+| monday | mon |
+| tuesday | tue |
+| wednesday | wed |
+| thursday | thu |
+| friday | fri |
+| saturday | sat |
+| sunday | sun |
 | thanks | thx or thanks |
 | because | bc |
 | probably | prob |
@@ -125,11 +132,11 @@ Write like a chill teenager texting — casual, abbreviated, can have typos.
 ```
 hey ru free tmrw night ? need help w the pups around seven
 
-hi lmk if ur available this week for walks , prob need tues and thurs
+hi lmk if ur available this week for walks , prob need tue and thu
 
 hey thanks for yesterday the dogs were so tired lol
 
-can u do tnght instead ? smth came up tmrw
+can u do tn instead ? smth came up tmrw
 ```
 
 ### Privacy Rules (Mode 2 Only)
