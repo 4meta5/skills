@@ -31,6 +31,32 @@ Also invoke explicitly with:
 - "update documentation"
 - "sync docs"
 
+### Pre-Merge Cleanup
+
+When owner says **"clean up before merge"** or similar, run this checklist:
+
+```bash
+# 1. Sync CLAUDE.md with installed skills (removes stale refs)
+skills claudemd sync
+
+# 2. Scan for test artifacts and slop
+skills hygiene scan
+
+# 3. If slop found, clean it
+skills hygiene clean --confirm
+
+# 4. Validate chain config (if chain files changed)
+chain validate
+
+# 5. Update PLAN.md with completed work
+# (follow doc-maintenance procedure below)
+
+# 6. Commit and push
+git add -A && git commit -m "chore: pre-merge cleanup" && git push
+```
+
+This is the standard cleanup before any PR merge.
+
 ## Procedure
 
 ### Step 1: Read Current State
