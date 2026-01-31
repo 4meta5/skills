@@ -242,3 +242,134 @@ describe('checkPreToolUse', () => {
     expect(result.allowed).toBe(true);
   });
 });
+
+describe('auto-activation', () => {
+  let testDir: string;
+  let stateManager: StateManager;
+  let mockSkills: SkillSpec[];
+  const mockProfiles = [
+    {
+      name: 'bug-fix',
+      description: 'Workflow for fixing bugs',
+      match: ['fix', 'bug', 'broken', 'error'],
+      capabilities_required: ['test_written', 'test_green'],
+      strictness: 'strict' as const,
+      priority: 10,
+      completion_requirements: [],
+    },
+    {
+      name: 'new-feature',
+      description: 'Workflow for new features',
+      match: ['add', 'implement', 'create', 'feature'],
+      capabilities_required: ['test_written'],
+      strictness: 'strict' as const,
+      priority: 5,
+      completion_requirements: [],
+    },
+    {
+      name: 'permissive',
+      description: 'Default permissive',
+      match: [],
+      capabilities_required: [],
+      strictness: 'permissive' as const,
+      priority: 0,
+      completion_requirements: [],
+    },
+  ];
+
+  beforeEach(async () => {
+    testDir = join(tmpdir(), `chain-test-${randomUUID()}`);
+    await mkdir(testDir, { recursive: true });
+    stateManager = new StateManager(testDir);
+
+    mockSkills = [
+      {
+        name: 'tdd',
+        skill_path: '.claude/skills/tdd',
+        provides: ['test_written', 'test_green'],
+        requires: [],
+        conflicts: [],
+        risk: 'low',
+        cost: 'low',
+        artifacts: [],
+        tool_policy: {
+          deny_until: {
+            write: { until: 'test_written', reason: 'Tests must be written first' },
+          },
+        },
+      },
+    ];
+  });
+
+  afterEach(async () => {
+    await rm(testDir, { recursive: true, force: true });
+  });
+
+  it('auto-activates profile when no session and prompt matches', async () => {
+    const hook = new PreToolUseHook(testDir, mockSkills, mockProfiles);
+
+    const result = await hook.check(
+      { tool: 'Write' },
+      { prompt: 'fix the login bug' }
+    );
+
+    // Should have activated bug-fix profile
+    const state = await stateManager.loadCurrent();
+    expect(state).not.toBeNull();
+    expect(state!.profile_id).toBe('bug-fix');
+    expect(result.message).toContain('bug-fix');
+  });
+
+  it('does not auto-activate when autoSelect is false', async () => {
+    const hook = new PreToolUseHook(testDir, mockSkills, mockProfiles);
+
+    const result = await hook.check(
+      { tool: 'Write' },
+      { prompt: 'fix the login bug', autoSelect: false }
+    );
+
+    // Should not have activated any profile
+    const state = await stateManager.loadCurrent();
+    expect(state).toBeNull();
+    expect(result.allowed).toBe(true);
+  });
+
+  it('does not auto-activate when prompt does not match any profile', async () => {
+    const hook = new PreToolUseHook(testDir, mockSkills, mockProfiles);
+
+    const result = await hook.check(
+      { tool: 'Read' },
+      { prompt: 'hello world' }
+    );
+
+    const state = await stateManager.loadCurrent();
+    expect(state).toBeNull();
+    expect(result.allowed).toBe(true);
+  });
+
+  it('persists profile selection for subsequent calls', async () => {
+    const hook = new PreToolUseHook(testDir, mockSkills, mockProfiles);
+
+    // First call - should auto-activate
+    await hook.check({ tool: 'Read' }, { prompt: 'fix the bug' });
+
+    // Second call without prompt - should use persisted profile
+    const result = await hook.check({ tool: 'Write' });
+
+    const state = await stateManager.loadCurrent();
+    expect(state).not.toBeNull();
+    expect(state!.profile_id).toBe('bug-fix');
+  });
+
+  it('includes auto-activation info in message', async () => {
+    const hook = new PreToolUseHook(testDir, mockSkills, mockProfiles);
+
+    const result = await hook.check(
+      { tool: 'Read' },
+      { prompt: 'implement new search feature' }
+    );
+
+    expect(result.message).toContain('auto-activated');
+    expect(result.message).toContain('new-feature');
+  });
+});

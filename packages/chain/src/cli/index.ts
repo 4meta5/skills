@@ -73,6 +73,8 @@ cli
   .option('--cwd <path>', 'Working directory for session state')
   .option('--skills <path>', 'Path to skills.yaml')
   .option('--profiles <path>', 'Path to profiles.yaml')
+  .option('--prompt <text>', 'User prompt for auto-activating profiles')
+  .option('--no-auto', 'Disable profile auto-selection')
   .action(hookPreToolUseCommand);
 
 cli

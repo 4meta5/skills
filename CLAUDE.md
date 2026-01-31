@@ -53,6 +53,12 @@ Pre-commit hook runs typecheck + unit tests in parallel. Property tests are excl
 If you skip this, respond: **"BLOCKED: DOGFOODING REQUIRED"**
 
 ## Installed Skills
+- @.claude/skills/test-skill-1769892993540/SKILL.md
+- @.claude/skills/test-skill-1769892993530/SKILL.md
+- @.claude/skills/test-skill-1769892993517/SKILL.md
+- @.claude/skills/test-skill-1769892287258/SKILL.md
+- @.claude/skills/test-skill-1769892287253/SKILL.md
+- @.claude/skills/test-skill-1769892287246/SKILL.md
 
 ### Workflow Orchestration
 - @.claude/skills/workflow-orchestrator/SKILL.md - **Always-on workflow orchestration**

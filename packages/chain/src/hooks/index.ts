@@ -7,7 +7,8 @@ export {
   formatStatusSummary,
 } from './denial-formatter.js';
 
-export { PreToolUseHook } from './pre-tool-use.js';
+export { PreToolUseHook, checkPreToolUse } from './pre-tool-use.js';
+export type { PreToolUseResult, PreToolUseOptions } from './pre-tool-use.js';
 export { StopHook } from './stop-hook.js';
 
 export {

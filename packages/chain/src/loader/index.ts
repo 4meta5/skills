@@ -239,14 +239,21 @@ export interface ChainConfig {
 
 /**
  * Load both skills and profiles configurations
+ * 
+ * If cwd is provided and explicit paths are not, looks for chains/ directory in cwd.
  */
 export async function loadConfig(
   cwd?: string,
   skillsPath?: string,
   profilesPath?: string
 ): Promise<ChainConfig> {
-  const skillsConfig = await loadSkillsConfig(skillsPath);
-  const profilesConfig = await loadProfilesConfig(profilesPath);
+  // If cwd is provided and no explicit paths, look in cwd/chains/
+  const chainsDir = cwd ? join(cwd, 'chains') : undefined;
+  const resolvedSkillsPath = skillsPath ?? (chainsDir ? join(chainsDir, 'skills.yaml') : undefined);
+  const resolvedProfilesPath = profilesPath ?? (chainsDir ? join(chainsDir, 'profiles.yaml') : undefined);
+
+  const skillsConfig = await loadSkillsConfig(resolvedSkillsPath);
+  const profilesConfig = await loadProfilesConfig(resolvedProfilesPath);
 
   return {
     skills: skillsConfig.skills,
