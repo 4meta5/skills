@@ -45,19 +45,22 @@ Chain owns session state. Tool-time enforcement is truth. Prompt-time is optimiz
 - [x] Total: 310 chain tests passing (was 269)
 - [ ] Add `skill_declined:<name>` capability for explicit decline (deferred)
 
-**6.4: Unified Session State**
+**6.4: Polyglot Test Discovery** ✅
+- [x] detectTestRunner() - returns primary test runner for a project
+- [x] detectAllTestRunners() - returns all detected runners sorted by confidence
+- [x] `chain detect-runner` CLI command (--path, --all, --json)
+- [x] Supported: cargo, go, pytest, vitest, jest, mocha, npm fallback
+- [x] Detection by config files and content patterns
+- [x] Workspace detection for Cargo.toml
+- [x] SkillSpecInput type and createSkillSpec() helper for partial definitions
+- [x] Tests: 329 passing (+19 new)
+
+**6.5: Unified Session State**
 - [ ] Add `chain explain --session <id>` (returns why blocked)
 - [ ] Add `chain get-state --session <id>` (programmatic)
 - [ ] Middleware uses state to craft targeted corrective prompts
 - [ ] Usage tracker records: decision, activation, blocks, retries, completions
 - [ ] Tests: blocked tool returns deterministic short reason
-
-**6.5: Polyglot Test Discovery (HIGH VALUE)**
-- [ ] Auto-detect test framework from project files (jest.config, pytest.ini, go.mod, Cargo.toml)
-- [ ] Language-agnostic test file patterns (see docs/4-LAYER-ARCHITECTURE.md)
-- [ ] `chain detect-tests` command for discovery
-- [ ] Update TDD skill to use detected runner instead of hardcoded `npm test`
-- [ ] Support: Jest, Vitest, Mocha, Pytest, Go test, Cargo test
 
 **6.6: Event Bus (Later)**
 - [ ] Replace direct calls with internal event dispatcher
