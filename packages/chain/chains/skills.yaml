@@ -27,13 +27,12 @@ skills:
         type: command_success
         command: npm test
     tool_policy:
+      # Note: We don't block 'write' because you need to write test files first.
+      # TDD enforcement happens at commit time - tests must pass before committing.
       deny_until:
-        write:
-          until: test_written
-          reason: "TDD RED phase: Write a failing test before implementation"
         commit:
           until: test_green
-          reason: "TDD GREEN phase: Tests must pass before committing"
+          reason: "TDD: Tests must pass before committing"
 
   # Prevents manual workarounds when building tools
   - name: no-workarounds
