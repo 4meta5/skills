@@ -59,6 +59,17 @@ Website improvements.
 
 ## Completed
 
+### 2026-01-31
+
+**Communication Skills**
+- [x] Created imessage-tone skill for iMessage communication
+- [x] Two-mode system: owner (direct, honest) vs others (approval required, casual)
+- [x] Abbreviation rules, punctuation rules, non-needy tone
+- [x] Created bluebubbles-setup skill for iMessage integration
+- [x] Covers Full Disk Access, Cloudflare tunnels, webhook config
+- [x] Documents critical config rules (open policy requires wildcard)
+- [x] Added both skills to README.md Skills Library table
+
 ### 2026-01-30
 
 **doc-maintenance Skill Fix**
