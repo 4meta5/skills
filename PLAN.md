@@ -19,7 +19,7 @@ Skill chaining system with declarative YAML-based profiles.
 - [ ] Add `chain validate` to CI/pre-commit
 - [ ] Update workflow-orchestrator skill to reference chain system
 - [ ] Migration guide from skill-based to chain-based workflows
-- [ ] Create README.md for the package
+- [x] Create README.md for the package
 
 ### Package: cli
 
