@@ -59,3 +59,7 @@ vite.config.ts.timestamp-*
 
 # Playwright
 playwright/.cache/
+
+# Chain state (session files)
+.chain-state.json
+**/chain_state/
