@@ -1,10 +1,55 @@
-import type { SessionState, SkillSpec, ProfileSpec } from '../types/index.js';
+import type { SessionState, SkillSpec, ProfileSpec, EnforcementTier } from '../types/index.js';
+import { HIGH_IMPACT_INTENTS } from '../types/index.js';
 import { StateManager } from '../session/index.js';
-import { findBlockedIntents, type ToolInput } from './intent-mapper.js';
+import { findBlockedIntents, mapToolToIntents, type ToolInput } from './intent-mapper.js';
 import { formatIntentDenial } from './denial-formatter.js';
 import { getSkillGuidance, formatGuidanceOutput } from './skill-guidance.js';
 import { matchProfileToPrompt } from '../resolver/profile-matcher.js';
 import { resolve } from '../resolver/resolver.js';
+
+/**
+ * Check if an intent is high-impact (blocked in soft tier)
+ */
+function isHighImpactIntent(intent: string): boolean {
+  return (HIGH_IMPACT_INTENTS as readonly string[]).includes(intent);
+}
+
+/**
+ * Get the enforcement tier for the current skill in the chain
+ */
+function getCurrentTier(sessionState: SessionState, skills: SkillSpec[]): EnforcementTier {
+  const currentSkillName = sessionState.chain[sessionState.current_skill_index];
+  if (!currentSkillName) {
+    return 'hard'; // Default to hard if no skill found
+  }
+
+  const skill = skills.find(s => s.name === currentSkillName);
+  return skill?.tier ?? 'hard';
+}
+
+/**
+ * Filter blocked intents based on enforcement tier
+ *
+ * - hard: all blocked intents apply
+ * - soft: only high-impact blocked intents apply
+ * - none: no blocking (returns empty array)
+ */
+function filterBlockedByTier(
+  blocked: Array<{ intent: string; reason: string }>,
+  tier: EnforcementTier
+): Array<{ intent: string; reason: string }> {
+  if (tier === 'none') {
+    return []; // No blocking in 'none' tier
+  }
+
+  if (tier === 'soft') {
+    // Only block high-impact intents
+    return blocked.filter(b => isHighImpactIntent(b.intent));
+  }
+
+  // 'hard' tier: all blocked intents apply
+  return blocked;
+}
 
 export interface PreToolUseResult {
   allowed: boolean;
@@ -114,9 +159,15 @@ export class PreToolUseHook {
     }
 
     // Find any blocked intents for this tool
-    const blocked = findBlockedIntents(toolInput, sessionState.blocked_intents);
+    const allBlocked = findBlockedIntents(toolInput, sessionState.blocked_intents);
 
-    // If no blocked intents, allow the tool with guidance
+    // Get current skill's enforcement tier
+    const tier = getCurrentTier(sessionState, this.skills);
+
+    // Filter blocked intents based on tier
+    const blocked = filterBlockedByTier(allBlocked, tier);
+
+    // If no blocked intents (after tier filtering), allow the tool with guidance
     if (blocked.length === 0) {
       const guidance = getSkillGuidance(sessionState, this.skills);
       let message = formatGuidanceOutput(guidance, sessionState.profile_id);

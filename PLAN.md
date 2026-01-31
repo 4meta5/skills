@@ -33,13 +33,17 @@ Chain owns session state. Tool-time enforcement is truth. Prompt-time is optimiz
 - [x] Default patterns: `**/{test,tests,__tests__}/**`, `**/*.{test,spec}.*`, etc.
 - [x] Tests: TDD RED allows `foo.test.ts`, blocks `src/foo.ts` (6 new integration tests)
 
-**6.3: Enforcement Tiers**
-- [ ] Add `tier: hard | soft | none` to skill schema
-- [ ] Hard: deny intents until capability satisfied
-- [ ] Soft: allow low-impact, block high-impact (write_impl, apply_patch) until ack
-- [ ] None: guidance + tracking only
-- [ ] Add `skill_declined:<name>` capability for explicit decline
-- [ ] Tests: suggest-tests blocks write_impl, allows read_file
+**6.3: Enforcement Tiers** ✅
+- [x] Add `tier: hard | soft | none` to skill schema (EnforcementTier enum)
+- [x] Define HIGH_IMPACT_INTENTS (write_impl, commit, push, deploy, delete)
+- [x] Define LOW_IMPACT_INTENTS (write_test, write_docs, write_config)
+- [x] Hard: block all denied intents (default behavior)
+- [x] Soft: block high-impact intents only, allow low-impact ones
+- [x] None: guidance only, no blocking
+- [x] filterBlockedByTier() and getCurrentTier() helpers
+- [x] Tests: 10 new tier enforcement tests
+- [x] Total: 310 chain tests passing (was 269)
+- [ ] Add `skill_declined:<name>` capability for explicit decline (deferred)
 
 **6.4: Unified Session State**
 - [ ] Add `chain explain --session <id>` (returns why blocked)

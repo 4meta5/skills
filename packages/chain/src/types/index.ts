@@ -8,6 +8,9 @@ export {
   ToolPolicy,
   SkillSpec,
   SkillsConfig,
+  EnforcementTier,
+  HIGH_IMPACT_INTENTS,
+  LOW_IMPACT_INTENTS,
 } from './skill-spec.js';
 
 export {
