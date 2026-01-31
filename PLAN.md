@@ -2,19 +2,52 @@
 
 Single source of truth for all project planning.
 
-## Current Sprint
+## Current Sprint: Layer Integration
 
-### Package: chain
+**Problem:** Router, Middleware, and Chain all work independently. They don't share state.
+Router determines `immediate` mode but Chain doesn't use it. Skills get ignored ~50%.
 
-Skill chaining system with declarative YAML-based profiles.
+**Solution:** Option A with Option C-shaped APIs. Direct calls now, event bus later.
+Chain owns session state. Tool-time enforcement is truth. Prompt-time is optimization.
 
-**Phase 4: Profile Auto-Selection** ✅
-- [x] Prompt to profile matching (regex scoring)
-- [x] Auto-activation in PreToolUse hook
-- [x] `--auto` flag to disable auto-selection
-- [x] Persist profile selection on first hook invocation
+### Phase 6: Integration Spine (HIGH PRIORITY)
 
-**Phase 5: Integration + Polish**
+**6.1: RouteDecision + Chain Activation**
+- [ ] Define `RouteDecision` payload type (request_id, session_id, mode, candidates, selected_profile)
+- [ ] Add `chain.activate(decision)` API with idempotency by request_id
+- [ ] Middleware calls activate when router mode is `immediate` or `suggestion`
+- [ ] Chain state shows active enforcement immediately after routing (before any Skill() call)
+- [ ] Tests: Router immediate → chain active without Skill()
+
+**6.2: Intent Mapping (Unblock Smarter Blocking)**
+- [ ] Define canonical intents: write_test, write_impl, write_docs, edit_test, edit_impl, etc.
+- [ ] Implement path-based intent classifier in chain (language-agnostic patterns)
+- [ ] Update deny rules to target intents not raw tools
+- [ ] Default patterns: `**/{test,tests,__tests__}/**`, `**/*.{test,spec}.*`, etc.
+- [ ] Tests: TDD RED allows `foo.test.ts`, blocks `src/foo.ts`
+
+**6.3: Enforcement Tiers**
+- [ ] Add `tier: hard | soft | none` to skill schema
+- [ ] Hard: deny intents until capability satisfied
+- [ ] Soft: allow low-impact, block high-impact (write_impl, apply_patch) until ack
+- [ ] None: guidance + tracking only
+- [ ] Add `skill_declined:<name>` capability for explicit decline
+- [ ] Tests: suggest-tests blocks write_impl, allows read_file
+
+**6.4: Unified Session State**
+- [ ] Add `chain explain --session <id>` (returns why blocked)
+- [ ] Add `chain get-state --session <id>` (programmatic)
+- [ ] Middleware uses state to craft targeted corrective prompts
+- [ ] Usage tracker records: decision, activation, blocks, retries, completions
+- [ ] Tests: blocked tool returns deterministic short reason
+
+**6.5: Event Bus (Later)**
+- [ ] Replace direct calls with internal event dispatcher
+- [ ] Keep payloads same (prompt:received, skill:matched, tool:requested)
+- [ ] Same behavior, pluggable integrations
+
+### Phase 5: Integration + Polish (Deferred)
+
 - [ ] `chain doc --profile X` command
 - [x] Add `chain validate` to CI/pre-commit
 - [ ] Update workflow-orchestrator skill to reference chain system
@@ -28,21 +61,39 @@ Skills CLI enhancements.
 - [ ] Add skill update command for version bumps
 - [ ] Improve semantic matching accuracy
 
-### Documentation
-
-- [x] Updated skill provenance for upstream skills (Trail of Bits, Claudeception)
-- [x] Updated README with chain system documentation
-- [x] Reorganized skills into single flat table with origin column
-- [x] Added skill update documentation
-
-### Package: web
-
-Website improvements.
+### Package: web (Low Priority)
 
 - [ ] Add skill search functionality
 - [ ] Create skill detail pages
 - [ ] Add skill submission flow
 - [ ] Improve mobile responsiveness
+
+## Architectural Decisions
+
+**AD-1: Option A with Option C-shaped APIs**
+- Direct calls now (middleware → chain), event bus later
+- Avoids god object (Option B) and premature infrastructure (Option C)
+- Keep payloads stable so swap is mechanical
+
+**AD-2: Chain owns session state**
+- Single source of truth for active enforcement
+- Router/middleware read and activate through chain
+- No parallel state in middleware
+
+**AD-3: Tool-time enforcement is truth**
+- Prompt-time injection (MUST_CALL) is optimization
+- Chain PreToolUse is the only guaranteed enforcement point
+- Skill() calls are state transitions, not the enforcement mechanism
+
+**AD-4: Intent-based blocking**
+- Canonical intents: write_test, write_impl, write_docs, etc.
+- Path patterns determine intent (language-agnostic)
+- Deny rules target intents, not raw tool names
+
+**AD-5: Three enforcement tiers**
+- Hard: blocks until capability (workflow skills)
+- Soft: blocks high-impact until ack (reference skills)
+- None: guidance only (informational skills)
 
 ## Backlog
 
