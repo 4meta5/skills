@@ -9,6 +9,10 @@ interface HookPreToolUseOptions {
   cwd?: string;
   skills?: string;
   profiles?: string;
+  /** Optional prompt for auto-activation */
+  prompt?: string;
+  /** Set to false to disable auto-selection (default: true) */
+  auto?: boolean;
 }
 
 interface HookStopOptions {
@@ -78,12 +82,15 @@ export async function hookPreToolUseCommand(options: HookPreToolUseOptions): Pro
     process.exit(1);
   }
 
-  // Load skills config
-  const { skills } = await loadSkills(cwd, options.skills, options.profiles);
+  // Load skills and profiles config
+  const { skills, profiles } = await loadSkills(cwd, options.skills, options.profiles);
 
-  // Create and run hook
-  const hook = new PreToolUseHook(cwd, skills);
-  const result = await hook.checkWithExitCode(toolInput);
+  // Create and run hook with profiles for auto-activation
+  const hook = new PreToolUseHook(cwd, skills, profiles);
+  const result = await hook.checkWithExitCode(toolInput, {
+    prompt: options.prompt,
+    autoSelect: options.auto !== false, // default to true
+  });
 
   // Output result
   if (result.stdout) {

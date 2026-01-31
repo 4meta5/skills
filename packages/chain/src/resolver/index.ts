@@ -7,3 +7,8 @@ export {
   type ConflictError,
   type ResolveOptions,
 } from './resolver.js';
+export {
+  matchProfileToPrompt,
+  calculateMatchScore,
+  type MatchResult,
+} from './profile-matcher.js';

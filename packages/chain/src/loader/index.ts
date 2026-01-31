@@ -11,9 +11,13 @@ const __dirname = dirname(__filename);
  * Default paths for chain configuration files
  */
 export function getDefaultChainsDir(): string {
-  // In dist: packages/chain/dist/src/loader
-  // Chains dir: packages/chain/chains
-  return join(__dirname, '..', '..', '..', 'chains');
+  // In source: packages/chain/src/loader -> up 2 levels
+  // In dist:   packages/chain/dist/src/loader -> up 3 levels
+  // Check if we're in dist or src
+  if (__dirname.includes('/dist/')) {
+    return join(__dirname, '..', '..', '..', 'chains');
+  }
+  return join(__dirname, '..', '..', 'chains');
 }
 
 /**
@@ -239,14 +243,21 @@ export interface ChainConfig {
 
 /**
  * Load both skills and profiles configurations
+ * 
+ * If cwd is provided and explicit paths are not, looks for chains/ directory in cwd.
  */
 export async function loadConfig(
   cwd?: string,
   skillsPath?: string,
   profilesPath?: string
 ): Promise<ChainConfig> {
-  const skillsConfig = await loadSkillsConfig(skillsPath);
-  const profilesConfig = await loadProfilesConfig(profilesPath);
+  // If cwd is provided and no explicit paths, look in cwd/chains/
+  const chainsDir = cwd ? join(cwd, 'chains') : undefined;
+  const resolvedSkillsPath = skillsPath ?? (chainsDir ? join(chainsDir, 'skills.yaml') : undefined);
+  const resolvedProfilesPath = profilesPath ?? (chainsDir ? join(chainsDir, 'profiles.yaml') : undefined);
+
+  const skillsConfig = await loadSkillsConfig(resolvedSkillsPath);
+  const profilesConfig = await loadProfilesConfig(resolvedProfilesPath);
 
   return {
     skills: skillsConfig.skills,
