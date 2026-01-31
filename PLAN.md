@@ -16,7 +16,7 @@ Skill chaining system with declarative YAML-based profiles.
 
 **Phase 5: Integration + Polish**
 - [ ] `chain doc --profile X` command
-- [ ] Add `chain validate` to CI/pre-commit
+- [x] Add `chain validate` to CI/pre-commit
 - [ ] Update workflow-orchestrator skill to reference chain system
 - [ ] Migration guide from skill-based to chain-based workflows
 - [x] Create README.md for the package
