@@ -12,12 +12,15 @@ Chain owns session state. Tool-time enforcement is truth. Prompt-time is optimiz
 
 ### Phase 6: Integration Spine (HIGH PRIORITY)
 
-**6.1: RouteDecision + Chain Activation**
-- [ ] Define `RouteDecision` payload type (request_id, session_id, mode, candidates, selected_profile)
-- [ ] Add `chain.activate(decision)` API with idempotency by request_id
-- [ ] Middleware calls activate when router mode is `immediate` or `suggestion`
-- [ ] Chain state shows active enforcement immediately after routing (before any Skill() call)
-- [ ] Tests: Router immediate → chain active without Skill()
+**6.1: RouteDecision + Chain Activation** ✅
+- [x] Define `RouteDecision` payload type (request_id, session_id, mode, candidates, selected_profile)
+- [x] Define `ActivationResult` type for activation responses
+- [x] Add `ChainActivator.activate(decision)` API with idempotency by request_id
+- [x] Add `createRouteDecision()` helper for building decisions
+- [x] Add `chain activate-route` CLI command for router integration
+- [x] Chain state shows active enforcement immediately after routing (before any Skill() call)
+- [x] Tests: 17 new tests for ChainActivator, 13 for RouteDecision types
+- [ ] Middleware calls activate when router mode is `immediate` or `suggestion` (next: integrate with CLI middleware)
 
 **6.2: Intent Mapping (Unblock Smarter Blocking)** ✅
 - [x] Define canonical intents: write_test, write_impl, write_docs, write_config, edit_test, edit_impl, etc.
@@ -111,6 +114,17 @@ Skills CLI enhancements.
 ## Completed
 
 ### 2026-01-31
+
+**Chain Package: Phase 6.1 - RouteDecision + Chain Activation**
+- [x] RouteDecision type with request_id, session_id, mode, candidates, selected_profile
+- [x] ActivationResult type with activated, session_id, is_new, idempotent flags
+- [x] ChainActivator class with activate(decision) API
+- [x] Idempotency via request_id caching (LRU eviction at 1000 entries)
+- [x] createRouteDecision() helper function
+- [x] `chain activate-route` CLI command with --decision JSON and --query/--mode flags
+- [x] Exported from main package index
+- [x] Tests: 30 new tests (17 activator + 13 types)
+- [x] Total: 242 tests passing
 
 **Chain Package: Phase 6.2 - Path-Aware Intent Mapping**
 - [x] Extended ToolIntent enum with path-aware variants (write_test, write_impl, write_docs, write_config, edit_*)

@@ -22,3 +22,6 @@ export * from './session/index.js';
 
 // Hooks
 export * from './hooks/index.js';
+
+// Activator
+export * from './activator/index.js';

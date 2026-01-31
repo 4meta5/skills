@@ -23,3 +23,10 @@ export {
   SessionState,
   ResolutionResult,
 } from './session-state.js';
+
+export {
+  ActivationMode,
+  ProfileMatch,
+  RouteDecision,
+  ActivationResult,
+} from './route-decision.js';
