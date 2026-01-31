@@ -23,6 +23,12 @@ pre-commit:
       run: npm test
       fail_text: "Unit tests failed. Fix failing tests before committing."
 
+    chain-validate:
+      glob: "packages/chain/chains/*.yaml"
+      root: "packages/chain"
+      run: npx tsx src/cli/index.ts validate
+      fail_text: "Chain validation failed. Fix skills.yaml or profiles.yaml errors."
+
 # Optional: Uncomment to add property tests to pre-push hook instead
 # pre-push:
 #   commands:

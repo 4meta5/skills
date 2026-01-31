@@ -11,9 +11,13 @@ const __dirname = dirname(__filename);
  * Default paths for chain configuration files
  */
 export function getDefaultChainsDir(): string {
-  // In dist: packages/chain/dist/src/loader
-  // Chains dir: packages/chain/chains
-  return join(__dirname, '..', '..', '..', 'chains');
+  // In source: packages/chain/src/loader -> up 2 levels
+  // In dist:   packages/chain/dist/src/loader -> up 3 levels
+  // Check if we're in dist or src
+  if (__dirname.includes('/dist/')) {
+    return join(__dirname, '..', '..', '..', 'chains');
+  }
+  return join(__dirname, '..', '..', 'chains');
 }
 
 /**
