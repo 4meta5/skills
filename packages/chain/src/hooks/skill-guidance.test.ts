@@ -12,6 +12,7 @@ describe('getSkillGuidance', () => {
       conflicts: [],
       risk: 'low',
       cost: 'low',
+      tier: 'hard',
       artifacts: [],
     },
     {
@@ -22,6 +23,7 @@ describe('getSkillGuidance', () => {
       conflicts: [],
       risk: 'low',
       cost: 'low',
+      tier: 'hard',
       artifacts: [],
     },
     {
@@ -32,6 +34,7 @@ describe('getSkillGuidance', () => {
       conflicts: [],
       risk: 'low',
       cost: 'low',
+      tier: 'hard',
       artifacts: [],
     },
   ];

@@ -31,6 +31,7 @@ describe('formatIntentDenial', () => {
       conflicts: [],
       risk: 'low',
       cost: 'low',
+      tier: 'hard',
       artifacts: [],
       tool_policy: {
         deny_until: {

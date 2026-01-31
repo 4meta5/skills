@@ -122,7 +122,20 @@ export const SkillSpec = z.object({
   artifacts: z.array(ArtifactSpec).default([]).describe('Evidence this skill produces'),
   tool_policy: ToolPolicy.optional(),
 });
-export type SkillSpec = z.infer<typeof SkillSpec>;
+
+/** Parsed/validated skill spec (all defaults applied) */
+export type SkillSpec = z.output<typeof SkillSpec>;
+
+/** Input type for skill spec (defaults optional) */
+export type SkillSpecInput = z.input<typeof SkillSpec>;
+
+/**
+ * Helper to create a SkillSpec with defaults applied.
+ * Useful for tests and programmatic skill creation.
+ */
+export function createSkillSpec(input: SkillSpecInput): SkillSpec {
+  return SkillSpec.parse(input);
+}
 
 /**
  * Skills configuration file schema

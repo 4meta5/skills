@@ -10,6 +10,7 @@ import { statusCommand } from './commands/status.js';
 import { clearCommand } from './commands/clear.js';
 import { nextCommand } from './commands/next.js';
 import { hookPreToolUseCommand, hookStopCommand } from './commands/hook.js';
+import { detectRunnerCommand } from './commands/detect-runner.js';
 
 const cli = cac('chain');
 
@@ -96,6 +97,13 @@ cli
   .option('--skills <path>', 'Path to skills.yaml')
   .option('--profiles <path>', 'Path to profiles.yaml')
   .action(hookStopCommand);
+
+cli
+  .command('detect-runner', 'Detect test runner for a project')
+  .option('--path <path>', 'Project path (default: current directory)')
+  .option('--all', 'Show all detected runners')
+  .option('--json', 'Output as JSON')
+  .action(detectRunnerCommand);
 
 cli.help();
 cli.version('1.0.0');
