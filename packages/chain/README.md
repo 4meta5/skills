@@ -196,6 +196,7 @@ Chain stores session state in `.chain-state.json`:
 | `chain explain <profile>` | Explain why each skill was selected |
 | `chain mermaid <profile>` | Generate Mermaid diagram |
 | `chain activate <profile>` | Start a workflow session |
+| `chain activate-route` | Activate from RouteDecision (router integration) |
 | `chain status` | Show current session status |
 | `chain next` | Show next skill and guidance |
 | `chain clear` | Clear current session |
@@ -216,6 +217,8 @@ chain hook-pre-tool-use \
 
 ```typescript
 import {
+  ChainActivator,
+  createRouteDecision,
   PreToolUseHook,
   matchProfileToPrompt,
   resolve,
@@ -225,6 +228,25 @@ import {
 // Load configuration
 const config = await loadConfig('/path/to/project');
 
+// === Router Integration ===
+// Activate from a RouteDecision (for middleware integration)
+const activator = new ChainActivator(cwd, config.skills, config.profiles);
+
+const decision = createRouteDecision(
+  'req-123',                    // request_id for idempotency
+  'fix the login bug',          // query
+  'immediate',                  // mode: immediate | suggestion | chat
+  [{ name: 'bug-fix', score: 0.9 }]  // candidates
+);
+
+const activation = await activator.activate(decision);
+// → { activated: true, session_id: '...', chain: ['tdd'], blocked_intents: {...} }
+
+// Idempotent: same request_id returns existing session
+const same = await activator.activate(decision);
+// → { activated: true, idempotent: true, session_id: same as before }
+
+// === Profile Matching ===
 // Match prompt to profile
 const profile = matchProfileToPrompt(
   'fix the login bug',
@@ -234,8 +256,9 @@ const profile = matchProfileToPrompt(
 
 // Resolve skill chain
 const result = resolve(profile, config.skills);
-// → { chain: ['tdd'], blocked_intents: { write: '...' }, ... }
+// → { chain: ['tdd'], blocked_intents: { write_impl: '...' }, ... }
 
+// === Hook Usage ===
 // Use the hook
 const hook = new PreToolUseHook(cwd, config.skills, config.profiles);
 const result = await hook.check(

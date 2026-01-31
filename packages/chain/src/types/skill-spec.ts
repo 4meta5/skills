@@ -13,6 +13,36 @@ export const CostLevel = z.enum(['low', 'medium', 'high']);
 export type CostLevel = z.infer<typeof CostLevel>;
 
 /**
+ * Enforcement tiers for skills
+ *
+ * - hard: Block all denied intents until capabilities satisfied (default)
+ * - soft: Block high-impact intents, allow low-impact ones until acknowledged
+ * - none: Guidance only, no blocking (tracking still active)
+ */
+export const EnforcementTier = z.enum(['hard', 'soft', 'none']);
+export type EnforcementTier = z.infer<typeof EnforcementTier>;
+
+/**
+ * Intents classified as high-impact (blocked in soft tier)
+ */
+export const HIGH_IMPACT_INTENTS = [
+  'write_impl',
+  'commit',
+  'push',
+  'deploy',
+  'delete',
+] as const;
+
+/**
+ * Intents classified as low-impact (allowed in soft tier)
+ */
+export const LOW_IMPACT_INTENTS = [
+  'write_test',
+  'write_docs',
+  'write_config',
+] as const;
+
+/**
  * Tool intents that can be gated by capabilities
  *
  * Path-aware intents (write_test, write_impl, etc.) subdivide the base
@@ -88,6 +118,7 @@ export const SkillSpec = z.object({
   conflicts: z.array(z.string()).default([]).describe('Skills that cannot coexist in same chain'),
   risk: RiskLevel.default('medium'),
   cost: CostLevel.default('medium'),
+  tier: EnforcementTier.default('hard').describe('Enforcement tier: hard, soft, or none'),
   artifacts: z.array(ArtifactSpec).default([]).describe('Evidence this skill produces'),
   tool_policy: ToolPolicy.optional(),
 });

@@ -574,3 +574,270 @@ describe('auto-activation', () => {
     expect(result.message).toContain('new-feature');
   });
 });
+
+describe('enforcement tiers', () => {
+  let testDir: string;
+  let stateManager: StateManager;
+
+  beforeEach(async () => {
+    testDir = join(tmpdir(), `chain-tier-test-${randomUUID()}`);
+    await mkdir(testDir, { recursive: true });
+    stateManager = new StateManager(testDir);
+  });
+
+  afterEach(async () => {
+    await rm(testDir, { recursive: true, force: true });
+  });
+
+  describe('hard tier (default)', () => {
+    it('blocks all denied intents', async () => {
+      const skills: SkillSpec[] = [
+        {
+          name: 'tdd',
+          skill_path: '.claude/skills/tdd',
+          provides: ['test_written'],
+          requires: [],
+          conflicts: [],
+          risk: 'low',
+          cost: 'low',
+          tier: 'hard',
+          artifacts: [],
+          tool_policy: {
+            deny_until: {
+              write_impl: { until: 'test_written', reason: 'Write test first' },
+              write_test: { until: 'test_written', reason: 'Should not block' },
+            },
+          },
+        },
+      ];
+
+      const hook = new PreToolUseHook(testDir, skills);
+
+      await stateManager.create({
+        session_id: 'test',
+        profile_id: 'test',
+        activated_at: new Date().toISOString(),
+        chain: ['tdd'],
+        capabilities_required: ['test_written'],
+        capabilities_satisfied: [],
+        current_skill_index: 0,
+        strictness: 'strict',
+        blocked_intents: {
+          write_impl: 'Write test first',
+          write_test: 'Should not block',
+        },
+      });
+
+      // Both should be blocked in hard tier
+      const implResult = await hook.check({
+        tool: 'Write',
+        input: { path: 'src/index.ts' },
+      });
+      expect(implResult.allowed).toBe(false);
+
+      const testResult = await hook.check({
+        tool: 'Write',
+        input: { path: 'src/index.test.ts' },
+      });
+      expect(testResult.allowed).toBe(false);
+    });
+  });
+
+  describe('soft tier', () => {
+    it('blocks high-impact intents but allows low-impact ones', async () => {
+      const skills: SkillSpec[] = [
+        {
+          name: 'suggest-tests',
+          skill_path: '.claude/skills/suggest-tests',
+          provides: ['test_suggestions'],
+          requires: [],
+          conflicts: [],
+          risk: 'low',
+          cost: 'low',
+          tier: 'soft',
+          artifacts: [],
+          tool_policy: {
+            deny_until: {
+              write_impl: { until: 'test_suggestions', reason: 'Review suggestions first' },
+              write_test: { until: 'test_suggestions', reason: 'Review suggestions first' },
+            },
+          },
+        },
+      ];
+
+      const hook = new PreToolUseHook(testDir, skills);
+
+      await stateManager.create({
+        session_id: 'test',
+        profile_id: 'test',
+        activated_at: new Date().toISOString(),
+        chain: ['suggest-tests'],
+        capabilities_required: ['test_suggestions'],
+        capabilities_satisfied: [],
+        current_skill_index: 0,
+        strictness: 'strict',
+        blocked_intents: {
+          write_impl: 'Review suggestions first',
+          write_test: 'Review suggestions first',
+        },
+      });
+
+      // write_impl is high-impact, should be blocked
+      const implResult = await hook.check({
+        tool: 'Write',
+        input: { path: 'src/index.ts' },
+      });
+      expect(implResult.allowed).toBe(false);
+
+      // write_test is low-impact, should be allowed in soft tier
+      const testResult = await hook.check({
+        tool: 'Write',
+        input: { path: 'src/index.test.ts' },
+      });
+      expect(testResult.allowed).toBe(true);
+    });
+
+    it('allows commit to be blocked (high-impact)', async () => {
+      const skills: SkillSpec[] = [
+        {
+          name: 'review-skill',
+          skill_path: '.claude/skills/review',
+          provides: ['reviewed'],
+          requires: [],
+          conflicts: [],
+          risk: 'low',
+          cost: 'low',
+          tier: 'soft',
+          artifacts: [],
+          tool_policy: {
+            deny_until: {
+              commit: { until: 'reviewed', reason: 'Review before commit' },
+            },
+          },
+        },
+      ];
+
+      const hook = new PreToolUseHook(testDir, skills);
+
+      await stateManager.create({
+        session_id: 'test',
+        profile_id: 'test',
+        activated_at: new Date().toISOString(),
+        chain: ['review-skill'],
+        capabilities_required: ['reviewed'],
+        capabilities_satisfied: [],
+        current_skill_index: 0,
+        strictness: 'strict',
+        blocked_intents: {
+          commit: 'Review before commit',
+        },
+      });
+
+      const result = await hook.check({
+        tool: 'Bash',
+        input: { command: 'git commit -m "test"' },
+      });
+      expect(result.allowed).toBe(false);
+    });
+  });
+
+  describe('none tier', () => {
+    it('never blocks any intents', async () => {
+      const skills: SkillSpec[] = [
+        {
+          name: 'code-review',
+          skill_path: '.claude/skills/code-review',
+          provides: ['code_reviewed'],
+          requires: [],
+          conflicts: [],
+          risk: 'low',
+          cost: 'low',
+          tier: 'none',
+          artifacts: [],
+          tool_policy: {
+            deny_until: {
+              write_impl: { until: 'code_reviewed', reason: 'Would block if not none' },
+              commit: { until: 'code_reviewed', reason: 'Would block if not none' },
+            },
+          },
+        },
+      ];
+
+      const hook = new PreToolUseHook(testDir, skills);
+
+      await stateManager.create({
+        session_id: 'test',
+        profile_id: 'test',
+        activated_at: new Date().toISOString(),
+        chain: ['code-review'],
+        capabilities_required: ['code_reviewed'],
+        capabilities_satisfied: [],
+        current_skill_index: 0,
+        strictness: 'strict',
+        blocked_intents: {
+          write_impl: 'Would block if not none',
+          commit: 'Would block if not none',
+        },
+      });
+
+      // All should be allowed in none tier
+      const implResult = await hook.check({
+        tool: 'Write',
+        input: { path: 'src/index.ts' },
+      });
+      expect(implResult.allowed).toBe(true);
+
+      const commitResult = await hook.check({
+        tool: 'Bash',
+        input: { command: 'git commit -m "test"' },
+      });
+      expect(commitResult.allowed).toBe(true);
+    });
+  });
+
+  describe('default tier', () => {
+    it('defaults to hard tier when not specified', async () => {
+      const skills: SkillSpec[] = [
+        {
+          name: 'tdd',
+          skill_path: '.claude/skills/tdd',
+          provides: ['test_written'],
+          requires: [],
+          conflicts: [],
+          risk: 'low',
+          cost: 'low',
+          // No tier specified - should default to 'hard'
+          artifacts: [],
+          tool_policy: {
+            deny_until: {
+              write_test: { until: 'test_written', reason: 'Test requirement' },
+            },
+          },
+        },
+      ];
+
+      const hook = new PreToolUseHook(testDir, skills);
+
+      await stateManager.create({
+        session_id: 'test',
+        profile_id: 'test',
+        activated_at: new Date().toISOString(),
+        chain: ['tdd'],
+        capabilities_required: ['test_written'],
+        capabilities_satisfied: [],
+        current_skill_index: 0,
+        strictness: 'strict',
+        blocked_intents: {
+          write_test: 'Test requirement',
+        },
+      });
+
+      // write_test is low-impact but should be blocked with default hard tier
+      const result = await hook.check({
+        tool: 'Write',
+        input: { path: 'src/index.test.ts' },
+      });
+      expect(result.allowed).toBe(false);
+    });
+  });
+});

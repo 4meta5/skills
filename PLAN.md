@@ -12,12 +12,19 @@ Chain owns session state. Tool-time enforcement is truth. Prompt-time is optimiz
 
 ### Phase 6: Integration Spine (HIGH PRIORITY)
 
-**6.1: RouteDecision + Chain Activation**
-- [ ] Define `RouteDecision` payload type (request_id, session_id, mode, candidates, selected_profile)
-- [ ] Add `chain.activate(decision)` API with idempotency by request_id
-- [ ] Middleware calls activate when router mode is `immediate` or `suggestion`
-- [ ] Chain state shows active enforcement immediately after routing (before any Skill() call)
-- [ ] Tests: Router immediate → chain active without Skill()
+**6.1: RouteDecision + Chain Activation** ✅
+- [x] Define `RouteDecision` payload type (request_id, session_id, mode, candidates, selected_profile)
+- [x] Define `ActivationResult` type for activation responses
+- [x] Add `ChainActivator.activate(decision)` API with idempotency by request_id
+- [x] Add `createRouteDecision()` helper for building decisions
+- [x] Add `chain activate-route` CLI command for router integration
+- [x] Chain state shows active enforcement immediately after routing (before any Skill() call)
+- [x] Tests: 17 new tests for ChainActivator, 13 for RouteDecision types
+- [x] Middleware calls activate when router mode is `immediate` or `suggestion`
+- [x] Added `createChainIntegration()` for router→chain bridging
+- [x] Updated `createCorrectiveLoop()` to accept optional chainIntegration
+- [x] Made `initializeFromRouting()` async to support chain activation
+- [x] Tests: 9 new chain-integration tests, 805 total CLI tests passing
 
 **6.2: Intent Mapping (Unblock Smarter Blocking)** ✅
 - [x] Define canonical intents: write_test, write_impl, write_docs, write_config, edit_test, edit_impl, etc.
@@ -26,13 +33,17 @@ Chain owns session state. Tool-time enforcement is truth. Prompt-time is optimiz
 - [x] Default patterns: `**/{test,tests,__tests__}/**`, `**/*.{test,spec}.*`, etc.
 - [x] Tests: TDD RED allows `foo.test.ts`, blocks `src/foo.ts` (6 new integration tests)
 
-**6.3: Enforcement Tiers**
-- [ ] Add `tier: hard | soft | none` to skill schema
-- [ ] Hard: deny intents until capability satisfied
-- [ ] Soft: allow low-impact, block high-impact (write_impl, apply_patch) until ack
-- [ ] None: guidance + tracking only
-- [ ] Add `skill_declined:<name>` capability for explicit decline
-- [ ] Tests: suggest-tests blocks write_impl, allows read_file
+**6.3: Enforcement Tiers** ✅
+- [x] Add `tier: hard | soft | none` to skill schema (EnforcementTier enum)
+- [x] Define HIGH_IMPACT_INTENTS (write_impl, commit, push, deploy, delete)
+- [x] Define LOW_IMPACT_INTENTS (write_test, write_docs, write_config)
+- [x] Hard: block all denied intents (default behavior)
+- [x] Soft: block high-impact intents only, allow low-impact ones
+- [x] None: guidance only, no blocking
+- [x] filterBlockedByTier() and getCurrentTier() helpers
+- [x] Tests: 10 new tier enforcement tests
+- [x] Total: 310 chain tests passing (was 269)
+- [ ] Add `skill_declined:<name>` capability for explicit decline (deferred)
 
 **6.4: Unified Session State**
 - [ ] Add `chain explain --session <id>` (returns why blocked)
@@ -41,10 +52,18 @@ Chain owns session state. Tool-time enforcement is truth. Prompt-time is optimiz
 - [ ] Usage tracker records: decision, activation, blocks, retries, completions
 - [ ] Tests: blocked tool returns deterministic short reason
 
-**6.5: Event Bus (Later)**
+**6.5: Polyglot Test Discovery (HIGH VALUE)**
+- [ ] Auto-detect test framework from project files (jest.config, pytest.ini, go.mod, Cargo.toml)
+- [ ] Language-agnostic test file patterns (see docs/4-LAYER-ARCHITECTURE.md)
+- [ ] `chain detect-tests` command for discovery
+- [ ] Update TDD skill to use detected runner instead of hardcoded `npm test`
+- [ ] Support: Jest, Vitest, Mocha, Pytest, Go test, Cargo test
+
+**6.6: Event Bus (Later)**
 - [ ] Replace direct calls with internal event dispatcher
 - [ ] Keep payloads same (prompt:received, skill:matched, tool:requested)
 - [ ] Same behavior, pluggable integrations
+- [ ] Trigger: need parallel consumers (security scanner, linter, test runner)
 
 ### Phase 5: Integration + Polish (Deferred)
 
@@ -111,6 +130,17 @@ Skills CLI enhancements.
 ## Completed
 
 ### 2026-01-31
+
+**Chain Package: Phase 6.1 - RouteDecision + Chain Activation**
+- [x] RouteDecision type with request_id, session_id, mode, candidates, selected_profile
+- [x] ActivationResult type with activated, session_id, is_new, idempotent flags
+- [x] ChainActivator class with activate(decision) API
+- [x] Idempotency via request_id caching (LRU eviction at 1000 entries)
+- [x] createRouteDecision() helper function
+- [x] `chain activate-route` CLI command with --decision JSON and --query/--mode flags
+- [x] Exported from main package index
+- [x] Tests: 30 new tests (17 activator + 13 types)
+- [x] Total: 242 tests passing
 
 **Chain Package: Phase 6.2 - Path-Aware Intent Mapping**
 - [x] Extended ToolIntent enum with path-aware variants (write_test, write_impl, write_docs, write_config, edit_*)

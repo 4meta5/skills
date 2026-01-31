@@ -5,6 +5,7 @@ import { resolveCommand } from './commands/resolve.js';
 import { explainCommand } from './commands/explain.js';
 import { mermaidCommand } from './commands/mermaid.js';
 import { activateCommand } from './commands/activate.js';
+import { activateRouteCommand } from './commands/activate-route.js';
 import { statusCommand } from './commands/status.js';
 import { clearCommand } from './commands/clear.js';
 import { nextCommand } from './commands/next.js';
@@ -45,6 +46,18 @@ cli
   .option('--profiles <path>', 'Path to profiles.yaml')
   .option('--cwd <path>', 'Working directory for session state')
   .action(activateCommand);
+
+cli
+  .command('activate-route', 'Activate from a RouteDecision (for router integration)')
+  .option('--decision <json>', 'RouteDecision as JSON')
+  .option('--query <text>', 'Query text (alternative to --decision)')
+  .option('--mode <mode>', 'Activation mode: immediate, suggestion, or chat')
+  .option('--profile <name>', 'Profile to activate')
+  .option('--skills <path>', 'Path to skills.yaml')
+  .option('--profiles <path>', 'Path to profiles.yaml')
+  .option('--cwd <path>', 'Working directory for session state')
+  .option('--json', 'Output as JSON')
+  .action(activateRouteCommand);
 
 cli
   .command('status', 'Show current session status')

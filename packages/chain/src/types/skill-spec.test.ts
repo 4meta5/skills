@@ -8,6 +8,9 @@ import {
   ToolPolicy,
   SkillSpec,
   SkillsConfig,
+  EnforcementTier,
+  HIGH_IMPACT_INTENTS,
+  LOW_IMPACT_INTENTS,
 } from './skill-spec.js';
 
 describe('SkillSpec schemas', () => {
@@ -33,6 +36,41 @@ describe('SkillSpec schemas', () => {
 
     it('rejects invalid cost levels', () => {
       expect(() => CostLevel.parse('extreme')).toThrow();
+    });
+  });
+
+  describe('EnforcementTier', () => {
+    it('accepts valid tiers', () => {
+      expect(EnforcementTier.parse('hard')).toBe('hard');
+      expect(EnforcementTier.parse('soft')).toBe('soft');
+      expect(EnforcementTier.parse('none')).toBe('none');
+    });
+
+    it('rejects invalid tiers', () => {
+      expect(() => EnforcementTier.parse('partial')).toThrow();
+      expect(() => EnforcementTier.parse('')).toThrow();
+    });
+  });
+
+  describe('Intent classifications', () => {
+    it('defines high-impact intents', () => {
+      expect(HIGH_IMPACT_INTENTS).toContain('write_impl');
+      expect(HIGH_IMPACT_INTENTS).toContain('commit');
+      expect(HIGH_IMPACT_INTENTS).toContain('push');
+      expect(HIGH_IMPACT_INTENTS).toContain('deploy');
+      expect(HIGH_IMPACT_INTENTS).toContain('delete');
+    });
+
+    it('defines low-impact intents', () => {
+      expect(LOW_IMPACT_INTENTS).toContain('write_test');
+      expect(LOW_IMPACT_INTENTS).toContain('write_docs');
+      expect(LOW_IMPACT_INTENTS).toContain('write_config');
+    });
+
+    it('high and low impact intents do not overlap', () => {
+      for (const intent of HIGH_IMPACT_INTENTS) {
+        expect(LOW_IMPACT_INTENTS).not.toContain(intent);
+      }
     });
   });
 
@@ -129,7 +167,24 @@ describe('SkillSpec schemas', () => {
       expect(skill.conflicts).toEqual([]);
       expect(skill.risk).toBe('medium');
       expect(skill.cost).toBe('medium');
+      expect(skill.tier).toBe('hard'); // default tier
       expect(skill.artifacts).toEqual([]);
+    });
+
+    it('parses skill with explicit tier', () => {
+      const softSkill = SkillSpec.parse({
+        name: 'suggest-tests',
+        skill_path: 'suggest-tests/SKILL.md',
+        tier: 'soft',
+      });
+      expect(softSkill.tier).toBe('soft');
+
+      const noneSkill = SkillSpec.parse({
+        name: 'code-review',
+        skill_path: 'code-review/SKILL.md',
+        tier: 'none',
+      });
+      expect(noneSkill.tier).toBe('none');
     });
 
     it('parses complete skill spec', () => {

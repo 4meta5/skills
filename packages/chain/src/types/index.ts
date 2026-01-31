@@ -8,6 +8,9 @@ export {
   ToolPolicy,
   SkillSpec,
   SkillsConfig,
+  EnforcementTier,
+  HIGH_IMPACT_INTENTS,
+  LOW_IMPACT_INTENTS,
 } from './skill-spec.js';
 
 export {
@@ -23,3 +26,10 @@ export {
   SessionState,
   ResolutionResult,
 } from './session-state.js';
+
+export {
+  ActivationMode,
+  ProfileMatch,
+  RouteDecision,
+  ActivationResult,
+} from './route-decision.js';

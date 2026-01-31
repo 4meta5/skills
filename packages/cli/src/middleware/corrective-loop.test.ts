@@ -27,14 +27,14 @@ function createMockRoutingResult(
 
 describe('createCorrectiveLoop', () => {
   describe('initializeFromRouting', () => {
-    it('should set required tools from immediate mode routing', () => {
+    it('should set required tools from immediate mode routing', async () => {
       const loop = createCorrectiveLoop();
       const routing = createMockRoutingResult('immediate', [
         { name: 'tdd', score: 0.92 },
         { name: 'no-workarounds', score: 0.85 },
       ]);
 
-      loop.initializeFromRouting(routing);
+      await await loop.initializeFromRouting(routing);
 
       const state = loop.getState();
       expect(state.mode).toBe('immediate');
@@ -42,37 +42,37 @@ describe('createCorrectiveLoop', () => {
       expect(state.requiredTools).toContain('no-workarounds');
     });
 
-    it('should filter out low-score matches', () => {
+    it('should filter out low-score matches', async () => {
       const loop = createCorrectiveLoop();
       const routing = createMockRoutingResult('immediate', [
         { name: 'tdd', score: 0.92 },
         { name: 'other', score: 0.50 },
       ]);
 
-      loop.initializeFromRouting(routing);
+      await loop.initializeFromRouting(routing);
 
       const state = loop.getState();
       expect(state.requiredTools).toContain('tdd');
       expect(state.requiredTools).not.toContain('other');
     });
 
-    it('should set suggestion mode correctly', () => {
+    it('should set suggestion mode correctly', async () => {
       const loop = createCorrectiveLoop();
       const routing = createMockRoutingResult('suggestion', [
         { name: 'tdd', score: 0.75 },
       ]);
 
-      loop.initializeFromRouting(routing);
+      await loop.initializeFromRouting(routing);
 
       const state = loop.getState();
       expect(state.mode).toBe('suggestion');
     });
 
-    it('should set chat mode with no required tools', () => {
+    it('should set chat mode with no required tools', async () => {
       const loop = createCorrectiveLoop();
       const routing = createMockRoutingResult('chat', []);
 
-      loop.initializeFromRouting(routing);
+      await loop.initializeFromRouting(routing);
 
       const state = loop.getState();
       expect(state.mode).toBe('chat');
@@ -83,7 +83,7 @@ describe('createCorrectiveLoop', () => {
   describe('processResponse', () => {
     it('should accept response with required tool calls', async () => {
       const loop = createCorrectiveLoop();
-      loop.initializeFromRouting(
+      await loop.initializeFromRouting(
         createMockRoutingResult('immediate', [{ name: 'tdd', score: 0.92 }])
       );
 
@@ -95,7 +95,7 @@ describe('createCorrectiveLoop', () => {
 
     it('should reject response without required tool calls', async () => {
       const loop = createCorrectiveLoop();
-      loop.initializeFromRouting(
+      await loop.initializeFromRouting(
         createMockRoutingResult('immediate', [{ name: 'tdd', score: 0.92 }])
       );
 
@@ -108,7 +108,7 @@ describe('createCorrectiveLoop', () => {
     it('should call onAccepted callback when accepted', async () => {
       const onAccepted = vi.fn();
       const loop = createCorrectiveLoop({ onAccepted });
-      loop.initializeFromRouting(
+      await loop.initializeFromRouting(
         createMockRoutingResult('immediate', [{ name: 'tdd', score: 0.92 }])
       );
 
@@ -120,7 +120,7 @@ describe('createCorrectiveLoop', () => {
     it('should call onRejection callback when rejected', async () => {
       const onRejection = vi.fn();
       const loop = createCorrectiveLoop({ onRejection });
-      loop.initializeFromRouting(
+      await loop.initializeFromRouting(
         createMockRoutingResult('immediate', [{ name: 'tdd', score: 0.92 }])
       );
 
@@ -132,9 +132,9 @@ describe('createCorrectiveLoop', () => {
   });
 
   describe('retry flow', () => {
-    it('should allow retries up to max', () => {
+    it('should allow retries up to max', async () => {
       const loop = createCorrectiveLoop({ maxRetries: 3 });
-      loop.initializeFromRouting(
+      await loop.initializeFromRouting(
         createMockRoutingResult('immediate', [{ name: 'tdd', score: 0.92 }])
       );
 
@@ -152,10 +152,10 @@ describe('createCorrectiveLoop', () => {
       expect(loop.prepareRetry()).toBe(false);
     });
 
-    it('should call onMaxRetriesExceeded when exceeded', () => {
+    it('should call onMaxRetriesExceeded when exceeded', async () => {
       const onMaxRetriesExceeded = vi.fn();
       const loop = createCorrectiveLoop({ maxRetries: 1, onMaxRetriesExceeded });
-      loop.initializeFromRouting(
+      await loop.initializeFromRouting(
         createMockRoutingResult('immediate', [{ name: 'tdd', score: 0.92 }])
       );
 
@@ -165,9 +165,9 @@ describe('createCorrectiveLoop', () => {
       expect(onMaxRetriesExceeded).toHaveBeenCalledTimes(1);
     });
 
-    it('should generate retry prompt with attempt count', () => {
+    it('should generate retry prompt with attempt count', async () => {
       const loop = createCorrectiveLoop({ maxRetries: 3 });
-      loop.initializeFromRouting(
+      await loop.initializeFromRouting(
         createMockRoutingResult('immediate', [{ name: 'tdd', score: 0.92 }])
       );
 
@@ -183,7 +183,7 @@ describe('createCorrectiveLoop', () => {
   describe('runCycle', () => {
     it('should return accepted on first try if tool is called', async () => {
       const loop = createCorrectiveLoop();
-      loop.initializeFromRouting(
+      await loop.initializeFromRouting(
         createMockRoutingResult('immediate', [{ name: 'tdd', score: 0.92 }])
       );
 
@@ -198,7 +198,7 @@ describe('createCorrectiveLoop', () => {
 
     it('should retry until tool is called', async () => {
       const loop = createCorrectiveLoop({ maxRetries: 3 });
-      loop.initializeFromRouting(
+      await loop.initializeFromRouting(
         createMockRoutingResult('immediate', [{ name: 'tdd', score: 0.92 }])
       );
 
@@ -217,7 +217,7 @@ describe('createCorrectiveLoop', () => {
 
     it('should return error after max retries exceeded', async () => {
       const loop = createCorrectiveLoop({ maxRetries: 2 });
-      loop.initializeFromRouting(
+      await loop.initializeFromRouting(
         createMockRoutingResult('immediate', [{ name: 'tdd', score: 0.92 }])
       );
 
@@ -233,9 +233,9 @@ describe('createCorrectiveLoop', () => {
   });
 
   describe('reset', () => {
-    it('should reset state for new request', () => {
+    it('should reset state for new request', async () => {
       const loop = createCorrectiveLoop();
-      loop.initializeFromRouting(
+      await loop.initializeFromRouting(
         createMockRoutingResult('immediate', [{ name: 'tdd', score: 0.92 }])
       );
       loop.prepareRetry();

@@ -2,12 +2,14 @@
  * Corrective Loop Implementation
  *
  * Orchestrates the middleware enforcement with retry logic.
- * This is the integration point between router and middleware.
+ * This is the integration point between router, middleware, and chain.
  */
 
 import type { RoutingResult } from '../router/types.js';
 import type { AgentMiddleware, MiddlewareResult } from './types.js';
 import { createMiddleware } from './middleware.js';
+import type { ChainIntegration } from './chain-integration.js';
+import type { ActivationResult } from '@4meta5/chain';
 
 /**
  * Options for the corrective loop
@@ -19,6 +21,9 @@ export interface CorrectiveLoopOptions {
   /** Threshold for including skills in required list (default: uses routing result's top score * 0.7) */
   suggestionThreshold?: number;
 
+  /** Chain integration for automatic activation (optional) */
+  chainIntegration?: ChainIntegration;
+
   /** Callback when response is rejected */
   onRejection?: (result: MiddlewareResult, attempt: number) => void;
 
@@ -27,6 +32,9 @@ export interface CorrectiveLoopOptions {
 
   /** Callback when response is accepted */
   onAccepted?: (result: MiddlewareResult) => void;
+
+  /** Callback when chain is activated (optional) */
+  onChainActivated?: (result: ActivationResult) => void;
 }
 
 /**
@@ -70,12 +78,28 @@ export function createCorrectiveLoop(options: CorrectiveLoopOptions = {}) {
   const middleware = createMiddleware({ maxRetries });
 
   let initialized = false;
+  let lastChainActivation: ActivationResult | null = null;
 
   return {
     /**
      * Initialize middleware state from routing result
+     *
+     * When chainIntegration is provided and mode is immediate/suggestion,
+     * automatically activates the skill chain for tool-time enforcement.
      */
-    initializeFromRouting(routingResult: RoutingResult): void {
+    async initializeFromRouting(routingResult: RoutingResult): Promise<ActivationResult | null> {
+      // Activate chain if integration is provided and mode requires it
+      if (options.chainIntegration && routingResult.mode !== 'chat') {
+        const activation = await options.chainIntegration.activateFromRouting(
+          routingResult,
+          routingResult.query
+        );
+        lastChainActivation = activation;
+        if (activation?.activated) {
+          options.onChainActivated?.(activation);
+        }
+      }
+
       if (routingResult.mode === 'immediate') {
         // Extract skill names from high-confidence matches
         // Use provided threshold, or derive from top score (70% of top score as minimum)
@@ -116,6 +140,7 @@ export function createCorrectiveLoop(options: CorrectiveLoopOptions = {}) {
       }
 
       initialized = true;
+      return lastChainActivation;
     },
 
     /**
@@ -123,6 +148,13 @@ export function createCorrectiveLoop(options: CorrectiveLoopOptions = {}) {
      */
     isInitialized(): boolean {
       return initialized;
+    },
+
+    /**
+     * Get the last chain activation result (if chain integration is enabled)
+     */
+    getChainActivation(): ActivationResult | null {
+      return lastChainActivation;
     },
 
     /**
