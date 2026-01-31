@@ -16,6 +16,7 @@ function createSkill(
     conflicts: [],
     risk: 'medium',
     cost: 'medium',
+    tier: 'hard',
     artifacts: [],
     ...options,
   };

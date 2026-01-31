@@ -7,10 +7,12 @@ export {
   ToolPolicyRule,
   ToolPolicy,
   SkillSpec,
+  SkillSpecInput,
   SkillsConfig,
   EnforcementTier,
   HIGH_IMPACT_INTENTS,
   LOW_IMPACT_INTENTS,
+  createSkillSpec,
 } from './skill-spec.js';
 
 export {

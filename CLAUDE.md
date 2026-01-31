@@ -76,6 +76,9 @@ If you skip this, respond: **"BLOCKED: DOGFOODING REQUIRED"**
 - @.claude/skills/no-workarounds/SKILL.md - **Prevents manual workarounds when building tools**
 - @.claude/skills/claudeception/SKILL.md - Extract learnings as skills
 
+### Memory
+- @.claude/skills/engram-recall/SKILL.md - Recall past work before starting new tasks
+
 ### Code Review & Security
 - @.claude/skills/code-review-ts/SKILL.md - TypeScript review guidelines
 - @.claude/skills/security-analysis/SKILL.md - Static security review

@@ -356,8 +356,10 @@ MIT. See [LICENSE](./LICENSE).
 | sveltekit-svelte5-tailwind-skill | custom | svelte | SvelteKit + Svelte 5 + Tailwind v4 |
 | imessage-tone | custom | communication | Two-mode iMessage tone (owner vs others) |
 | bluebubbles-setup | custom | communication | BlueBubbles iMessage integration setup |
+| engram-recall | upstream (engram) | memory | Recall past work before starting new tasks |
 
 **Origin key:**
 - `custom` - Created for this project
 - `upstream (tob)` - From [Trail of Bits](https://github.com/trailofbits/skills)
 - `upstream (claudeception)` - From [Claudeception](https://github.com/blader/Claudeception)
+- `upstream (engram)` - From [engram](https://github.com/bobamatcha/engram)

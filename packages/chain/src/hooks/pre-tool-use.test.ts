@@ -26,6 +26,7 @@ describe('PreToolUseHook', () => {
         conflicts: [],
         risk: 'low',
         cost: 'low',
+        tier: 'hard',
         artifacts: [],
         tool_policy: {
           deny_until: {
@@ -201,6 +202,7 @@ describe('PreToolUseHook', () => {
           conflicts: [],
           risk: 'low',
           cost: 'low',
+          tier: 'hard',
           artifacts: [],
           tool_policy: {
             deny_until: {
@@ -492,6 +494,7 @@ describe('auto-activation', () => {
         conflicts: [],
         risk: 'low',
         cost: 'low',
+        tier: 'hard',
         artifacts: [],
         tool_policy: {
           deny_until: {
@@ -797,6 +800,7 @@ describe('enforcement tiers', () => {
 
   describe('default tier', () => {
     it('defaults to hard tier when not specified', async () => {
+      // Note: tier is required by TypeScript, but YAML configs will use default
       const skills: SkillSpec[] = [
         {
           name: 'tdd',
@@ -806,7 +810,7 @@ describe('enforcement tiers', () => {
           conflicts: [],
           risk: 'low',
           cost: 'low',
-          // No tier specified - should default to 'hard'
+          tier: 'hard', // Default tier
           artifacts: [],
           tool_policy: {
             deny_until: {

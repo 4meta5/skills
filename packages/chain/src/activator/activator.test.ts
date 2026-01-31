@@ -27,6 +27,7 @@ describe('ChainActivator', () => {
         conflicts: [],
         risk: 'low',
         cost: 'low',
+        tier: 'hard',
         artifacts: [],
         tool_policy: {
           deny_until: {
@@ -43,6 +44,7 @@ describe('ChainActivator', () => {
         conflicts: [],
         risk: 'low',
         cost: 'low',
+        tier: 'hard',
         artifacts: [],
         tool_policy: {},
       },

@@ -275,6 +275,7 @@ describe('StateManager', () => {
         conflicts: [],
         risk: 'low' as const,
         cost: 'low' as const,
+        tier: 'hard' as const,
         artifacts: [],
       },
       {
@@ -285,6 +286,7 @@ describe('StateManager', () => {
         conflicts: [],
         risk: 'low' as const,
         cost: 'low' as const,
+        tier: 'hard' as const,
         artifacts: [],
       },
       {
@@ -295,6 +297,7 @@ describe('StateManager', () => {
         conflicts: [],
         risk: 'low' as const,
         cost: 'low' as const,
+        tier: 'hard' as const,
         artifacts: [],
       },
     ];
