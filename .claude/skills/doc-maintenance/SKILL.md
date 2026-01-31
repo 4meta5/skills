@@ -3,7 +3,7 @@ name: doc-maintenance
 description: |
   Automatic documentation updates after task completion. Use when:
   (1) completing tasks, (2) adding features, (3) fixing bugs,
-  (4) refactoring code. Updates docs/PLAN.md (consolidated) and
+  (4) refactoring code. Updates root PLAN.md (consolidated) and
   README.md when features change. Chains markdown-writer for style.
 category: documentation
 user-invocable: true
@@ -15,7 +15,7 @@ Automatically updates project documentation after task completion.
 
 ## Consolidated Plan Location
 
-All plan updates go to `docs/PLAN.md`. This is the single source of truth for project planning. Package-level PLAN.md files should be consolidated into docs/PLAN.md.
+All plan updates go to root `PLAN.md`. This is the single source of truth for project planning. Package-level PLAN.md files should be consolidated into the root PLAN.md.
 
 ## Trigger Conditions
 
@@ -36,21 +36,21 @@ Also invoke explicitly with:
 ### Step 1: Read Current State
 
 Read these files:
-- `docs/PLAN.md` (consolidated project plan)
+- `PLAN.md` (root, consolidated project plan)
 - `README.md` (feature documentation)
-- `packages/*/PLAN.md` (check for package-level plans to consolidate)
+- `packages/*/PLAN.md` (check for package-level plans to consolidate into root)
 - Recent git commits (what changed)
 
 ### Step 2: Consolidate Package Plans
 
-If `packages/*/PLAN.md` files exist, consolidate their content into `docs/PLAN.md`:
+If `packages/*/PLAN.md` files exist, consolidate their content into root `PLAN.md`:
 
 1. Each package gets a section: `## Package: {name}`
 2. Move completed items to the Completed section
 3. Move pending items to the appropriate sprint/backlog section
 4. Delete the package-level PLAN.md after consolidation
 
-Structure for `docs/PLAN.md`:
+Structure for root `PLAN.md`:
 ```markdown
 # Project Plan
 
@@ -76,13 +76,13 @@ Structure for `docs/PLAN.md`:
 ### Step 3: Analyze Changes
 
 Determine what was accomplished:
-- Which docs/PLAN.md items are now complete?
+- Which PLAN.md items are now complete?
 - Were new features added?
 - Were bugs fixed?
 - Did refactoring occur?
 - Were new issues discovered?
 
-### Step 4: Update docs/PLAN.md
+### Step 4: Update PLAN.md
 
 **Mark completed items:**
 ```markdown
@@ -131,7 +131,7 @@ Output a summary:
 ```
 Documentation updated:
 
-docs/PLAN.md:
+PLAN.md:
   - Marked complete: "Implement user authentication"
   - Added to backlog: "Need rate limiting for auth endpoints"
   - Moved to completed: 1 item
@@ -157,14 +157,14 @@ Implicitly chain markdown-writer when editing any .md file.
 ### After TDD Completion
 
 When TDD workflow completes (GREEN phase):
-1. Mark the related docs/PLAN.md task as complete
+1. Mark the related PLAN.md task as complete
 2. Add any discovered edge cases to backlog
 
 ### After Bug Fix
 
 When a bug is fixed:
-1. Mark bug item as complete in docs/PLAN.md
-2. Add regression test to docs/PLAN.md if not present
+1. Mark bug item as complete in PLAN.md
+2. Add regression test to PLAN.md if not present
 
 ### After Refactoring
 
@@ -225,11 +225,11 @@ When adding a feature to README.md:
 
 | Rationalization | Why It's Wrong | Required Action |
 |-----------------|----------------|-----------------|
-| "Too small to document" | Small changes accumulate | Update docs/PLAN.md |
+| "Too small to document" | Small changes accumulate | Update PLAN.md |
 | "I'll remember" | Context is lost between sessions | Write it down |
 | "README is fine" | Feature docs get stale | Verify accuracy |
 | "Just a bug fix" | Bugs deserve tracking | Mark complete |
-| "Package has its own PLAN" | Fragmentation causes confusion | Consolidate to docs/PLAN.md |
+| "Package has its own PLAN" | Fragmentation causes confusion | Consolidate to root PLAN.md |
 
 ## Example Session
 
@@ -251,7 +251,7 @@ Found:
 
 Updates:
 
-docs/PLAN.md:
+PLAN.md:
   Current Sprint:
     - [x] Implement user authentication
   Backlog:
@@ -269,9 +269,9 @@ README.md:
 
 ## Notes
 
-- All plan updates go to `docs/PLAN.md` (consolidated)
+- All plan updates go to root `PLAN.md` (consolidated)
 - Package-level PLAN.md files should be consolidated, not maintained separately
-- Never removes items from docs/PLAN.md (only marks complete)
+- Never removes items from PLAN.md (only marks complete)
 - Preserves existing formatting
 - Adds timestamps to completed items
 - Creates backlog items for discovered work

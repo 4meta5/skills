@@ -28,6 +28,13 @@ Skills CLI enhancements.
 - [ ] Add skill update command for version bumps
 - [ ] Improve semantic matching accuracy
 
+### Documentation
+
+- [x] Updated skill provenance for upstream skills (Trail of Bits, Claudeception)
+- [x] Updated README with chain system documentation
+- [x] Reorganized skills into single flat table with origin column
+- [x] Added skill update documentation
+
 ### Package: web
 
 Website improvements.
@@ -55,12 +62,12 @@ Website improvements.
 ### 2026-01-30
 
 **doc-maintenance Skill Fix**
-- [x] Fixed doc-maintenance skill to use docs/PLAN.md (consolidated)
+- [x] Fixed doc-maintenance skill to use root PLAN.md (consolidated)
 - [x] Added markdown-writer chaining to doc-maintenance skill
 - [x] Added package-level PLAN.md consolidation instructions
 - [x] Created doc-maintenance skill content tests (4 tests)
-- [x] Consolidated all PLAN.md files into docs/PLAN.md
-- [x] Removed root PLAN.md and packages/chain/PLAN.md
+- [x] Consolidated all PLAN.md files into root PLAN.md
+- [x] Simplified: moved PLAN.md to root (convention over configuration)
 
 **Chain Package: Phases 0-3.5**
 - [x] Package structure with package.json, tsconfig.json

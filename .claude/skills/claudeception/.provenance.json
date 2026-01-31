@@ -1,6 +1,10 @@
 {
   "source": {
-    "type": "git"
+    "type": "git",
+    "url": "https://github.com/blader/Claudeception.git",
+    "path": ".",
+    "ref": "main",
+    "commit": "7d7f5915f90db26e1a3fc52db6ac2e68d6d705a2"
   },
   "installed": {
     "at": "2026-01-30T19:26:00.013Z",

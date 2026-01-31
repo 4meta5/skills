@@ -13,14 +13,17 @@ describe('doc-maintenance skill', () => {
     '.claude/skills/doc-maintenance/SKILL.md'
   );
 
-  it('should reference docs/PLAN.md as the consolidated plan location', async () => {
+  it('should reference PLAN.md at root as the consolidated plan location', async () => {
     const content = await readFile(skillPath, 'utf-8');
-    expect(content).toContain('docs/PLAN.md');
+    // Should mention PLAN.md is at root, not in docs/
+    expect(content).toMatch(/PLAN\.md.*root|root.*PLAN\.md/i);
   });
 
-  it('should mention consolidation from package-level PLAN.md files', async () => {
+  it('should mention consolidation from package-level PLAN.md files into root', async () => {
     const content = await readFile(skillPath, 'utf-8');
+    // Should mention consolidating package-level plans into root PLAN.md
     expect(content).toMatch(/packages\/\*\/PLAN\.md|package-level|consolidat/i);
+    expect(content).toMatch(/root.*PLAN\.md|PLAN\.md.*root/i);
   });
 
   it('should chain markdown-writer for consistent style', async () => {
@@ -28,29 +31,10 @@ describe('doc-maintenance skill', () => {
     expect(content).toContain('markdown-writer');
   });
 
-  it('should not reference generic PLAN.md without docs/ prefix for main updates', async () => {
+  it('should not reference docs/PLAN.md - plan should be at root', async () => {
     const content = await readFile(skillPath, 'utf-8');
-    // The skill should reference docs/PLAN.md for the main consolidated plan
-    // It should NOT tell users to update a generic "PLAN.md" in the root or current directory
-    const lines = content.split('\n');
-    const stepLines = lines.filter(
-      (line) =>
-        line.includes('Read') ||
-        line.includes('Update') ||
-        line.includes('Step')
-    );
-
-    // Check that when referring to THE plan file to update, it's docs/PLAN.md
-    const updateLines = lines.filter((line) =>
-      line.match(/update.*plan\.md/i)
-    );
-    const hasConsolidatedReference = updateLines.some((line) =>
-      line.includes('docs/PLAN.md')
-    );
-
-    // If there are update references, at least one should be to docs/PLAN.md
-    if (updateLines.length > 0) {
-      expect(hasConsolidatedReference).toBe(true);
-    }
+    // The skill should NOT reference docs/PLAN.md
+    // PLAN.md lives at root for simplicity (convention over configuration)
+    expect(content).not.toContain('docs/PLAN.md');
   });
 });

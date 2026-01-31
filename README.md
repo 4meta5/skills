@@ -87,32 +87,25 @@ Skills activate based on context, not manual invocation. The router scores your 
 
 ### Skill Chaining
 
-Skills chain together automatically. When one skill completes, it triggers the next in the pipeline.
+Skills chain together using the declarative chain system in `packages/chain/`.
 
-**Testing Pipeline:**
-```
-tdd → suggest-tests → unit-test-workflow → property-based-testing → repo-hygiene
-```
+**How it works:**
+1. Define skills with capabilities they provide/require in `chains/skills.yaml`
+2. Define workflow profiles in `chains/profiles.yaml`
+3. Chain system resolves skill order using DAG-based resolution
+4. Hooks enforce prerequisites before allowing tools
 
-The TDD skill enforces RED/GREEN/REFACTOR phases. After you reach the REFACTOR phase, suggest-tests analyzes your changes for gaps. Then unit-test-workflow generates comprehensive tests. Property-based testing adds invariant checks. Finally, repo-hygiene cleans up test artifacts.
-
-**Feature Completion Chain:**
-```
-dogfood-skills → repo-hygiene → doc-maintenance
-```
-
-When you finish a feature, dogfood-skills runs `skills scan` to check for recommendations. Repo-hygiene cleans generated slop. Doc-maintenance updates PLAN.md to mark tasks complete.
-
-**Bug Fix Chain:**
-```
-tdd + no-workarounds → doc-maintenance
+**Commands:**
+```bash
+chain validate              # Validate YAML specs
+chain resolve --profile X   # Show resolved skill chain
+chain status                # Show current chain progress
+chain activate --profile X  # Activate a workflow
+chain next                  # Show next step in chain
+chain clear                 # Clear active session
 ```
 
-Bug fixes require TDD. The no-workarounds skill blocks manual fixes when you're building tools. After the fix, doc-maintenance updates documentation.
-
-**How Chaining Works:**
-
-Each skill defines what it chains to in its SKILL.md. The workflow-orchestrator skill detects context and activates the appropriate chain. Skills like repo-hygiene are terminal in testing flows but chain to doc-maintenance in feature flows.
+**Status:** Phases 0-3.5 complete (189 tests). Profile auto-selection pending.
 
 ## How Skills Get Activated
 
@@ -156,62 +149,6 @@ This creates `.claude/hooks/` with the shell scripts and configures `.claude/set
 
 If you skip hooks, skills still exist in `.claude/skills/` but Claude won't automatically know to use them. You'd have to manually invoke them with `/skill-name` or hope Claude reads the CLAUDE.md references.
 
-## Bundled Skills
-
-### Testing & Quality
-
-| Skill | Description |
-|-------|-------------|
-| tdd | Test-driven development workflow (RED/GREEN/REFACTOR) |
-| unit-test-workflow | Multi-phase test generation |
-| suggest-tests | Recommend tests based on git diff |
-| property-based-testing | Property and invariant testing guidance |
-
-### Development Workflow
-
-| Skill | Description |
-|-------|-------------|
-| no-workarounds | Prevents manual workarounds when building tools |
-| dogfood-skills | Enforces using the tools you build |
-| claudeception | Extracts learnings into new skills |
-| typescript-circular-dependency | Detect and resolve circular imports |
-
-### Code Review & Security
-
-| Skill | Description |
-|-------|-------------|
-| code-review-ts | TypeScript-specific review guidelines |
-| security-analysis | Static security review for PRs |
-| differential-review | Security-focused diff analysis |
-| code-maturity-assessor | Trail of Bits maturity framework |
-
-### Documentation
-
-| Skill | Description |
-|-------|-------------|
-| markdown-writer | Consistent markdown style (Paul Graham voice) |
-| blog-writer | Blog post creation for amarsingh.dev |
-
-### Frontend & UI
-
-| Skill | Description |
-|-------|-------------|
-| frontend-design | Distinctive, production-grade UI creation |
-| baseline-ui | Enforces opinionated UI baseline |
-| web-design-guidelines | Review against Web Interface Guidelines |
-| fixing-accessibility | Fix accessibility issues |
-| fixing-motion-performance | Fix animation performance issues |
-
-### Svelte & SvelteKit
-
-| Skill | Description |
-|-------|-------------|
-| svelte-runes | Svelte 5 runes guidance ($state, $derived, $effect) |
-| sveltekit-structure | File-based routing, layouts, error handling |
-| sveltekit-data-flow | Load functions, form actions, data flow |
-| claude-svelte5-skill | Comprehensive Svelte 5 reference |
-| sveltekit-svelte5-tailwind-skill | SvelteKit + Svelte 5 + Tailwind v4 integration |
-
 ## CLI Reference
 
 | Command | Description |
@@ -227,6 +164,9 @@ If you skip hooks, skills still exist in `.claude/skills/` but Claude won't auto
 | `list --provenance` | Show provenance type for each skill |
 | `show <name>` | Display skill details |
 | `remove <name>` | Uninstall a skill |
+| `update --check` | Check for upstream skill updates |
+| `update <name>` | Update a skill from its source |
+| `update --all` | Update all upstream skills |
 | `hygiene scan` | Detect auto-generated test slop |
 | `hygiene clean --confirm` | Delete detected slop |
 | `claudemd sync` | Sync CLAUDE.md with installed skills |
@@ -291,7 +231,13 @@ That's it. No registration. No config. Just `SKILL.md`.
 
 ```json
 {
-  "source": { "type": "git", "url": "https://github.com/..." },
+  "source": {
+    "type": "git",
+    "url": "https://github.com/...",
+    "path": "plugins/skill-name/skills/skill-name",
+    "ref": "main",
+    "commit": "abc123..."
+  },
   "installed": { "at": "2024-01-15T...", "by": "skills-cli@1.0.0" }
 }
 ```
@@ -305,6 +251,26 @@ The logic is simple:
 
 Use `skills list --provenance` to see which is which.
 
+## Updating Skills
+
+Skills with `upstream` origin can be updated from their source:
+
+```bash
+# Check for updates
+skills update --check
+
+# Update with security review
+skills update property-based-testing --review
+
+# Update all upstream skills
+skills update --all --review
+```
+
+Security review assesses risk using differential-review:
+- **LOW**: Documentation changes
+- **MEDIUM**: New files, import changes
+- **HIGH**: Scripts, external calls, permissions (requires `--yes`)
+
 ## Packages
 
 This monorepo contains:
@@ -313,6 +279,7 @@ This monorepo contains:
 |---------|------|-------------|
 | `@4meta5/skills-cli` | `packages/cli` | CLI for scanning, installing, and managing skills |
 | `@4meta5/skills` | `packages/skills` | Core library for loading and parsing skills |
+| `@4meta5/chain` | `packages/chain` | Skill chaining system with DAG resolution |
 | `web` (private) | `packages/web` | Website for browsing and discovering skills |
 
 ## Contributing
@@ -348,3 +315,47 @@ MIT. See [LICENSE](./LICENSE).
 - [Implementation Status](./docs/DONE.md)
 - [Contributing Guide](./CONTRIBUTING.md)
 - [Changelog](./CHANGELOG.md)
+
+---
+
+## Skills Library
+
+| Skill | Origin | Category | Description |
+|-------|--------|----------|-------------|
+| tdd | custom | testing | Test-driven development (RED/GREEN/REFACTOR) |
+| suggest-tests | custom | testing | Recommend tests based on git diff |
+| unit-test-workflow | custom | testing | Multi-phase test generation |
+| property-based-testing | upstream (tob) | testing | Property and invariant testing |
+| repo-hygiene | custom | testing | Clean auto-generated test artifacts |
+| dogfood-skills | custom | development | Enforces using tools you build |
+| no-workarounds | custom | development | Prevents manual workarounds |
+| claudeception | upstream (claudeception) | development | Extract learnings into skills |
+| typescript-circular-dependency | upstream (claudeception) | development | Detect circular imports |
+| skill-maker | custom | development | Create Claude Code skills |
+| workflow-orchestrator | custom | workflow | Context detection and skill chaining |
+| project-init | custom | workflow | Scaffold new projects |
+| doc-maintenance | custom | workflow | Auto-update docs after tasks |
+| agent-orchestration | custom | workflow | Coordinate parallel agents |
+| research-to-plan | custom | workflow | Convert research to plans |
+| gitignore-hygiene | custom | workflow | Maintain gitignore patterns |
+| code-review-ts | custom | security | TypeScript review guidelines |
+| security-analysis | custom | security | Static security review |
+| differential-review | upstream (tob) | security | Security-focused diff analysis |
+| code-maturity-assessor | upstream (tob) | security | Trail of Bits maturity framework |
+| markdown-writer | custom | documentation | Consistent markdown style |
+| blog-writer | custom | documentation | Blog post creation |
+| frontend-design | custom | ui | Distinctive UI creation |
+| baseline-ui | custom | ui | Opinionated UI baseline |
+| web-design-guidelines | custom | ui | Web Interface Guidelines |
+| fixing-accessibility | custom | ui | Fix accessibility issues |
+| fixing-motion-performance | custom | ui | Fix animation performance |
+| svelte-runes | custom | svelte | Svelte 5 runes ($state, $derived, $effect) |
+| sveltekit-structure | custom | svelte | File-based routing, layouts |
+| sveltekit-data-flow | custom | svelte | Load functions, form actions |
+| claude-svelte5-skill | custom | svelte | Comprehensive Svelte 5 reference |
+| sveltekit-svelte5-tailwind-skill | custom | svelte | SvelteKit + Svelte 5 + Tailwind v4 |
+
+**Origin key:**
+- `custom` - Created for this project
+- `upstream (tob)` - From [Trail of Bits](https://github.com/trailofbits/skills)
+- `upstream (claudeception)` - From [Claudeception](https://github.com/blader/Claudeception)
