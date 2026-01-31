@@ -354,6 +354,8 @@ MIT. See [LICENSE](./LICENSE).
 | sveltekit-data-flow | custom | svelte | Load functions, form actions |
 | claude-svelte5-skill | custom | svelte | Comprehensive Svelte 5 reference |
 | sveltekit-svelte5-tailwind-skill | custom | svelte | SvelteKit + Svelte 5 + Tailwind v4 |
+| imessage-tone | custom | communication | Two-mode iMessage tone (owner vs others) |
+| bluebubbles-setup | custom | communication | BlueBubbles iMessage integration setup |
 
 **Origin key:**
 - `custom` - Created for this project
