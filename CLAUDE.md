@@ -53,9 +53,6 @@ Pre-commit hook runs typecheck + unit tests in parallel. Property tests are excl
 If you skip this, respond: **"BLOCKED: DOGFOODING REQUIRED"**
 
 ## Installed Skills
-- @.claude/skills/test-skill-1769900505718/SKILL.md
-- @.claude/skills/test-skill-1769900505674/SKILL.md
-- @.claude/skills/test-skill-1769900505622/SKILL.md
 - @.claude/skills/bluebubbles-setup/SKILL.md
 - @.claude/skills/imessage-tone/SKILL.md
 
@@ -78,6 +75,9 @@ If you skip this, respond: **"BLOCKED: DOGFOODING REQUIRED"**
 - @.claude/skills/dogfood-skills/SKILL.md - **Enforces dogfooding (READ THIS)**
 - @.claude/skills/no-workarounds/SKILL.md - **Prevents manual workarounds when building tools**
 - @.claude/skills/claudeception/SKILL.md - Extract learnings as skills
+
+### Memory
+- @.claude/skills/engram-recall/SKILL.md - Recall past work before starting new tasks
 
 ### Code Review & Security
 - @.claude/skills/code-review-ts/SKILL.md - TypeScript review guidelines
