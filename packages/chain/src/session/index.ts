@@ -15,3 +15,14 @@ export {
   checkCommandSuccess,
   type EvidenceResult,
 } from './evidence-checker.js';
+
+export {
+  UsageTracker,
+  type UsageEvent,
+  type ActivationEvent,
+  type DecisionEvent,
+  type BlockEvent,
+  type RetryEvent,
+  type CompletionEvent,
+  type UsageStats,
+} from './usage-tracker.js';
