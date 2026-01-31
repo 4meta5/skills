@@ -50,6 +50,16 @@ This prevents you from responding to your own messages when they appear in the c
 ### Recognition Rule
 When you see a message starting with `(YourName)`, **DO NOT RESPOND** — it's your own message.
 
+### Commit Before Texting
+**Always commit and push your work BEFORE sending text updates.**
+
+Order:
+1. Do the work
+2. `git add && git commit && git push`
+3. THEN send the text update
+
+This ensures your human can actually see the work you're reporting on.
+
 ---
 
 ## Mode 1: Direct to Owner
