@@ -251,4 +251,68 @@ describe('ChainIntegration', () => {
       expect(integration.getLastActivation()).toBeNull();
     });
   });
+
+  describe('usage tracking', () => {
+    it('tracks block events', async () => {
+      const integration = createChainIntegration({
+        cwd: testDir,
+        skills: mockSkills,
+        profiles: mockProfiles,
+        trackUsage: true,
+      });
+
+      await integration.trackBlock('test-session', 'write_impl', 'TDD RED phase');
+
+      const tracker = integration.getTracker();
+      expect(tracker).not.toBeNull();
+
+      const events = await tracker!.getEvents('test-session');
+      expect(events).toHaveLength(1);
+      expect(events[0].type).toBe('block');
+    });
+
+    it('tracks retry events', async () => {
+      const integration = createChainIntegration({
+        cwd: testDir,
+        skills: mockSkills,
+        profiles: mockProfiles,
+      });
+
+      await integration.trackRetry('test-session', 'write_impl', 2);
+
+      const tracker = integration.getTracker();
+      const events = await tracker!.getEvents('test-session');
+      expect(events).toHaveLength(1);
+      expect(events[0].type).toBe('retry');
+    });
+
+    it('tracks completion events', async () => {
+      const integration = createChainIntegration({
+        cwd: testDir,
+        skills: mockSkills,
+        profiles: mockProfiles,
+      });
+
+      await integration.trackCompletion('test-session', 'test_written', 'tdd');
+
+      const tracker = integration.getTracker();
+      const events = await tracker!.getEvents('test-session');
+      expect(events).toHaveLength(1);
+      expect(events[0].type).toBe('completion');
+    });
+
+    it('disables tracking when trackUsage is false', async () => {
+      const integration = createChainIntegration({
+        cwd: testDir,
+        skills: mockSkills,
+        profiles: mockProfiles,
+        trackUsage: false,
+      });
+
+      await integration.trackBlock('test-session', 'write_impl', 'TDD RED phase');
+
+      const tracker = integration.getTracker();
+      expect(tracker).toBeNull();
+    });
+  });
 });
