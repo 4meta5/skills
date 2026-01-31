@@ -61,10 +61,21 @@ Website improvements.
 
 ### 2026-01-31
 
+**Chain Package: Phase 4 + Phase 5 Progress**
+- [x] Profile matcher with regex scoring (matchProfileToPrompt)
+- [x] Auto-activation in PreToolUse hook when prompt provided
+- [x] `--prompt` and `--no-auto` CLI flags for hook-pre-tool-use
+- [x] Session persistence on first hook invocation
+- [x] Comprehensive README.md for chain package
+- [x] `chain validate` added to pre-commit hook
+- [x] Fixed TDD write blocking (dogfooding found circular dependency)
+- [x] Tests: 212 passing (was 189)
+
 **Communication Skills**
 - [x] Created imessage-tone skill for iMessage communication
 - [x] Two-mode system: owner (direct, honest) vs others (approval required, casual)
 - [x] Abbreviation rules, punctuation rules, non-needy tone
+- [x] Added self-identification prefix to prevent self-reply loops
 - [x] Created bluebubbles-setup skill for iMessage integration
 - [x] Covers Full Disk Access, Cloudflare tunnels, webhook config
 - [x] Documents critical config rules (open policy requires wildcard)
@@ -162,4 +173,4 @@ None currently.
 
 - Test skills (test-skill-*) are for CLI testing. Clean with `skills hygiene clean -r --confirm`.
 - Some skills are marked _temp_ pending proper naming.
-- Chain package has 189 tests. CLI package has 796 tests.
+- Chain package has 212 tests. CLI package has 796 tests.
