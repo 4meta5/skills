@@ -14,8 +14,33 @@ export type CostLevel = z.infer<typeof CostLevel>;
 
 /**
  * Tool intents that can be gated by capabilities
+ *
+ * Path-aware intents (write_test, write_impl, etc.) subdivide the base
+ * intent for fine-grained blocking. The classifier uses language-agnostic
+ * patterns to determine file category.
+ *
+ * Intent hierarchy:
+ *   write → write_test, write_impl, write_docs, write_config
+ *   edit  → edit_test, edit_impl, edit_docs, edit_config
  */
-export const ToolIntent = z.enum(['write', 'commit', 'push', 'deploy', 'delete']);
+export const ToolIntent = z.enum([
+  // Base intents
+  'write',
+  'commit',
+  'push',
+  'deploy',
+  'delete',
+  // Path-aware write intents
+  'write_test',
+  'write_impl',
+  'write_docs',
+  'write_config',
+  // Path-aware edit intents
+  'edit_test',
+  'edit_impl',
+  'edit_docs',
+  'edit_config',
+]);
 export type ToolIntent = z.infer<typeof ToolIntent>;
 
 /**

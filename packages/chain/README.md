@@ -52,7 +52,7 @@ skills:
     artifacts: ["**/*.test.ts"]
     tool_policy:
       deny_until:
-        write:
+        write_impl:
           until: test_written
           reason: "RED phase: Write failing test first"
         commit:
@@ -138,6 +138,37 @@ CHAIN ENFORCEMENT: BLOCKED
 Intent: write
 Reason: Write failing test first (TDD RED)
 ```
+
+### Path-Aware Intents
+
+Chain supports fine-grained blocking based on file paths. Instead of blocking all writes, you can target specific file categories:
+
+| Intent | Description | Example Files |
+|--------|-------------|---------------|
+| `write_test` | Writing test files | `*.test.ts`, `*.spec.js`, `tests/` |
+| `write_impl` | Writing implementation files | `src/*.ts`, `lib/*.js` |
+| `write_docs` | Writing documentation | `*.md`, `docs/`, `README` |
+| `write_config` | Writing configuration | `*.json`, `*.yaml`, `.env` |
+
+**TDD Example:** Block implementation writes until tests exist, but always allow writing tests:
+
+```yaml
+tool_policy:
+  deny_until:
+    write_impl:
+      until: test_written
+      reason: "TDD RED: Write a failing test first"
+    commit:
+      until: test_green
+      reason: "TDD GREEN: Tests must pass"
+```
+
+With this config:
+- `Write` to `src/index.ts` → **blocked** (write_impl)
+- `Write` to `src/index.test.ts` → **allowed** (write_test)
+- `Write` to `README.md` → **allowed** (write_docs)
+
+**Fallback behavior:** If you block the base `write` intent, it blocks all file writes regardless of category. Path-aware intents provide finer control when needed.
 
 ### Session Persistence
 

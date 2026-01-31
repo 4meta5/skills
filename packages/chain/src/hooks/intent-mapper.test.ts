@@ -3,6 +3,8 @@ import {
   extractBashIntents,
   mapToolToIntents,
   findBlockedIntents,
+  classifyFilePath,
+  getPathAwareIntent,
 } from './intent-mapper.js';
 
 describe('extractBashIntents', () => {
@@ -168,5 +170,266 @@ describe('findBlockedIntents', () => {
     );
 
     expect(result).toEqual([]);
+  });
+});
+
+describe('classifyFilePath', () => {
+  describe('test files', () => {
+    it('classifies .test.ts files', () => {
+      expect(classifyFilePath('src/foo.test.ts')).toBe('test');
+    });
+
+    it('classifies .spec.ts files', () => {
+      expect(classifyFilePath('src/foo.spec.ts')).toBe('test');
+    });
+
+    it('classifies .test.js files', () => {
+      expect(classifyFilePath('lib/bar.test.js')).toBe('test');
+    });
+
+    it('classifies _test.go files (Go convention)', () => {
+      expect(classifyFilePath('pkg/foo_test.go')).toBe('test');
+    });
+
+    it('classifies test_*.py files (Python convention)', () => {
+      expect(classifyFilePath('tests/test_utils.py')).toBe('test');
+    });
+
+    it('classifies files in tests/ directory', () => {
+      expect(classifyFilePath('tests/integration/auth.ts')).toBe('test');
+    });
+
+    it('classifies files in test/ directory', () => {
+      expect(classifyFilePath('test/helpers.ts')).toBe('test');
+    });
+
+    it('classifies files in __tests__/ directory', () => {
+      expect(classifyFilePath('src/__tests__/component.tsx')).toBe('test');
+    });
+
+    it('classifies Rust test files in tests/', () => {
+      expect(classifyFilePath('tests/integration.rs')).toBe('test');
+    });
+
+    it('handles case-insensitive matching', () => {
+      expect(classifyFilePath('src/Foo.Test.ts')).toBe('test');
+      expect(classifyFilePath('TESTS/bar.py')).toBe('test');
+    });
+  });
+
+  describe('documentation files', () => {
+    it('classifies .md files', () => {
+      expect(classifyFilePath('CHANGELOG.md')).toBe('docs');
+    });
+
+    it('classifies .mdx files', () => {
+      expect(classifyFilePath('docs/guide.mdx')).toBe('docs');
+    });
+
+    it('classifies files in docs/ directory', () => {
+      expect(classifyFilePath('docs/api/reference.html')).toBe('docs');
+    });
+
+    it('classifies README files', () => {
+      expect(classifyFilePath('README')).toBe('docs');
+      expect(classifyFilePath('README.md')).toBe('docs');
+    });
+
+    it('classifies CHANGELOG files', () => {
+      expect(classifyFilePath('CHANGELOG')).toBe('docs');
+    });
+
+    it('classifies LICENSE files', () => {
+      expect(classifyFilePath('LICENSE')).toBe('docs');
+    });
+
+    it('classifies .txt files', () => {
+      expect(classifyFilePath('notes.txt')).toBe('docs');
+    });
+
+    it('classifies .rst files', () => {
+      expect(classifyFilePath('docs/index.rst')).toBe('docs');
+    });
+  });
+
+  describe('configuration files', () => {
+    it('classifies .json files', () => {
+      expect(classifyFilePath('package.json')).toBe('config');
+    });
+
+    it('classifies .yaml files', () => {
+      expect(classifyFilePath('config.yaml')).toBe('config');
+    });
+
+    it('classifies .yml files', () => {
+      expect(classifyFilePath('docker-compose.yml')).toBe('config');
+    });
+
+    it('classifies .toml files', () => {
+      expect(classifyFilePath('Cargo.toml')).toBe('config');
+    });
+
+    it('classifies .env files', () => {
+      expect(classifyFilePath('.env')).toBe('config');
+      expect(classifyFilePath('.env.local')).toBe('config');
+    });
+
+    it('classifies RC files', () => {
+      expect(classifyFilePath('.eslintrc')).toBe('config');
+      expect(classifyFilePath('.prettierrc')).toBe('config');
+    });
+
+    it('classifies .config.* files', () => {
+      expect(classifyFilePath('vite.config.ts')).toBe('config');
+      expect(classifyFilePath('jest.config.js')).toBe('config');
+    });
+
+    it('classifies tsconfig files', () => {
+      expect(classifyFilePath('tsconfig.json')).toBe('config');
+      expect(classifyFilePath('tsconfig.build.json')).toBe('config');
+    });
+
+    it('classifies Dockerfile', () => {
+      expect(classifyFilePath('Dockerfile')).toBe('config');
+    });
+
+    it('classifies Makefile', () => {
+      expect(classifyFilePath('Makefile')).toBe('config');
+    });
+
+    it('classifies lock files', () => {
+      expect(classifyFilePath('package-lock.json')).toBe('config');
+      expect(classifyFilePath('yarn.lock')).toBe('config');
+    });
+  });
+
+  describe('implementation files', () => {
+    it('classifies .ts files in src/', () => {
+      expect(classifyFilePath('src/index.ts')).toBe('impl');
+    });
+
+    it('classifies .js files in lib/', () => {
+      expect(classifyFilePath('lib/utils.js')).toBe('impl');
+    });
+
+    it('classifies .py files in src/', () => {
+      expect(classifyFilePath('src/main.py')).toBe('impl');
+    });
+
+    it('classifies .rs files in src/', () => {
+      expect(classifyFilePath('src/lib.rs')).toBe('impl');
+    });
+
+    it('classifies .go files', () => {
+      expect(classifyFilePath('pkg/service.go')).toBe('impl');
+    });
+
+    it('classifies .tsx component files', () => {
+      expect(classifyFilePath('src/components/Button.tsx')).toBe('impl');
+    });
+  });
+
+  describe('priority handling', () => {
+    it('prioritizes test over docs for .test.md files', () => {
+      // While uncommon, test files take priority
+      expect(classifyFilePath('src/readme.test.ts')).toBe('test');
+    });
+
+    it('prioritizes test over config for test config files', () => {
+      expect(classifyFilePath('tests/fixtures/config.json')).toBe('test');
+    });
+  });
+
+  describe('Windows path handling', () => {
+    it('handles backslashes in paths', () => {
+      expect(classifyFilePath('src\\foo.test.ts')).toBe('test');
+      expect(classifyFilePath('docs\\guide.md')).toBe('docs');
+    });
+  });
+});
+
+describe('getPathAwareIntent', () => {
+  it('returns write_test for test files', () => {
+    expect(getPathAwareIntent('write', 'src/foo.test.ts')).toBe('write_test');
+  });
+
+  it('returns write_impl for implementation files', () => {
+    expect(getPathAwareIntent('write', 'src/foo.ts')).toBe('write_impl');
+  });
+
+  it('returns write_docs for documentation files', () => {
+    expect(getPathAwareIntent('write', 'docs/guide.md')).toBe('write_docs');
+  });
+
+  it('returns write_config for configuration files', () => {
+    expect(getPathAwareIntent('write', 'package.json')).toBe('write_config');
+  });
+
+  it('returns edit_test for editing test files', () => {
+    expect(getPathAwareIntent('edit', 'src/foo.test.ts')).toBe('edit_test');
+  });
+
+  it('returns edit_impl for editing implementation files', () => {
+    expect(getPathAwareIntent('edit', 'src/foo.ts')).toBe('edit_impl');
+  });
+});
+
+describe('mapToolToIntents with paths', () => {
+  it('returns path-aware intent and base intent for Write with path', () => {
+    const intents = mapToolToIntents({
+      tool: 'Write',
+      input: { path: 'src/foo.test.ts' },
+    });
+    expect(intents).toContain('write_test');
+    expect(intents).toContain('write');
+  });
+
+  it('returns write_impl for implementation file writes', () => {
+    const intents = mapToolToIntents({
+      tool: 'Write',
+      input: { path: 'src/index.ts' },
+    });
+    expect(intents).toContain('write_impl');
+    expect(intents).toContain('write');
+  });
+
+  it('returns write_docs for documentation file writes', () => {
+    const intents = mapToolToIntents({
+      tool: 'Write',
+      input: { path: 'README.md' },
+    });
+    expect(intents).toContain('write_docs');
+    expect(intents).toContain('write');
+  });
+
+  it('returns write_config for config file writes', () => {
+    const intents = mapToolToIntents({
+      tool: 'Write',
+      input: { path: 'package.json' },
+    });
+    expect(intents).toContain('write_config');
+    expect(intents).toContain('write');
+  });
+
+  it('works with Edit tool', () => {
+    const intents = mapToolToIntents({
+      tool: 'Edit',
+      input: { path: 'src/foo.test.ts' },
+    });
+    expect(intents).toContain('write_test');
+    expect(intents).toContain('write');
+  });
+
+  it('works with file_path input key', () => {
+    const intents = mapToolToIntents({
+      tool: 'Write',
+      input: { file_path: 'src/foo.ts' },
+    });
+    expect(intents).toContain('write_impl');
+  });
+
+  it('falls back to base intent when no path provided', () => {
+    const intents = mapToolToIntents({ tool: 'Write' });
+    expect(intents).toEqual(['write']);
   });
 });

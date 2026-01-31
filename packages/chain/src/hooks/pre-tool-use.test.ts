@@ -187,6 +187,207 @@ describe('PreToolUseHook', () => {
     });
   });
 
+  describe('path-aware intent blocking', () => {
+    let pathAwareSkills: SkillSpec[];
+
+    beforeEach(() => {
+      // TDD skill that blocks implementation writes but allows test writes
+      pathAwareSkills = [
+        {
+          name: 'tdd',
+          skill_path: '.claude/skills/tdd',
+          provides: ['test_written', 'test_green'],
+          requires: [],
+          conflicts: [],
+          risk: 'low',
+          cost: 'low',
+          artifacts: [],
+          tool_policy: {
+            deny_until: {
+              write_impl: {
+                until: 'test_written',
+                reason: 'TDD RED: Write a failing test first',
+              },
+              commit: { until: 'test_green', reason: 'Tests must pass' },
+            },
+          },
+        },
+      ];
+    });
+
+    it('blocks writes to implementation files when write_impl is blocked', async () => {
+      const hook = new PreToolUseHook(testDir, pathAwareSkills);
+
+      // Create session with write_impl blocked
+      await stateManager.create({
+        session_id: 'test-session',
+        profile_id: 'tdd',
+        activated_at: new Date().toISOString(),
+        chain: ['tdd'],
+        capabilities_required: ['test_written'],
+        capabilities_satisfied: [],
+        current_skill_index: 0,
+        strictness: 'strict',
+        blocked_intents: {
+          write_impl: 'TDD RED: Write a failing test first',
+        },
+      });
+
+      // Write to implementation file should be blocked
+      const result = await hook.check({
+        tool: 'Write',
+        input: { path: 'src/index.ts' },
+      });
+
+      expect(result.allowed).toBe(false);
+      expect(result.blockedIntents).toContainEqual({
+        intent: 'write_impl',
+        reason: 'TDD RED: Write a failing test first',
+      });
+    });
+
+    it('allows writes to test files even when write_impl is blocked', async () => {
+      const hook = new PreToolUseHook(testDir, pathAwareSkills);
+
+      // Create session with write_impl blocked
+      await stateManager.create({
+        session_id: 'test-session',
+        profile_id: 'tdd',
+        activated_at: new Date().toISOString(),
+        chain: ['tdd'],
+        capabilities_required: ['test_written'],
+        capabilities_satisfied: [],
+        current_skill_index: 0,
+        strictness: 'strict',
+        blocked_intents: {
+          write_impl: 'TDD RED: Write a failing test first',
+        },
+      });
+
+      // Write to test file should be allowed
+      const result = await hook.check({
+        tool: 'Write',
+        input: { path: 'src/index.test.ts' },
+      });
+
+      expect(result.allowed).toBe(true);
+    });
+
+    it('allows writes to spec files even when write_impl is blocked', async () => {
+      const hook = new PreToolUseHook(testDir, pathAwareSkills);
+
+      await stateManager.create({
+        session_id: 'test-session',
+        profile_id: 'tdd',
+        activated_at: new Date().toISOString(),
+        chain: ['tdd'],
+        capabilities_required: ['test_written'],
+        capabilities_satisfied: [],
+        current_skill_index: 0,
+        strictness: 'strict',
+        blocked_intents: {
+          write_impl: 'TDD RED: Write a failing test first',
+        },
+      });
+
+      const result = await hook.check({
+        tool: 'Write',
+        input: { path: 'tests/auth.spec.ts' },
+      });
+
+      expect(result.allowed).toBe(true);
+    });
+
+    it('allows writes to documentation files even when write_impl is blocked', async () => {
+      const hook = new PreToolUseHook(testDir, pathAwareSkills);
+
+      await stateManager.create({
+        session_id: 'test-session',
+        profile_id: 'tdd',
+        activated_at: new Date().toISOString(),
+        chain: ['tdd'],
+        capabilities_required: ['test_written'],
+        capabilities_satisfied: [],
+        current_skill_index: 0,
+        strictness: 'strict',
+        blocked_intents: {
+          write_impl: 'TDD RED: Write a failing test first',
+        },
+      });
+
+      const result = await hook.check({
+        tool: 'Write',
+        input: { path: 'README.md' },
+      });
+
+      expect(result.allowed).toBe(true);
+    });
+
+    it('blocks all writes when base write intent is blocked', async () => {
+      const hook = new PreToolUseHook(testDir, pathAwareSkills);
+
+      // Block the base 'write' intent instead of write_impl
+      await stateManager.create({
+        session_id: 'test-session',
+        profile_id: 'no-workarounds',
+        activated_at: new Date().toISOString(),
+        chain: ['no-workarounds'],
+        capabilities_required: ['tool_verified'],
+        capabilities_satisfied: [],
+        current_skill_index: 0,
+        strictness: 'strict',
+        blocked_intents: {
+          write: 'Fix the tool first',
+        },
+      });
+
+      // Both test and impl writes should be blocked
+      const implResult = await hook.check({
+        tool: 'Write',
+        input: { path: 'src/index.ts' },
+      });
+      expect(implResult.allowed).toBe(false);
+
+      const testResult = await hook.check({
+        tool: 'Write',
+        input: { path: 'src/index.test.ts' },
+      });
+      expect(testResult.allowed).toBe(false);
+    });
+
+    it('works with Edit tool', async () => {
+      const hook = new PreToolUseHook(testDir, pathAwareSkills);
+
+      await stateManager.create({
+        session_id: 'test-session',
+        profile_id: 'tdd',
+        activated_at: new Date().toISOString(),
+        chain: ['tdd'],
+        capabilities_required: ['test_written'],
+        capabilities_satisfied: [],
+        current_skill_index: 0,
+        strictness: 'strict',
+        blocked_intents: {
+          write_impl: 'TDD RED: Write a failing test first',
+        },
+      });
+
+      // Edit to impl file should be blocked
+      const implResult = await hook.check({
+        tool: 'Edit',
+        input: { path: 'src/index.ts' },
+      });
+      expect(implResult.allowed).toBe(false);
+
+      // Edit to test file should be allowed
+      const testResult = await hook.check({
+        tool: 'Edit',
+        input: { path: 'src/index.test.ts' },
+      });
+      expect(testResult.allowed).toBe(true);
+    });
+  });
+
   describe('checkWithExitCode', () => {
     it('returns exit code 0 when allowed', async () => {
       const hook = new PreToolUseHook(testDir, mockSkills);

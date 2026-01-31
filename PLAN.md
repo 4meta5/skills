@@ -19,12 +19,12 @@ Chain owns session state. Tool-time enforcement is truth. Prompt-time is optimiz
 - [ ] Chain state shows active enforcement immediately after routing (before any Skill() call)
 - [ ] Tests: Router immediate → chain active without Skill()
 
-**6.2: Intent Mapping (Unblock Smarter Blocking)**
-- [ ] Define canonical intents: write_test, write_impl, write_docs, edit_test, edit_impl, etc.
-- [ ] Implement path-based intent classifier in chain (language-agnostic patterns)
-- [ ] Update deny rules to target intents not raw tools
-- [ ] Default patterns: `**/{test,tests,__tests__}/**`, `**/*.{test,spec}.*`, etc.
-- [ ] Tests: TDD RED allows `foo.test.ts`, blocks `src/foo.ts`
+**6.2: Intent Mapping (Unblock Smarter Blocking)** ✅
+- [x] Define canonical intents: write_test, write_impl, write_docs, write_config, edit_test, edit_impl, etc.
+- [x] Implement path-based intent classifier in chain (language-agnostic patterns)
+- [x] Update deny rules to target intents not raw tools
+- [x] Default patterns: `**/{test,tests,__tests__}/**`, `**/*.{test,spec}.*`, etc.
+- [x] Tests: TDD RED allows `foo.test.ts`, blocks `src/foo.ts` (6 new integration tests)
 
 **6.3: Enforcement Tiers**
 - [ ] Add `tier: hard | soft | none` to skill schema
@@ -111,6 +111,17 @@ Skills CLI enhancements.
 ## Completed
 
 ### 2026-01-31
+
+**Chain Package: Phase 6.2 - Path-Aware Intent Mapping**
+- [x] Extended ToolIntent enum with path-aware variants (write_test, write_impl, write_docs, write_config, edit_*)
+- [x] Implemented classifyFilePath() with language-agnostic patterns
+- [x] Added getPathAwareIntent() for intent classification
+- [x] Updated mapToolToIntents to return both path-aware and base intents
+- [x] Added 51 new tests for file classification (test/docs/config/impl patterns)
+- [x] Added 6 new integration tests for PreToolUse path-aware blocking
+- [x] Updated TDD skill config to use write_impl instead of write
+- [x] Updated README with path-aware intents documentation
+- [x] Tests: 269 passing (was 212)
 
 **Chain Package: Phase 4 + Phase 5 Progress**
 - [x] Profile matcher with regex scoring (matchProfileToPrompt)
