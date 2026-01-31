@@ -12,6 +12,9 @@ dist/
 !src/**/*.ts
 !skills/**/*.ts
 
+# Keep CLI bin entry points
+!packages/cli/bin/*.js
+
 # Keep config files (both root and nested)
 !*.config.ts
 !*.config.js
