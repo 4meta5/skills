@@ -1,402 +1,147 @@
-# Skills CLI - Implementation Plan
-
-Gaps identified in RESEARCH.md, organized for parallel subagent delegation.
-
-**Rules:**
-- Every task follows TDD (RED → GREEN → REFACTOR)
-- After each wave, run `skills sync` to update external projects
-- If sync fails, fix the CLI (no manual workarounds)
-
----
-
-## Wave 1: High Priority (Parallel) ✓ COMPLETE
-
-**Status:** All tasks complete, 637 tests passing, synced to external projects.
-
-### Task 1.1: Exponential Backoff ✓
-
-Add jitter and backoff to retry logic.
-
-**File:** `src/middleware/backoff.ts`
-**Test:** `src/middleware/backoff.test.ts`
-**TDD:** Required
-**Parallel:** Yes (with 1.2)
-**Status:** Complete (13 tests)
-
-```typescript
-interface BackoffConfig {
-  initialDelayMs: number;  // default 1000
-  maxDelayMs: number;      // default 30000
-  multiplier: number;      // default 2
-  jitterMs: number;        // default 1000
-}
-
-function calculateDelay(attempt: number, config: BackoffConfig): number;
-function shouldRetry(error: Error, attempt: number, max: number): boolean;
-```
-
-**Tests:**
-- calculateDelay returns exponential values
-- calculateDelay respects maxDelayMs cap
-- calculateDelay adds jitter within range
-- shouldRetry returns false for auth errors (401/403)
-- shouldRetry returns true for 429/5xx
-
----
-
-### Task 1.2: Enhanced Error Messages ✓
-
-Improve rejection messages with specific details.
-
-**File:** `src/middleware/error-messages.ts`
-**Test:** `src/middleware/error-messages.test.ts`
-**TDD:** Required
-**Parallel:** Yes (with 1.1)
-**Status:** Complete (9 tests)
-
-```typescript
-interface ValidationError {
-  missingSkills: string[];
-  foundSkills: string[];
-  attemptNumber: number;
-  maxAttempts: number;
-}
-
-function formatValidationError(error: ValidationError): string;
-function formatRetryPrompt(error: ValidationError): string;
-```
-
-**Output format:**
-```
-VALIDATION FAILURE: Required skill invocation missing.
-
-Missing: tdd, no-workarounds
-Found: code-review
-Attempt: 2/3
-
-You MUST invoke:
-- Skill(skill: "tdd")
-- Skill(skill: "no-workarounds")
-```
-
----
-
-### Task 1.3: Sync Command Enhancement ✓
-
-Fix sync to handle new skills (not just updates).
-
-**File:** `src/commands/sync.ts`
-**Test:** `src/commands/sync.test.ts`
-**TDD:** Required
-**Parallel:** Yes (with 1.1, 1.2)
-**Status:** Complete (7 tests, includes bundled skill sync fix)
-
-**Current behavior:** Only syncs skills that exist in target projects.
-**Desired behavior:** Option to push new skills to tracked projects.
-
-```typescript
-interface SyncOptions {
-  skillNames: string[];
-  dryRun?: boolean;
-  push?: boolean;  // NEW: install to projects that don't have it
-}
-```
-
-**Tests:**
-- sync --push installs skill to projects without it
-- sync --push respects project's existing skills
-- sync --push updates CLAUDE.md in target project
-
----
-
-## Wave 1 Completion ✓
-
-Completed 2026-01-29:
-
-```bash
-# 1. Run all tests
-npm test -w @4meta5/skills-cli
-
-# 2. Dogfood scan
-./packages/skills-cli/bin/skills.js scan
-
-# 3. Sync to external projects
-./packages/skills-cli/bin/skills.js sync --all
-
-# 4. Verify external projects updated
-ls ~/OpenPawVet/web/.claude/skills/
-ls ~/AG1337v2/BobaMatchSolutions/web/amarsingh.dev/.claude/skills/
-```
-
-**If sync fails:** BLOCKED. Fix the CLI using TDD, then retry.
-
----
-
-## Wave 2: Medium Priority (Parallel) ✓ COMPLETE
-
-**Status:** All tasks complete, 684 tests passing, synced to external projects.
-
-### Task 2.1: Zod Schema Validation ✓
-
-Add schema validation for tool call arguments.
-
-**File:** `src/middleware/schema-validator.ts`
-**Test:** `src/middleware/schema-validator.test.ts`
-**TDD:** Required
-**Parallel:** Yes (with 2.2)
-**Depends:** Wave 1
-**Status:** Complete (16 tests)
-
-```typescript
-import { z } from 'zod';
-
-const SkillInvocationSchema = z.object({
-  skill: z.string().min(1),
-  args: z.string().optional(),
-});
-
-function validateToolCall(call: unknown): ValidationResult;
-function formatSchemaError(error: z.ZodError): string;
-```
-
-**Tests:**
-- Validates skill name is non-empty
-- Rejects unknown fields
-- Formats Zod errors as actionable messages
-
----
-
-### Task 2.2: Skill Dependency Resolution ✓
-
-Skills that depend on other skills.
-
-**File:** `src/dependencies/resolver.ts`
-**Test:** `src/dependencies/resolver.test.ts`
-**TDD:** Required
-**Parallel:** Yes (with 2.1)
-**Depends:** Wave 1
-**Status:** Complete (25 tests)
-
-```typescript
-interface SkillDependency {
-  skillName: string;
-  dependencies: string[];
-}
-
-function resolveDependencies(skill: string, installed: string[]): string[];
-function detectMissingDependencies(skill: string, installed: string[]): string[];
-```
-
-SKILL.md extension:
-```yaml
----
-name: tdd
-dependencies:
-  - no-workarounds
----
-```
-
-**Tests:**
-- Resolves transitive dependencies
-- Detects missing dependencies on install
-- Warns on remove if depended upon
-
----
-
-### Task 2.3: Skill Conflict Detection ✓
-
-Prevent conflicting skills.
-
-**File:** `src/dependencies/conflicts.ts`
-**Test:** `src/dependencies/conflicts.test.ts`
-**TDD:** Required
-**Parallel:** Yes (with 2.1, 2.2)
-**Depends:** Wave 1
-**Status:** Complete (6 tests)
-
-```typescript
-interface SkillConflict {
-  skillName: string;
-  conflicts: string[];
-}
-
-function detectConflicts(skill: string, installed: string[]): string[];
-function blockInstallIfConflict(skill: string, installed: string[]): void;
-```
-
-SKILL.md extension:
-```yaml
----
-name: strict-tdd
-conflicts:
-  - loose-tdd
----
-```
-
----
-
-## Wave 2 Completion ✓
-
-Completed 2026-01-29:
-
-```bash
-npm test -w @4meta5/skills-cli
-./packages/skills-cli/bin/skills.js scan
-./packages/skills-cli/bin/skills.js sync --all
-```
-
----
-
-## Wave 3: Low Priority (Sequential) ✓ COMPLETE
-
-**Status:** All tasks complete, 732 tests passing, synced to external projects.
-
-### Task 3.1: Dynamic Skill Evaluation Hook ✓
-
-Read skills dynamically instead of hardcoded list.
-
-**File:** `src/hooks/dynamic-eval.ts`
-**Test:** `src/hooks/dynamic-eval.test.ts`
-**TDD:** Required
-**Depends:** Wave 2
-**Status:** Complete (22 tests)
-
-- Parse `.claude/skills/*/SKILL.md` at runtime
-- Generate evaluation prompt from descriptions
-- Cache parsed skills for performance
-
----
-
-### Task 3.2: Structured Outputs Migration ✓
-
-Replace regex with Claude structured outputs API.
-
-**File:** `src/middleware/structured-detector.ts`
-**Test:** `src/middleware/structured-detector.test.ts`
-**TDD:** Required
-**Depends:** Wave 2
-**Status:** Complete (26 tests)
-
-**Current:** Regex patterns to detect `Skill()` calls
-**Desired:** Claude API with `anthropic-beta: structured-outputs-2025-11-13`
-
-```typescript
-const ToolCallSchema = z.object({
-  action: z.enum(['invoke_skill', 'respond', 'request_info']),
-  skill: z.string().optional(),
-  response: z.string().optional(),
-});
-```
-
-**Note:** Requires API key configuration.
-
----
-
-## Wave 3 Completion ✓
-
-Completed 2026-01-29:
-
-```bash
-npm test -w @4meta5/skills-cli  # 732 tests passing
-./packages/skills-cli/bin/skills.js scan  # No new recommendations
-./packages/skills-cli/bin/skills.js sync --all  # Synced 3521 projects
-```
-
----
-
-## Execution Graph
-
-```
-Wave 1 (Parallel):
-┌───────┐  ┌───────┐  ┌───────┐
-│  1.1  │  │  1.2  │  │  1.3  │
-│Backoff│  │Errors │  │ Sync  │
-└───┬───┘  └───┬───┘  └───┬───┘
-    └──────────┼──────────┘
-               ▼
-         [Sync to projects]
-               │
-               ▼
-Wave 2 (Parallel):
-┌───────┐  ┌───────┐  ┌───────┐
-│  2.1  │  │  2.2  │  │  2.3  │
-│ Zod   │  │ Deps  │  │Conflict│
-└───┬───┘  └───┬───┘  └───┬───┘
-    └──────────┼──────────┘
-               ▼
-         [Sync to projects]
-               │
-               ▼
-Wave 3 (Sequential):
-┌───────┐
-│  3.1  │
-│Dynamic│
-└───┬───┘
-    │
-    ▼
-┌───────┐
-│  3.2  │
-│Struct │
-└───┬───┘
-    │
-    ▼
-         [Final sync]
-```
-
----
-
-## Subagent Delegation Format
-
-For each task, spawn subagent with:
-
-```
-Task {N.M}: {Title}
-
-TDD REQUIRED: RED → GREEN → REFACTOR
-
-Files:
-- Implementation: {path}
-- Tests: {path}
-
-Requirements:
-{spec from above}
-
-Commands:
-- Test: npm test -w @4meta5/skills-cli -- --testNamePattern="{pattern}"
-
-BLOCKED until Phase 1 (RED) shows failing test.
-```
-
----
-
-## External Project Sync
-
-After each wave:
-
-| Project | Path | Command |
-|---------|------|---------|
-| OpenPawVet | `~/OpenPawVet/web` | `skills sync --all` |
-| amarsingh.dev | `~/AG1337v2/BobaMatchSolutions/web/amarsingh.dev` | `skills sync --all` |
-
-**If sync fails:**
-1. BLOCKED: FIX THE TOOL
-2. Write failing test for the bug
-3. Fix the CLI code
-4. Verify sync works
-5. Continue
-
----
-
-## Success Metrics ✓ ALL COMPLETE
-
-| Metric | Before | After Wave 3 |
-|--------|--------|--------------|
-| Tests | 599 | **732** |
-| Retry has backoff | No | **Yes** |
-| Error messages | Generic | **Detailed** |
-| Sync pushes new skills | No | **Yes** |
-| Schema validation | No | **Yes** |
-| Structured outputs | No | **Yes** |
-| Dynamic skill eval | No | **Yes** |
-| Dependency resolution | No | **Yes** |
-| Conflict detection | No | **Yes** |
+# Project Plan
+
+Single source of truth for all project planning.
+
+## Current Sprint
+
+### Package: chain
+
+Skill chaining system with declarative YAML-based profiles.
+
+**Phase 4: Profile Auto-Selection**
+- [ ] Prompt to profile matching (regex scoring)
+- [ ] Auto-activation in PreToolUse hook
+- [ ] `--auto` flag to disable auto-selection
+- [ ] Persist profile selection on first hook invocation
+
+**Phase 5: Integration + Polish**
+- [ ] `chain doc --profile X` command
+- [ ] Add `chain validate` to CI/pre-commit
+- [ ] Update workflow-orchestrator skill to reference chain system
+- [ ] Migration guide from skill-based to chain-based workflows
+- [ ] Create README.md for the package
+
+### Package: cli
+
+Skills CLI enhancements.
+
+- [ ] Add skill update command for version bumps
+- [ ] Improve semantic matching accuracy
+
+### Package: web
+
+Website improvements.
+
+- [ ] Add skill search functionality
+- [ ] Create skill detail pages
+- [ ] Add skill submission flow
+- [ ] Improve mobile responsiveness
+
+## Backlog
+
+### Skill Library Expansion
+- [ ] Add more language-specific skills (Python, Rust, Go)
+- [ ] Add CI/CD skills (GitHub Actions, CircleCI)
+- [ ] Add database skills (Postgres, MongoDB patterns)
+- [ ] Add API design skills (REST, GraphQL)
+
+### Infrastructure
+- [ ] Set up automated skill testing
+- [ ] Create skill quality metrics
+- [ ] Add skill usage analytics dashboard
+
+## Completed
+
+### 2026-01-30
+
+**doc-maintenance Skill Fix**
+- [x] Fixed doc-maintenance skill to use docs/PLAN.md (consolidated)
+- [x] Added markdown-writer chaining to doc-maintenance skill
+- [x] Added package-level PLAN.md consolidation instructions
+- [x] Created doc-maintenance skill content tests (4 tests)
+- [x] Consolidated all PLAN.md files into docs/PLAN.md
+- [x] Removed root PLAN.md and packages/chain/PLAN.md
+
+**Chain Package: Phases 0-3.5**
+- [x] Package structure with package.json, tsconfig.json
+- [x] Zod schemas for SkillSpec, ProfileSpec, SessionState
+- [x] Example chains/skills.yaml with 8 skills
+- [x] Example chains/profiles.yaml with 3 profiles
+- [x] `chain validate` command
+- [x] CapabilityGraph with nodes=skills, edges=provides/requires
+- [x] Topological sort with cycle detection
+- [x] Conflict detection
+- [x] Tie-breaking: risk (asc), cost (asc), name (alpha)
+- [x] `chain resolve --profile <name>` command
+- [x] `chain explain --profile <name>` command
+- [x] `chain mermaid --profile <name>` command
+- [x] SessionState type and file format
+- [x] StateManager (create/load/save/clear)
+- [x] EvidenceChecker (file exists, marker regex, command exit code)
+- [x] `chain activate --profile <name>` command
+- [x] `chain status` command
+- [x] `chain clear` command
+- [x] Intent mapper (tool to intents like write/commit/deploy)
+- [x] PreToolUse hook logic
+- [x] Stop hook logic
+- [x] Denial message formatting with checklists
+- [x] getCurrentSkill() in StateManager
+- [x] getSkillGuidance() function
+- [x] PreToolUse outputs guidance even when allowed
+- [x] Updated status command with next step
+- [x] `chain next` command
+- [x] Fixed CLI command naming (hook-pre-tool-use, hook-stop)
+- [x] Dogfooding setup with PreToolUse hook
+
+**Tests:** 189 passing
+
+**Workflow Skill Bundle**
+- [x] Create workflow orchestrator skill
+- [x] Create project-init skill for scaffolding
+- [x] Create doc-maintenance skill for auto-updates
+- [x] Create gitignore-hygiene skill
+- [x] Create agent-orchestration skill
+- [x] Create research-to-plan skill
+- [x] Create templates (CLAUDE.md, README.md, PLAN.md, RESEARCH.md, AGENTS.md)
+- [x] Create reference documentation
+
+**Documentation Updates**
+- [x] Update README.md with complete skill list
+- [x] Add web package documentation
+- [x] Document Svelte/SvelteKit skills
+
+**Skills CLI: Wave 1-3**
+- [x] Exponential backoff with jitter (13 tests)
+- [x] Enhanced error messages (9 tests)
+- [x] Sync command enhancement (7 tests)
+- [x] Zod schema validation (16 tests)
+- [x] Skill dependency resolution (25 tests)
+- [x] Skill conflict detection (6 tests)
+- [x] Dynamic skill evaluation hook (22 tests)
+- [x] Structured outputs migration (26 tests)
+
+**CLI Tests:** 796 passing (including 4 new doc-maintenance skill tests)
+
+### Earlier
+
+- [x] Initial skills-cli implementation
+- [x] Project analysis and tech stack detection
+- [x] Skill scanning and recommendations
+- [x] Skill installation from sources
+- [x] Bundled skill library (tdd, no-workarounds, etc.)
+- [x] Svelte/SvelteKit skill collection
+- [x] Accessibility and UI quality skills
+- [x] Frontend design skills
+- [x] Add skill validation command
+- [x] Support skill bundles (multiple skills in one package)
+- [x] Fixed nested skill discovery in loadSkillsFromDirectory
+
+## Blocked
+
+None currently.
+
+## Notes
+
+- Test skills (test-skill-*) are for CLI testing. Clean with `skills hygiene clean -r --confirm`.
+- Some skills are marked _temp_ pending proper naming.
+- Chain package has 189 tests. CLI package has 796 tests.

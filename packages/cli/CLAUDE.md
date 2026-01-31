@@ -1,6 +1,9 @@
 # Project
 
 ## Installed Skills
+- @.claude/skills/test-skill-1769818435792/SKILL.md
+- @.claude/skills/test-skill-1769818435211/SKILL.md
+- @.claude/skills/test-skill-1769818434623/SKILL.md
 - @.claude/skills/test-skill-1769815141685/SKILL.md
 - @.claude/skills/test-skill-1769815141151/SKILL.md
 - @.claude/skills/test-skill-1769815140531/SKILL.md
