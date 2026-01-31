@@ -8,11 +8,11 @@ Single source of truth for all project planning.
 
 Skill chaining system with declarative YAML-based profiles.
 
-**Phase 4: Profile Auto-Selection**
-- [ ] Prompt to profile matching (regex scoring)
-- [ ] Auto-activation in PreToolUse hook
-- [ ] `--auto` flag to disable auto-selection
-- [ ] Persist profile selection on first hook invocation
+**Phase 4: Profile Auto-Selection** ✅
+- [x] Prompt to profile matching (regex scoring)
+- [x] Auto-activation in PreToolUse hook
+- [x] `--auto` flag to disable auto-selection
+- [x] Persist profile selection on first hook invocation
 
 **Phase 5: Integration + Polish**
 - [ ] `chain doc --profile X` command
