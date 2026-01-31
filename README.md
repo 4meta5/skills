@@ -357,6 +357,7 @@ MIT. See [LICENSE](./LICENSE).
 | imessage-tone | custom | communication | Two-mode iMessage tone (owner vs others) |
 | bluebubbles-setup | custom | communication | BlueBubbles iMessage integration setup |
 | engram-recall | upstream (engram) | memory | Recall past work before starting new tasks |
+| engram-generate | upstream (engram) | workflow | Generate project skills from Claude Code history |
 
 **Origin key:**
 - `custom` - Created for this project

@@ -1,0 +1,11 @@
+{
+  "source": {
+    "type": "git",
+    "url": "https://github.com/bobamatcha/engram",
+    "commit": "36665c75c332314a1b7086a228e95830f007e2cf"
+  },
+  "installed": {
+    "at": "2026-01-31T23:47:32.380Z",
+    "by": "skills-cli@1.0.0"
+  }
+}
