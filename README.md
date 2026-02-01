@@ -358,6 +358,7 @@ MIT. See [LICENSE](./LICENSE).
 | bluebubbles-setup | custom | communication | BlueBubbles iMessage integration setup |
 | engram-recall | upstream (engram) | memory | Recall past work before starting new tasks |
 | engram-generate | upstream (engram) | workflow | Generate project skills from Claude Code history |
+| engram-summarize | upstream (engram) | memory | Summarize sessions into structured learnings via LLM |
 
 **Origin key:**
 - `custom` - Created for this project
