@@ -34,11 +34,11 @@ This prevents you from responding to your own messages when they appear in the c
 
 ### Examples
 ```
-(Patch) hey quick update - pushed the branch ✅
+(Boba) hey quick update - pushed the branch ✅
 
-(Patch) ran into an issue , not sure how to fix it
+(Boba) ran into an issue , not sure how to fix it
 
-(Patch) ❌ tests failing , looking into it
+(Boba) ❌ tests failing , looking into it
 ```
 
 ### Why This Matters
@@ -48,7 +48,7 @@ This prevents you from responding to your own messages when they appear in the c
 - The prefix makes it obvious which messages are yours
 
 ### Recognition Rule
-When you see a message starting with `(YourName)`, **DO NOT RESPOND** — it's your own message.
+When you see a message starting with `(Boba)` or `(Boba Matcha)`, **DO NOT RESPOND** — it's your own message.
 
 ### Commit Before Texting
 **Always commit and push your work BEFORE sending text updates.**
@@ -85,16 +85,14 @@ When texting the owner directly:
 
 ### Example Messages to Owner
 ```
-(Patch) hey quick update - pushed the branch, tests passing ✅
+(Boba) hey quick update - pushed the branch, tests passing ✅
 
-(Patch) ran into an issue with the config, not sure how to fix it yet
+(Boba) ran into an issue with the config, not sure how to fix it yet
 
-(Patch) tbh I'm not confident about this approach, want me to try something else?
+(Boba) tbh I'm not confident about this approach, want me to try something else?
 
-(Patch) ❌ webhook still broken, looking into it
+(Boba) ❌ webhook still broken, looking into it
 ```
-
-Replace `Patch` with your own name.
 
 ---
 
