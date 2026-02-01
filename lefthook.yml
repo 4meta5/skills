@@ -14,7 +14,7 @@ pre-commit:
     skill-location:
       glob: "**/SKILL.md"
       run: ./scripts/check-skill-location.sh
-      fail_text: "Skills must be in .claude/skills/, not elsewhere. See error above."
+      fail_text: "Skills must be in skills/ (root level), not elsewhere. See error above."
 
     typecheck:
       glob: "*.{ts,tsx}"
@@ -35,7 +35,7 @@ pre-commit:
       fail_text: "Chain validation failed. Fix skills.yaml or profiles.yaml errors."
 
     claudemd-sync:
-      glob: ".claude/skills/**/*"
+      glob: "skills/**/*"
       run: npx tsx packages/cli/src/index.ts claudemd sync && git add CLAUDE.md
       fail_text: "CLAUDE.md sync failed."
 

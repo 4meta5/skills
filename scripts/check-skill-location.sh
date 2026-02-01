@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
-# Enforce skills are placed in .claude/skills/, not elsewhere
+# Enforce skills are placed in skills/ (root level), not elsewhere
+#
+# Skills live at root skills/ for visibility.
+# .claude/skills is a symlink to ../skills for Claude Code compatibility.
 #
 # This prevents the mistake of adding skills to packages/skills/skills/
 # which is a different directory structure.
@@ -17,10 +20,11 @@ fi
 # Check each staged SKILL.md
 errors=0
 while IFS= read -r file; do
-  if [[ ! "$file" =~ ^\.claude/skills/ ]]; then
+  # Allow skills/ at root (primary location) or .claude/skills (symlink)
+  if [[ ! "$file" =~ ^skills/ ]] && [[ ! "$file" =~ ^\.claude/skills/ ]]; then
     echo "❌ ERROR: Skill in wrong location: $file"
-    echo "   Skills MUST go in .claude/skills/, not elsewhere."
-    echo "   Correct path: .claude/skills/$(basename $(dirname $file))/SKILL.md"
+    echo "   Skills MUST go in skills/, not elsewhere."
+    echo "   Correct path: skills/$(basename $(dirname $file))/SKILL.md"
     errors=$((errors + 1))
   fi
 done <<< "$staged_skills"
@@ -28,9 +32,9 @@ done <<< "$staged_skills"
 if [ $errors -gt 0 ]; then
   echo ""
   echo "🚫 BLOCKED: $errors skill(s) in wrong location."
-  echo "   Move them to .claude/skills/<skill-name>/SKILL.md"
+  echo "   Move them to skills/<skill-name>/SKILL.md"
   exit 1
 fi
 
-echo "✅ All skills in correct location (.claude/skills/)"
+echo "✅ All skills in correct location (skills/)"
 exit 0

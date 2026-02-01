@@ -263,17 +263,27 @@ See [SKILL_FORMAT.md](./docs/SKILL_FORMAT.md) for the full specification.
 
 ### How Skills Are Recognized
 
-A skill is any folder with a `SKILL.md` file inside `.claude/skills/`:
+A skill is any folder with a `SKILL.md` file. In this project, skills live in the root `skills/` directory for better visibility:
 
 ```
-.claude/skills/
+skills/                       ← Root-level for visibility
 ├── tdd/
-│   └── SKILL.md          ← This makes it a skill
+│   └── SKILL.md              ← This makes it a skill
 ├── svelte-runes/
-│   ├── SKILL.md          ← This makes it a skill
-│   └── references/       ← Optional supporting files
+│   ├── SKILL.md              ← This makes it a skill
+│   └── references/           ← Optional supporting files
 └── my-custom-skill/
-    └── SKILL.md          ← This makes it a skill
+    └── SKILL.md              ← This makes it a skill
+
+.claude/
+└── skills -> ../skills       ← Symlink for Claude Code compatibility
+```
+
+Claude Code expects skills in `.claude/skills/`. We use a symlink so skills remain discoverable while being visible at root level.
+
+**Windows users**: Recreate the symlink with admin privileges:
+```cmd
+mklink /D .claude\skills ..\skills
 ```
 
 That's it. No registration. No config. Just `SKILL.md`.
@@ -332,7 +342,8 @@ Security review assesses risk using differential-review:
 
 | Location | Purpose |
 |----------|---------|
-| `.claude/skills/` | Project-level skills (tracked in git) |
+| `skills/` | Project-level skills (visible at root) |
+| `.claude/skills/` | Symlink to `skills/` (Claude Code compatibility) |
 | `~/.claude/skills/` | User-level skills (shared across projects) |
 | `.claude/hooks/` | Hook scripts for skill activation |
 | `.claude/settings.local.json` | Local Claude Code settings |

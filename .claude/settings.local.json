@@ -10,7 +10,10 @@
       "Bash(npm run test:property:*)",
       "Skill(markdown-writer)",
       "Bash(done)",
-      "Bash(./packages/cli/bin/skills.js:*)"
+      "Bash(./packages/cli/bin/skills.js:*)",
+      "WebFetch(domain:claudelog.com)",
+      "Bash(ln:*)",
+      "Bash(git add:*)"
     ]
   },
   "hooks": {
