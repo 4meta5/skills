@@ -106,6 +106,8 @@ If you skip this, respond: **"BLOCKED: DOGFOODING REQUIRED"**
 - @.claude/skills/markdown-writer/SKILL.md - Consistent markdown style
 - @.claude/skills/blog-writer/SKILL.md - Blog post creation
 - @.claude/skills/skill-maker/SKILL.md - Create Claude Code skills
+- @.claude/skills/readme-writer/SKILL.md - Write effective README files
+- @.claude/skills/monorepo-readme/SKILL.md - Monorepo README patterns
 - @.claude/skills/typescript-circular-dependency/SKILL.md - Resolve circular imports
 
 ## Workflow Orchestration

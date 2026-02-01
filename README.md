@@ -2,9 +2,27 @@
 
 Intelligent skill discovery and workflow enforcement for Claude Code.
 
+[![npm version](https://img.shields.io/npm/v/@4meta5/skills-cli)](https://npmjs.com/package/@4meta5/skills-cli)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
 ```bash
 npx @4meta5/skills-cli scan
 ```
+
+## Table of Contents
+
+- [What It Does](#what-it-does)
+- [Quick Start](#quick-start)
+- [Why Skills?](#why-skills)
+- [Architecture](#architecture)
+- [Features](#features)
+- [How Skills Get Activated](#how-skills-get-activated)
+- [CLI Reference](#cli-reference)
+- [Skill Format](#skill-format)
+- [Configuration](#configuration)
+- [Packages](#packages)
+- [Contributing](#contributing)
+- [Skills Library](#skills-library)
 
 ## What It Does
 
@@ -19,7 +37,10 @@ npx @4meta5/skills-cli scan
 ## Quick Start
 
 ```bash
-# Install globally
+# Run without installing (recommended)
+npx @4meta5/skills-cli scan
+
+# Or install globally
 npm install -g @4meta5/skills-cli
 
 # Scan your project for recommended skills
@@ -30,15 +51,6 @@ skills scan --all
 
 # List installed skills
 skills list
-
-# List only custom skills (your own)
-skills list --custom
-
-# List only upstream skills (from sources)
-skills list --upstream
-
-# Show provenance type for each skill
-skills list --provenance
 
 # Add a specific skill
 skills add tdd
@@ -57,6 +69,49 @@ This CLI solves that:
 | "Are these skills any good?" | Confidence scoring and deduplication |
 | "How do I install them?" | `skills add name` or `skills scan --all` |
 | "Which skills did I write?" | `skills list --custom` filters by provenance |
+
+## Architecture
+
+This monorepo contains 8 packages organized in layers:
+
+```mermaid
+graph TD
+    subgraph "Applications"
+        CLI[cli]
+        WEB[web]
+    end
+
+    subgraph "Core Libraries"
+        SKILLS[skills]
+        CHAIN[chain]
+    end
+
+    subgraph "Utilities"
+        LOADER[skill-loader]
+        DETECTOR[project-detector]
+        MATCHER[semantic-matcher]
+        ENFORCER[workflow-enforcer]
+    end
+
+    CLI --> SKILLS
+    CLI --> CHAIN
+    CLI --> DETECTOR
+    CLI --> MATCHER
+    WEB --> SKILLS
+    SKILLS --> LOADER
+    CHAIN --> ENFORCER
+```
+
+| Package | Description |
+|---------|-------------|
+| `@4meta5/skills-cli` | CLI for scanning, installing, and managing skills |
+| `@4meta5/skills` | Core library for loading and managing skills |
+| `@4meta5/chain` | Skill chaining system with DAG resolution |
+| `@4meta5/skill-loader` | Parse and load SKILL.md files |
+| `@4meta5/project-detector` | Detect project technology stack |
+| `@4meta5/semantic-matcher` | Hybrid keyword + embedding matching |
+| `@4meta5/workflow-enforcer` | State machine for workflow enforcement |
+| `web` (private) | Website for browsing and discovering skills |
 
 ## Features
 
@@ -206,7 +261,7 @@ Step-by-step guidance...
 
 See [SKILL_FORMAT.md](./docs/SKILL_FORMAT.md) for the full specification.
 
-## How Skills Are Recognized
+### How Skills Are Recognized
 
 A skill is any folder with a `SKILL.md` file inside `.claude/skills/`:
 
@@ -223,7 +278,7 @@ A skill is any folder with a `SKILL.md` file inside `.claude/skills/`:
 
 That's it. No registration. No config. Just `SKILL.md`.
 
-## How Provenance Works
+### How Provenance Works
 
 `.provenance.json` is optional metadata. It tracks where a skill came from.
 
@@ -251,7 +306,7 @@ The logic is simple:
 
 Use `skills list --provenance` to see which is which.
 
-## Updating Skills
+### Updating Skills
 
 Skills with `upstream` origin can be updated from their source:
 
@@ -271,20 +326,66 @@ Security review assesses risk using differential-review:
 - **MEDIUM**: New files, import changes
 - **HIGH**: Scripts, external calls, permissions (requires `--yes`)
 
+## Configuration
+
+### Directory Locations
+
+| Location | Purpose |
+|----------|---------|
+| `.claude/skills/` | Project-level skills (tracked in git) |
+| `~/.claude/skills/` | User-level skills (shared across projects) |
+| `.claude/hooks/` | Hook scripts for skill activation |
+| `.claude/settings.local.json` | Local Claude Code settings |
+| `~/.claude/usage.jsonl` | Usage analytics (if tracker enabled) |
+
+### Environment Variables
+
+| Variable | Description |
+|----------|-------------|
+| `SKILLS_DEBUG` | Enable debug logging |
+| `NO_COLOR` | Disable colored output |
+
+### Skill Sources
+
+Configure skill sources with `skills source`:
+
+```bash
+# List configured sources
+skills source list
+
+# Add a source
+skills source add https://github.com/trailofbits/skills
+
+# Sources are stored in ~/.claude/sources.json
+```
+
 ## Packages
 
-This monorepo contains 8 packages:
+This monorepo contains 8 packages. See [Architecture](#architecture) for the dependency graph.
 
-| Package | Path | Description |
-|---------|------|-------------|
-| `@4meta5/skills-cli` | `packages/cli` | CLI for scanning, installing, and managing skills |
-| `@4meta5/skills` | `packages/skills` | Core library for loading and managing skills |
-| `@4meta5/chain` | `packages/chain` | Skill chaining system with DAG resolution |
-| `@4meta5/skill-loader` | `packages/skill-loader` | Parse and load SKILL.md files |
-| `@4meta5/project-detector` | `packages/project-detector` | Detect project technology stack |
-| `@4meta5/semantic-matcher` | `packages/semantic-matcher` | Hybrid keyword + embedding matching |
-| `@4meta5/workflow-enforcer` | `packages/workflow-enforcer` | State machine for workflow enforcement |
-| `web` (private) | `packages/web` | Website for browsing and discovering skills |
+| Package | Path | npm |
+|---------|------|-----|
+| `@4meta5/skills-cli` | `packages/cli` | [![npm](https://img.shields.io/npm/v/@4meta5/skills-cli)](https://npmjs.com/package/@4meta5/skills-cli) |
+| `@4meta5/skills` | `packages/skills` | [![npm](https://img.shields.io/npm/v/@4meta5/skills)](https://npmjs.com/package/@4meta5/skills) |
+| `@4meta5/chain` | `packages/chain` | [![npm](https://img.shields.io/npm/v/@4meta5/chain)](https://npmjs.com/package/@4meta5/chain) |
+| `@4meta5/skill-loader` | `packages/skill-loader` | [![npm](https://img.shields.io/npm/v/@4meta5/skill-loader)](https://npmjs.com/package/@4meta5/skill-loader) |
+| `@4meta5/project-detector` | `packages/project-detector` | [![npm](https://img.shields.io/npm/v/@4meta5/project-detector)](https://npmjs.com/package/@4meta5/project-detector) |
+| `@4meta5/semantic-matcher` | `packages/semantic-matcher` | [![npm](https://img.shields.io/npm/v/@4meta5/semantic-matcher)](https://npmjs.com/package/@4meta5/semantic-matcher) |
+| `@4meta5/workflow-enforcer` | `packages/workflow-enforcer` | [![npm](https://img.shields.io/npm/v/@4meta5/workflow-enforcer)](https://npmjs.com/package/@4meta5/workflow-enforcer) |
+| `web` (private) | `packages/web` | (not published) |
+
+### Build Order
+
+Packages must be built in dependency order:
+
+1. `skill-loader`, `project-detector` (no dependencies)
+2. `semantic-matcher`, `workflow-enforcer` (no internal dependencies)
+3. `skills` (depends on skill-loader)
+4. `chain` (depends on workflow-enforcer)
+5. `cli` (depends on skills, chain, project-detector, semantic-matcher)
+6. `web` (depends on skills)
+
+Run `npm run build` to build all packages in the correct order.
 
 ## Contributing
 
@@ -298,10 +399,10 @@ git clone https://github.com/4meta5/skills.git
 cd skills
 npm install
 
-# Build
+# Build all packages
 npm run build
 
-# Test
+# Test all packages
 npm test
 
 # Run CLI locally
@@ -322,7 +423,8 @@ MIT. See [LICENSE](./LICENSE).
 
 ---
 
-## Skills Library
+<details>
+<summary><h2>Skills Library</h2></summary>
 
 | Skill | Origin | Category | Description |
 |-------|--------|----------|-------------|
@@ -348,6 +450,8 @@ MIT. See [LICENSE](./LICENSE).
 | code-maturity-assessor | upstream (tob) | security | Trail of Bits maturity framework |
 | markdown-writer | custom | documentation | Consistent markdown style |
 | blog-writer | custom | documentation | Blog post creation |
+| readme-writer | custom | documentation | Write effective README files |
+| monorepo-readme | custom | documentation | Monorepo README patterns |
 | frontend-design | custom | ui | Distinctive UI creation |
 | baseline-ui | custom | ui | Opinionated UI baseline |
 | web-design-guidelines | custom | ui | Web Interface Guidelines |
@@ -368,3 +472,5 @@ MIT. See [LICENSE](./LICENSE).
 - `upstream (tob)` - From [Trail of Bits](https://github.com/trailofbits/skills)
 - `upstream (claudeception)` - From [Claudeception](https://github.com/blader/Claudeception)
 - `upstream (engram)` - From [engram](https://github.com/bobamatcha/engram)
+
+</details>

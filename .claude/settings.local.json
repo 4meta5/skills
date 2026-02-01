@@ -9,7 +9,8 @@
       "Bash(npm test)",
       "Bash(npm run test:property:*)",
       "Skill(markdown-writer)",
-      "Bash(done)"
+      "Bash(done)",
+      "Bash(./packages/cli/bin/skills.js:*)"
     ]
   },
   "hooks": {
