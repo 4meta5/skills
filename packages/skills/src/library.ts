@@ -11,7 +11,7 @@ import type {
   ProjectTemplate,
   FileStructure
 } from './types.js';
-import { loadSkillFromPath, loadSkillsFromDirectory } from './loader.js';
+import { loadSkillFromPath, loadSkillsFromDirectory } from '@4meta5/skill-loader';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);

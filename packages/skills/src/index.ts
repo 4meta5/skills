@@ -1,6 +1,13 @@
 // Main library exports
 export { createSkillsLibrary } from './library.js';
-export { loadSkillFromPath, loadSkillsFromDirectory, parseFrontmatter } from './loader.js';
+
+// Re-export from @4meta5/skill-loader for backwards compatibility
+export {
+  loadSkillFromPath,
+  loadSkillsFromDirectory,
+  parseFrontmatter,
+  discoverSupportingFiles,
+} from '@4meta5/skill-loader';
 
 // Types
 export type {

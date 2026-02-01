@@ -5,14 +5,14 @@
     "packages/*"
   ],
   "scripts": {
-    "build": "npm run build -w @4meta5/skills && npm run build -w @4meta5/skills-cli",
+    "build": "npm run build -w @4meta5/skill-loader && npm run build -w @4meta5/project-detector && npm run build -w @4meta5/semantic-matcher && npm run build -w @4meta5/workflow-enforcer && npm run build -w @4meta5/chain && npm run build -w @4meta5/skills && npm run build -w @4meta5/skills-cli",
     "build:lib": "npm run build -w @4meta5/skills",
     "build:cli": "npm run build -w @4meta5/skills-cli",
-    "test": "npm run test -w @4meta5/skills && npm run test -w @4meta5/skills-cli",
+    "test": "npm run test --workspaces --if-present",
     "test:property": "npm run test:property -w @4meta5/skills",
     "test:all": "npm run test:all -w @4meta5/skills",
     "lint": "npm run lint -w @4meta5/skills",
-    "typecheck": "npm run typecheck -w @4meta5/skills && npm run typecheck -w @4meta5/skills-cli",
+    "typecheck": "npm run typecheck --workspaces --if-present",
     "prepare": "lefthook install",
     "skills": "node packages/cli/bin/skills.js",
     "sk": "node packages/cli/bin/skills.js"

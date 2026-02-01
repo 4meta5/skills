@@ -105,7 +105,7 @@ chain next                  # Show next step in chain
 chain clear                 # Clear active session
 ```
 
-**Status:** Phases 0-3.5 complete (189 tests). Profile auto-selection pending.
+**Status:** Phases 0-6.5 complete (350 tests). Event bus pending.
 
 ## How Skills Get Activated
 
@@ -273,13 +273,17 @@ Security review assesses risk using differential-review:
 
 ## Packages
 
-This monorepo contains:
+This monorepo contains 8 packages:
 
 | Package | Path | Description |
 |---------|------|-------------|
 | `@4meta5/skills-cli` | `packages/cli` | CLI for scanning, installing, and managing skills |
-| `@4meta5/skills` | `packages/skills` | Core library for loading and parsing skills |
+| `@4meta5/skills` | `packages/skills` | Core library for loading and managing skills |
 | `@4meta5/chain` | `packages/chain` | Skill chaining system with DAG resolution |
+| `@4meta5/skill-loader` | `packages/skill-loader` | Parse and load SKILL.md files |
+| `@4meta5/project-detector` | `packages/project-detector` | Detect project technology stack |
+| `@4meta5/semantic-matcher` | `packages/semantic-matcher` | Hybrid keyword + embedding matching |
+| `@4meta5/workflow-enforcer` | `packages/workflow-enforcer` | State machine for workflow enforcement |
 | `web` (private) | `packages/web` | Website for browsing and discovering skills |
 
 ## Contributing

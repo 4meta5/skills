@@ -1,19 +1,18 @@
 {
-  "name": "@4meta5/skills",
+  "name": "@4meta5/skill-loader",
   "version": "1.0.0",
-  "description": "TypeScript library for managing Claude AI skills",
+  "description": "Parse and load SKILL.md files for Claude Code skills",
   "type": "module",
-  "main": "dist/src/index.js",
-  "types": "dist/src/index.d.ts",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "exports": {
     ".": {
-      "import": "./dist/src/index.js",
-      "types": "./dist/src/index.d.ts"
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
     }
   },
   "files": [
-    "dist",
-    "skills"
+    "dist"
   ],
   "scripts": {
     "build": "tsc",
@@ -23,36 +22,34 @@
     "test:all": "vitest run && vitest run --config vitest.property.config.ts",
     "lint": "eslint src",
     "typecheck": "tsc --noEmit",
-    "prepublishOnly": "npm run build",
-    "precommit": "npm run typecheck && npm test"
+    "prepublishOnly": "npm run build"
   },
   "keywords": [
     "claude",
-    "ai",
     "skills",
-    "anthropic",
-    "claude-code"
+    "skill-loader",
+    "markdown",
+    "frontmatter",
+    "yaml"
   ],
   "author": "Amar Singh",
   "license": "MIT",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/4meta5/skills.git",
-    "directory": "packages/skills"
+    "directory": "packages/skill-loader"
   },
   "homepage": "https://github.com/4meta5/skills#readme",
   "bugs": {
     "url": "https://github.com/4meta5/skills/issues"
   },
   "dependencies": {
-    "@4meta5/skill-loader": "*",
     "yaml": "^2.3.0"
   },
   "devDependencies": {
     "@types/node": "^20.0.0",
     "eslint": "^8.0.0",
     "fast-check": "^4.5.3",
-    "lefthook": "^2.0.16",
     "typescript": "^5.0.0",
     "vitest": "^1.0.0"
   }

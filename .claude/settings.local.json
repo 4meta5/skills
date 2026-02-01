@@ -1,4 +1,17 @@
 {
+  "permissions": {
+    "allow": [
+      "Bash(git -C /Users/amar/skillex/skills log --all --oneline)",
+      "WebSearch",
+      "Bash(tree:*)",
+      "Bash(npm install)",
+      "Bash(npm run build:*)",
+      "Bash(npm test)",
+      "Bash(npm run test:property:*)",
+      "Skill(markdown-writer)",
+      "Bash(done)"
+    ]
+  },
   "hooks": {
     "UserPromptSubmit": [
       {
