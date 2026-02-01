@@ -7,6 +7,31 @@ Consolidated research on reliable skill activation for Claude Code.
 
 ---
 
+## Current Architecture (2026-02-01)
+
+The project uses a modular monorepo with 8 packages:
+
+| Package | Purpose | Tests |
+|---------|---------|-------|
+| @4meta5/skill-loader | Parse SKILL.md files | 28 |
+| @4meta5/project-detector | Detect tech stack | 29 |
+| @4meta5/semantic-matcher | Hybrid matching (RRF) | 72 |
+| @4meta5/workflow-enforcer | State machine enforcement | 69 |
+| @4meta5/chain | Skill chaining DAG | 350 |
+| @4meta5/skills | Core library | 26 |
+| @4meta5/skills-cli | CLI tool | 812 |
+| web | Website (private) | 18 |
+
+**Total: 1,404 tests**
+
+**Design Principles:**
+- Each package has a single responsibility
+- Packages can be used independently
+- Core logic extracted for reuse and testing
+- CLI depends on modular packages, not monolithic code
+
+---
+
 ## Executive Summary
 
 **Problem:** Claude ignores skills ~50% of the time without enforcement. The current system relies on LLM reasoning to decide skill usage, which is inherently non-deterministic.

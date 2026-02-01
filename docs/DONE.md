@@ -1,6 +1,6 @@
 # Skills CLI - Implementation Status
 
-**732 tests passing** | Phases 1-5 + Waves 1-3 complete
+**1,404 tests passing** | Modular architecture with 8 packages
 
 ## Summary
 
@@ -14,6 +14,20 @@
 | Wave 1 | Complete | Backoff, error messages, sync --push |
 | Wave 2 | Complete | Zod validation, dependencies, conflicts |
 | Wave 3 | Complete | Dynamic eval, structured outputs |
+| Modularization | Complete | Extracted 4 standalone packages |
+
+## Modular Architecture (2026-02-01)
+
+Extracted standalone packages from the monolith:
+
+| Package | Tests | Purpose |
+|---------|-------|---------|
+| @4meta5/skill-loader | 28 | Parse SKILL.md files |
+| @4meta5/project-detector | 29 | Detect tech stack |
+| @4meta5/semantic-matcher | 72 | Hybrid matching with RRF |
+| @4meta5/workflow-enforcer | 69 | State machine enforcement |
+
+All packages are independently publishable with proper TypeScript types.
 
 ---
 
@@ -211,17 +225,14 @@ isValidToolCall(action);
 
 ## Test Summary
 
-| Area | Tests |
-|------|-------|
-| Sandbox (types, loader, isolate, state-machine) | 127 |
-| Response Validation | 21 |
-| Feedback Loop | 20 |
-| E2E Workflow | 17 |
-| Router | 54 |
-| Middleware (incl. backoff, error-messages, schema, structured) | 111 |
-| Dependencies (resolver, conflicts) | 31 |
-| Hooks (incl. dynamic-eval) | 42 |
-| Tracker | 19 |
-| Commands (incl. sync --push) | 60+ |
-| Other | 250 |
-| **Total** | **732** |
+| Package | Tests |
+|---------|-------|
+| @4meta5/chain | 350 |
+| @4meta5/skills-cli | 812 |
+| @4meta5/skill-loader | 28 |
+| @4meta5/project-detector | 29 |
+| @4meta5/semantic-matcher | 72 |
+| @4meta5/workflow-enforcer | 69 |
+| @4meta5/skills | 26 |
+| web | 18 |
+| **Total** | **1,404** |

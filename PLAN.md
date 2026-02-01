@@ -136,6 +136,18 @@ Skills CLI enhancements.
 
 ## Completed
 
+### 2026-02-01
+
+**Modular Architecture Refactoring**
+- [x] Extract @4meta5/skill-loader package (28 tests)
+- [x] Extract @4meta5/project-detector package (29 tests)
+- [x] Extract @4meta5/semantic-matcher package (72 tests)
+- [x] Extract @4meta5/workflow-enforcer package (69 tests)
+- [x] Update @4meta5/skills to depend on @4meta5/skill-loader
+- [x] Update @4meta5/skills-cli to depend on all 4 new packages
+- [x] Update root package.json build order
+- [x] All 1,404 tests passing across all packages
+
 ### 2026-01-31
 
 **Chain Package: Phase 6.1 - RouteDecision + Chain Activation**
@@ -272,4 +284,4 @@ None currently.
 
 - Test skills (test-skill-*) are for CLI testing. Clean with `skills hygiene clean -r --confirm`.
 - Some skills are marked _temp_ pending proper naming.
-- Chain package has 212 tests. CLI package has 796 tests.
+- Test counts: chain 350, cli 812, skill-loader 28, project-detector 29, semantic-matcher 72, workflow-enforcer 69, skills 26, web 18. Total: 1,404.

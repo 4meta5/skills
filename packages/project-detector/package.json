@@ -1,58 +1,52 @@
 {
-  "name": "@4meta5/skills",
+  "name": "@4meta5/project-detector",
   "version": "1.0.0",
-  "description": "TypeScript library for managing Claude AI skills",
+  "description": "Detect project technology stack (languages, frameworks, databases, etc.)",
   "type": "module",
-  "main": "dist/src/index.js",
-  "types": "dist/src/index.d.ts",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "exports": {
     ".": {
-      "import": "./dist/src/index.js",
-      "types": "./dist/src/index.d.ts"
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
     }
   },
   "files": [
-    "dist",
-    "skills"
+    "dist"
   ],
   "scripts": {
     "build": "tsc",
     "test": "vitest run",
     "test:watch": "vitest",
-    "test:property": "vitest run --config vitest.property.config.ts",
-    "test:all": "vitest run && vitest run --config vitest.property.config.ts",
     "lint": "eslint src",
     "typecheck": "tsc --noEmit",
-    "prepublishOnly": "npm run build",
-    "precommit": "npm run typecheck && npm test"
+    "prepublishOnly": "npm run build"
   },
   "keywords": [
-    "claude",
-    "ai",
-    "skills",
-    "anthropic",
-    "claude-code"
+    "project-detection",
+    "tech-stack",
+    "framework-detection",
+    "language-detection",
+    "tooling"
   ],
   "author": "Amar Singh",
   "license": "MIT",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/4meta5/skills.git",
-    "directory": "packages/skills"
+    "directory": "packages/project-detector"
   },
   "homepage": "https://github.com/4meta5/skills#readme",
   "bugs": {
     "url": "https://github.com/4meta5/skills/issues"
   },
   "dependencies": {
-    "@4meta5/skill-loader": "*",
+    "smol-toml": "^1.1.4",
     "yaml": "^2.3.0"
   },
   "devDependencies": {
     "@types/node": "^20.0.0",
     "eslint": "^8.0.0",
-    "fast-check": "^4.5.3",
-    "lefthook": "^2.0.16",
     "typescript": "^5.0.0",
     "vitest": "^1.0.0"
   }
