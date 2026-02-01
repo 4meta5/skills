@@ -55,12 +55,16 @@ Chain owns session state. Tool-time enforcement is truth. Prompt-time is optimiz
 - [x] SkillSpecInput type and createSkillSpec() helper for partial definitions
 - [x] Tests: 329 passing (+19 new)
 
-**6.5: Unified Session State**
-- [ ] Add `chain explain --session <id>` (returns why blocked)
-- [ ] Add `chain get-state --session <id>` (programmatic)
-- [ ] Middleware uses state to craft targeted corrective prompts
-- [ ] Usage tracker records: decision, activation, blocks, retries, completions
-- [ ] Tests: blocked tool returns deterministic short reason
+**6.5: Unified Session State** ✅
+- [x] Add `chain session-explain --session <id>` (returns why blocked)
+- [x] Add `chain get-state --session <id>` (programmatic)
+- [x] `extractShortReason()` for deterministic short block reasons
+- [x] `UsageTracker` records: decision, activation, blocks, retries, completions
+- [x] JSONL persistence to `.chain-usage.jsonl`
+- [x] `getStats()` for session analytics
+- [x] Middleware integration: ChainIntegration tracks all events
+- [x] trackBlock(), trackRetry(), trackCompletion() methods
+- [x] Tests: 350 chain + 812 CLI passing
 
 **6.6: Event Bus (Later)**
 - [ ] Replace direct calls with internal event dispatcher

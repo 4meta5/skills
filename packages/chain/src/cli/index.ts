@@ -11,6 +11,7 @@ import { clearCommand } from './commands/clear.js';
 import { nextCommand } from './commands/next.js';
 import { hookPreToolUseCommand, hookStopCommand } from './commands/hook.js';
 import { detectRunnerCommand } from './commands/detect-runner.js';
+import { explainCommand as sessionExplainCommand, getStateCommand } from './commands/session.js';
 
 const cli = cac('chain');
 
@@ -104,6 +105,19 @@ cli
   .option('--all', 'Show all detected runners')
   .option('--json', 'Output as JSON')
   .action(detectRunnerCommand);
+
+cli
+  .command('session-explain', 'Explain why tools are blocked in a session')
+  .option('--session <id>', 'Session ID (default: "default")')
+  .option('--cwd <path>', 'Working directory for session state')
+  .option('--json', 'Output as JSON')
+  .action(sessionExplainCommand);
+
+cli
+  .command('get-state', 'Get full session state (JSON output)')
+  .option('--session <id>', 'Session ID (default: "default")')
+  .option('--cwd <path>', 'Working directory for session state')
+  .action(getStateCommand);
 
 cli.help();
 cli.version('1.0.0');

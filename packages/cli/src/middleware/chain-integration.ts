@@ -10,6 +10,7 @@ import type { RoutingResult } from '../router/types.js';
 import {
   ChainActivator,
   createRouteDecision,
+  UsageTracker,
   type ActivationResult,
   type RouteDecision,
   type SkillSpec,
@@ -28,6 +29,9 @@ export interface ChainIntegrationOptions {
 
   /** Profiles configuration */
   profiles: ProfileSpec[];
+
+  /** Enable usage tracking (default: true) */
+  trackUsage?: boolean;
 
   /** Callback when chain is activated */
   onActivation?: (result: ActivationResult) => void;
@@ -58,6 +62,10 @@ export function createChainIntegration(options: ChainIntegrationOptions) {
     options.skills,
     options.profiles
   );
+
+  const tracker = options.trackUsage !== false
+    ? new UsageTracker(options.cwd)
+    : null;
 
   let lastActivation: ActivationResult | null = null;
 
@@ -98,7 +106,26 @@ export function createChainIntegration(options: ChainIntegrationOptions) {
         const result = await activator.activate(decision);
         lastActivation = result;
 
-        if (result.activated) {
+        // Track decision event
+        if (tracker && result.session_id) {
+          await tracker.track({
+            type: 'decision',
+            session_id: result.session_id,
+            request_id: requestId,
+            mode: routingResult.mode,
+            selected_profile: result.chain?.[0] ?? '',
+            timestamp: new Date().toISOString(),
+          });
+        }
+
+        // Track activation event
+        if (result.activated && tracker && result.session_id) {
+          await tracker.track({
+            type: 'activation',
+            session_id: result.session_id,
+            profile_id: result.chain?.[0] ?? 'unknown',
+            timestamp: new Date().toISOString(),
+          });
           options.onActivation?.(result);
         }
 
@@ -166,6 +193,70 @@ export function createChainIntegration(options: ChainIntegrationOptions) {
     clearCache(): void {
       activator.clearCache();
       lastActivation = null;
+    },
+
+    /**
+     * Track a block event (tool was denied)
+     */
+    async trackBlock(
+      sessionId: string,
+      intent: string,
+      reason: string
+    ): Promise<void> {
+      if (tracker) {
+        await tracker.track({
+          type: 'block',
+          session_id: sessionId,
+          intent,
+          reason,
+          timestamp: new Date().toISOString(),
+        });
+      }
+    },
+
+    /**
+     * Track a retry event (user retried after block)
+     */
+    async trackRetry(
+      sessionId: string,
+      intent: string,
+      attempt: number
+    ): Promise<void> {
+      if (tracker) {
+        await tracker.track({
+          type: 'retry',
+          session_id: sessionId,
+          intent,
+          attempt,
+          timestamp: new Date().toISOString(),
+        });
+      }
+    },
+
+    /**
+     * Track a completion event (capability satisfied)
+     */
+    async trackCompletion(
+      sessionId: string,
+      capability: string,
+      satisfiedBy: string
+    ): Promise<void> {
+      if (tracker) {
+        await tracker.track({
+          type: 'completion',
+          session_id: sessionId,
+          capability,
+          satisfied_by: satisfiedBy,
+          timestamp: new Date().toISOString(),
+        });
+      }
+    },
+
+    /**
+     * Get the usage tracker (for analytics)
+     */
+    getTracker(): UsageTracker | null {
+      return tracker;
     },
   };
 }
