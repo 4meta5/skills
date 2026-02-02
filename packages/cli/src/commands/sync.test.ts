@@ -9,10 +9,11 @@ describe('sync command', () => {
   let projectB: string;
   let sourceSkillContent: string;
   // Use a unique skill name per test run to avoid conflicts
+  // NOTE: Using 'sync-test-skill' prefix instead of 'test-skill' to avoid slop detection
   let testSkillName: string;
 
   beforeEach(async () => {
-    testSkillName = `test-skill-${Date.now()}`;
+    testSkillName = `sync-test-skill-${Math.random().toString(36).slice(2, 8)}`;
 
     // Create two temporary project directories
     projectA = await mkdtemp(join(tmpdir(), 'skills-sync-project-a-'));
@@ -130,7 +131,7 @@ NEW content with improvements!
       const projectC = await mkdtemp(join(tmpdir(), 'skills-sync-project-c-'));
       await mkdir(join(projectC, '.claude', 'skills'), { recursive: true });
       // Track a different skill (unique to this test)
-      const otherSkillName = `other-skill-${Date.now()}`;
+      const otherSkillName = `other-skill-${Math.random().toString(36).slice(2, 8)}`;
       await trackProjectInstallation(projectC, otherSkillName, 'skill');
 
       const sourceDir = await mkdtemp(join(tmpdir(), 'skills-source-'));
@@ -221,7 +222,7 @@ NEW content with improvements!
       await mkdir(join(projectC, '.claude', 'skills'), { recursive: true });
 
       // Track projectC with a different skill so it appears in tracked projects
-      const otherSkillName = `other-skill-${Date.now()}`;
+      const otherSkillName = `other-skill-${Math.random().toString(36).slice(2, 8)}`;
       await mkdir(join(projectC, '.claude', 'skills', otherSkillName), { recursive: true });
       await writeFile(
         join(projectC, '.claude', 'skills', otherSkillName, 'SKILL.md'),
@@ -314,7 +315,7 @@ Some project documentation.
       await writeFile(join(projectD, 'CLAUDE.md'), initialClaudeMd, 'utf-8');
 
       // Track projectD with a placeholder skill so it appears in tracked projects
-      const placeholderSkill = `placeholder-${Date.now()}`;
+      const placeholderSkill = `placeholder-${Math.random().toString(36).slice(2, 8)}`;
       await mkdir(join(projectD, '.claude', 'skills', placeholderSkill), { recursive: true });
       await writeFile(
         join(projectD, '.claude', 'skills', placeholderSkill, 'SKILL.md'),
@@ -455,7 +456,7 @@ Some project documentation.
       await mkdir(join(projectE, '.claude', 'skills'), { recursive: true });
 
       // Track projectE with a placeholder skill
-      const placeholderSkill = `placeholder-${Date.now()}`;
+      const placeholderSkill = `placeholder-${Math.random().toString(36).slice(2, 8)}`;
       await mkdir(join(projectE, '.claude', 'skills', placeholderSkill), { recursive: true });
       await writeFile(
         join(projectE, '.claude', 'skills', placeholderSkill, 'SKILL.md'),
@@ -492,6 +493,139 @@ Some project documentation.
       } finally {
         await untrackProjectInstallation(projectE, placeholderSkill, 'skill');
         await rm(projectE, { recursive: true, force: true });
+        await rm(sourceDir, { recursive: true, force: true });
+      }
+    });
+  });
+
+  describe('syncCommand slop detection', () => {
+    it('should skip syncing skills that match test-skill-* pattern and warn', async () => {
+      const { syncCommand } = await import('./sync.js');
+
+      // Create a test-skill-* in source directory
+      const slopSkillName = `test-skill-${Date.now()}`;
+      const sourceDir = await mkdtemp(join(tmpdir(), 'skills-source-'));
+      await mkdir(join(sourceDir, '.claude', 'skills', slopSkillName), { recursive: true });
+      await writeFile(
+        join(sourceDir, '.claude', 'skills', slopSkillName, 'SKILL.md'),
+        `---\nname: ${slopSkillName}\ndescription: Slop skill\n---\n\n# Test Skill`,
+        'utf-8'
+      );
+
+      // Create target project WITH the skill directory (to simulate --push scenario)
+      const targetProject = await mkdtemp(join(tmpdir(), 'skills-target-'));
+      await mkdir(join(targetProject, '.claude', 'skills', slopSkillName), { recursive: true });
+      await writeFile(
+        join(targetProject, '.claude', 'skills', slopSkillName, 'SKILL.md'),
+        `---\nname: ${slopSkillName}\ndescription: Old slop\n---\n\n# Old Slop`,
+        'utf-8'
+      );
+      await trackProjectInstallation(targetProject, slopSkillName, 'skill');
+
+      // Capture console output
+      const logs: string[] = [];
+      const originalLog = console.log;
+      const originalError = console.error;
+      console.log = (...args: unknown[]) => logs.push(args.map(a => String(a)).join(' '));
+      console.error = (...args: unknown[]) => logs.push('ERROR: ' + args.map(a => String(a)).join(' '));
+
+      try {
+        await syncCommand([slopSkillName], { cwd: sourceDir });
+
+        // Should have logged that slop was detected
+        const slopMessage = logs.some(log =>
+          log.toLowerCase().includes('slop')
+        );
+        expect(slopMessage).toBe(true);
+
+        // Target project should still have OLD content (not synced)
+        const content = await readFile(
+          join(targetProject, '.claude', 'skills', slopSkillName, 'SKILL.md'),
+          'utf-8'
+        );
+        expect(content).toContain('Old slop');
+        expect(content).not.toContain('Slop skill');
+      } finally {
+        console.log = originalLog;
+        console.error = originalError;
+        await untrackProjectInstallation(targetProject, slopSkillName, 'skill');
+        await rm(targetProject, { recursive: true, force: true });
+        await rm(sourceDir, { recursive: true, force: true });
+      }
+    });
+
+    it('should allow syncing legitimate skills alongside skipping slop', async () => {
+      const { syncCommand } = await import('./sync.js');
+
+      const sourceDir = await mkdtemp(join(tmpdir(), 'skills-source-'));
+      const targetProject = await mkdtemp(join(tmpdir(), 'skills-target-'));
+
+      // Create a legitimate skill
+      const legitSkillName = 'legit-skill';
+      await mkdir(join(sourceDir, '.claude', 'skills', legitSkillName), { recursive: true });
+      await writeFile(
+        join(sourceDir, '.claude', 'skills', legitSkillName, 'SKILL.md'),
+        `---\nname: ${legitSkillName}\ndescription: Legitimate skill\n---\n\n# Legit Skill`,
+        'utf-8'
+      );
+
+      // Create a slop skill in source
+      const slopSkillName = `test-skill-${Date.now()}`;
+      await mkdir(join(sourceDir, '.claude', 'skills', slopSkillName), { recursive: true });
+      await writeFile(
+        join(sourceDir, '.claude', 'skills', slopSkillName, 'SKILL.md'),
+        `---\nname: ${slopSkillName}\ndescription: Slop source\n---\n\n# Slop`,
+        'utf-8'
+      );
+
+      // Set up target with both skills (legit exists, slop exists too)
+      await mkdir(join(targetProject, '.claude', 'skills', legitSkillName), { recursive: true });
+      await writeFile(
+        join(targetProject, '.claude', 'skills', legitSkillName, 'SKILL.md'),
+        `---\nname: ${legitSkillName}\ndescription: Old version\n---\n\n# Old`,
+        'utf-8'
+      );
+      await mkdir(join(targetProject, '.claude', 'skills', slopSkillName), { recursive: true });
+      await writeFile(
+        join(targetProject, '.claude', 'skills', slopSkillName, 'SKILL.md'),
+        `---\nname: ${slopSkillName}\ndescription: Old slop in target\n---\n\n# Old Slop Target`,
+        'utf-8'
+      );
+      await trackProjectInstallation(targetProject, legitSkillName, 'skill');
+      await trackProjectInstallation(targetProject, slopSkillName, 'skill');
+
+      // Capture console output
+      const logs: string[] = [];
+      const originalLog = console.log;
+      console.log = (...args: unknown[]) => logs.push(args.map(a => String(a)).join(' '));
+
+      try {
+        // Sync both skills
+        await syncCommand([legitSkillName, slopSkillName], { cwd: sourceDir });
+
+        // Should have logged slop warning
+        const slopMessage = logs.some(log => log.toLowerCase().includes('slop'));
+        expect(slopMessage).toBe(true);
+
+        // Legit skill should be synced
+        const legitContent = await readFile(
+          join(targetProject, '.claude', 'skills', legitSkillName, 'SKILL.md'),
+          'utf-8'
+        );
+        expect(legitContent).toContain('Legitimate skill');
+
+        // Slop skill should NOT be synced (should still have old content)
+        const slopContent = await readFile(
+          join(targetProject, '.claude', 'skills', slopSkillName, 'SKILL.md'),
+          'utf-8'
+        );
+        expect(slopContent).toContain('Old slop in target');
+        expect(slopContent).not.toContain('Slop source');
+      } finally {
+        console.log = originalLog;
+        await untrackProjectInstallation(targetProject, legitSkillName, 'skill');
+        await untrackProjectInstallation(targetProject, slopSkillName, 'skill');
+        await rm(targetProject, { recursive: true, force: true });
         await rm(sourceDir, { recursive: true, force: true });
       }
     });

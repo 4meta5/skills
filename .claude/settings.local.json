@@ -20,7 +20,10 @@
       "Bash(npm view:*)",
       "Bash(curl:*)",
       "Bash(git push:*)",
-      "Bash(gh release create:*)"
+      "Bash(gh release create:*)",
+      "Skill(tdd)",
+      "Bash(npm test:*)",
+      "Bash(node:*)"
     ]
   },
   "hooks": {

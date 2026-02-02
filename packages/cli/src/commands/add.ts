@@ -15,6 +15,7 @@ import {
 import { parseSkillRef, loadRemoteSkill, resolveSkillRef } from '../registry.js';
 import { join } from 'path';
 import { homedir } from 'os';
+import { isSlop } from './hygiene.js';
 
 interface AddOptions {
   defaults?: boolean;
@@ -68,9 +69,18 @@ export async function addCommand(names: string[], options: AddOptions = {}): Pro
 
   // Install each skill
   let installed = 0;
+  let slopSkipped = 0;
   const installedNames: string[] = [];
 
   for (const name of skillNames) {
+    // Check if skill name matches slop patterns
+    const { name: skillNameOnly } = parseSkillRef(name);
+    const slopType = isSlop(skillNameOnly);
+    if (slopType) {
+      console.log(`x ${name} - skipped (detected as slop: ${slopType})`);
+      slopSkipped++;
+      continue;
+    }
     const { source: sourceName, name: skillName } = parseSkillRef(name);
 
     try {
@@ -189,6 +199,10 @@ export async function addCommand(names: string[], options: AddOptions = {}): Pro
         console.log('Updated CLAUDE.md with skill references.');
       }
     }
+  }
+
+  if (slopSkipped > 0) {
+    console.log(`\nSkipped ${slopSkipped} slop skill(s). Run 'skills hygiene clean --confirm' to remove them.`);
   }
 }
 

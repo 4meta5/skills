@@ -91,7 +91,7 @@ interface HygieneCommandResult {
 /**
  * Slop detection patterns
  */
-const SLOP_PATTERNS = {
+export const SLOP_PATTERNS = {
   // test-skill-* with any suffix
   testSkill: /^test-skill-\d+$/,
   // Ends with 13-digit timestamp (milliseconds since epoch)
@@ -99,6 +99,25 @@ const SLOP_PATTERNS = {
   // _temp_ prefix
   tempPrefix: /^_temp_/,
 };
+
+/**
+ * Check if a skill name matches slop patterns.
+ * Returns the slop type if matched, false otherwise.
+ *
+ * Use this function to validate skill names before syncing or adding.
+ */
+export function isSlop(skillName: string): SlopType | false {
+  if (SLOP_PATTERNS.testSkill.test(skillName)) {
+    return 'test-skill';
+  }
+  if (SLOP_PATTERNS.timestamped.test(skillName)) {
+    return 'timestamped';
+  }
+  if (SLOP_PATTERNS.tempPrefix.test(skillName)) {
+    return 'temp-prefix';
+  }
+  return false;
+}
 
 /**
  * Placeholder content patterns

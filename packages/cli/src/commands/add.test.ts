@@ -203,4 +203,110 @@ This skill only exists in the source project.
       }
     });
   });
+
+  describe('add command slop detection', () => {
+    it('should reject adding skills that match test-skill-* pattern', async () => {
+      const { addCommand } = await import('./add.js');
+
+      // Create target project structure
+      await mkdir(join(targetDir, '.claude', 'skills'), { recursive: true });
+      await writeFile(join(targetDir, 'CLAUDE.md'), '# Test Project\n\n## Installed Skills\n');
+
+      // Create a slop skill in source directory
+      const slopSkillName = `test-skill-${Date.now()}`;
+      const sourceDir = await mkdtemp(join(tmpdir(), 'skills-add-source-'));
+      await mkdir(join(sourceDir, '.claude', 'skills', slopSkillName), { recursive: true });
+      await writeFile(
+        join(sourceDir, '.claude', 'skills', slopSkillName, 'SKILL.md'),
+        `---\nname: ${slopSkillName}\ndescription: Slop skill\n---\n\n# Slop`,
+        'utf-8'
+      );
+
+      // Capture console output
+      const logs: string[] = [];
+      const originalLog = console.log;
+      const originalError = console.error;
+      console.log = (...args: unknown[]) => logs.push(args.map(a => String(a)).join(' '));
+      console.error = (...args: unknown[]) => logs.push('ERROR: ' + args.map(a => String(a)).join(' '));
+
+      const originalCwd = process.cwd();
+      process.chdir(sourceDir);
+
+      try {
+        await addCommand([slopSkillName], { cwd: targetDir });
+
+        // Should have logged that slop was detected
+        const slopMessage = logs.some(log =>
+          log.toLowerCase().includes('slop')
+        );
+        expect(slopMessage).toBe(true);
+
+        // Target project should NOT have the skill installed
+        const skillsDir = join(targetDir, '.claude', 'skills');
+        const installed = await readdir(skillsDir);
+        expect(installed).not.toContain(slopSkillName);
+      } finally {
+        process.chdir(originalCwd);
+        console.log = originalLog;
+        console.error = originalError;
+        await rm(sourceDir, { recursive: true, force: true });
+      }
+    });
+
+    it('should allow adding legitimate skills alongside skipping slop', async () => {
+      const { addCommand } = await import('./add.js');
+
+      await mkdir(join(targetDir, '.claude', 'skills'), { recursive: true });
+      await writeFile(join(targetDir, 'CLAUDE.md'), '# Test Project\n\n## Installed Skills\n');
+
+      // Create source with legit skill and slop skill
+      const sourceDir = await mkdtemp(join(tmpdir(), 'skills-add-source-'));
+
+      // Legitimate skill
+      const legitSkillName = 'legit-add-skill';
+      await mkdir(join(sourceDir, '.claude', 'skills', legitSkillName), { recursive: true });
+      await writeFile(
+        join(sourceDir, '.claude', 'skills', legitSkillName, 'SKILL.md'),
+        `---\nname: ${legitSkillName}\ndescription: Legitimate skill\n---\n\n# Legit`,
+        'utf-8'
+      );
+
+      // Slop skill
+      const slopSkillName = `test-skill-${Date.now()}`;
+      await mkdir(join(sourceDir, '.claude', 'skills', slopSkillName), { recursive: true });
+      await writeFile(
+        join(sourceDir, '.claude', 'skills', slopSkillName, 'SKILL.md'),
+        `---\nname: ${slopSkillName}\ndescription: Slop\n---\n\n# Slop`,
+        'utf-8'
+      );
+
+      // Capture console output
+      const logs: string[] = [];
+      const originalLog = console.log;
+      console.log = (...args: unknown[]) => logs.push(args.map(a => String(a)).join(' '));
+
+      const originalCwd = process.cwd();
+      process.chdir(sourceDir);
+
+      try {
+        await addCommand([legitSkillName, slopSkillName], { cwd: targetDir });
+
+        // Should have logged slop warning
+        const slopMessage = logs.some(log => log.toLowerCase().includes('slop'));
+        expect(slopMessage).toBe(true);
+
+        // Legit skill should be installed
+        const skillsDir = join(targetDir, '.claude', 'skills');
+        const installed = await readdir(skillsDir);
+        expect(installed).toContain(legitSkillName);
+
+        // Slop skill should NOT be installed
+        expect(installed).not.toContain(slopSkillName);
+      } finally {
+        process.chdir(originalCwd);
+        console.log = originalLog;
+        await rm(sourceDir, { recursive: true, force: true });
+      }
+    });
+  });
 });

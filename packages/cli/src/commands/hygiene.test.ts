@@ -13,6 +13,47 @@ import {
   type CleanResult
 } from './hygiene.js';
 
+describe('isSlop', () => {
+  it('should detect test-skill-* pattern', async () => {
+    const { isSlop } = await import('./hygiene.js');
+
+    // Returns the slop type when matched, not just true
+    expect(isSlop('test-skill-1234567890')).toBe('test-skill');
+    expect(isSlop('test-skill-9999999999999')).toBe('test-skill');
+  });
+
+  it('should NOT flag legitimate skill names', async () => {
+    const { isSlop } = await import('./hygiene.js');
+
+    expect(isSlop('tdd')).toBe(false);
+    expect(isSlop('code-review')).toBe(false);
+    expect(isSlop('my-test-skill')).toBe(false); // Has 'test-skill' but not at start with timestamp
+  });
+
+  it('should detect timestamped skill names', async () => {
+    const { isSlop } = await import('./hygiene.js');
+
+    expect(isSlop('my-skill-1706625000000')).toBe('timestamped');
+    expect(isSlop('anything-9999999999999')).toBe('timestamped');
+  });
+
+  it('should detect _temp_ prefix', async () => {
+    const { isSlop } = await import('./hygiene.js');
+
+    expect(isSlop('_temp_my-skill')).toBe('temp-prefix');
+    expect(isSlop('_temp_anything')).toBe('temp-prefix');
+  });
+
+  it('should return false for valid skill names', async () => {
+    const { isSlop } = await import('./hygiene.js');
+
+    expect(isSlop('valid-skill')).toBe(false);
+    expect(isSlop('tdd')).toBe(false);
+    expect(isSlop('code-review-ts')).toBe(false);
+    expect(isSlop('svelte-runes')).toBe(false);
+  });
+});
+
 describe('hygiene command', () => {
   let tempDir: string;
 

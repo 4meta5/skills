@@ -84,6 +84,7 @@ Chain owns session state. Tool-time enforcement is truth. Prompt-time is optimiz
 
 Skills CLI enhancements.
 
+- [x] Add slop detection to sync/add commands (prevents test-skill-* from being synced)
 - [ ] Add skill update command for version bumps
 - [ ] Improve semantic matching accuracy
 
@@ -135,6 +136,18 @@ Skills CLI enhancements.
 - [ ] Add skill usage analytics dashboard
 
 ## Completed
+
+### 2026-02-02
+
+**Slop Detection in Sync/Add Commands**
+- [x] Added `isSlop()` function to hygiene module (detects test-skill-*, timestamped, _temp_ patterns)
+- [x] Sync command now skips slop skills with warning message
+- [x] Add command now skips slop skills with warning message
+- [x] Updated test suite to use non-slop naming convention (sync-test-skill-* with short random suffix)
+- [x] Cleaned 76 test-skill-* directories from affected project (amarsingh.dev)
+- [x] Cleaned 76 stale CLAUDE.md references from affected project
+- [x] Cleaned 16 stale CLAUDE.md references from packages/cli
+- [x] Tests: 821 CLI tests passing, 5 new tests for isSlop() and slop detection
 
 ### 2026-02-01
 
@@ -282,6 +295,6 @@ None currently.
 
 ## Notes
 
-- Test skills (test-skill-*) are for CLI testing. Clean with `skills hygiene clean -r --confirm`.
+- Test skills (test-skill-*) are now blocked from sync/add commands. The test suite uses `sync-test-skill-*` with short random suffixes to avoid triggering slop detection.
 - Some skills are marked _temp_ pending proper naming.
-- Test counts: chain 350, cli 812, skill-loader 28, project-detector 29, semantic-matcher 72, workflow-enforcer 69, skills 26, web 18. Total: 1,404.
+- Test counts: chain 350, cli 821, skill-loader 28, project-detector 29, semantic-matcher 72, workflow-enforcer 69, skills 26, web 18. Total: 1,413.
