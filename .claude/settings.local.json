@@ -12,7 +12,15 @@
       "Bash(done)",
       "Bash(./packages/cli/bin/skills.js:*)",
       "Bash(ln:*)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(npm publish:*)",
+      "Bash(npm whoami:*)",
+      "Bash(npm config set:*)",
+      "Bash(npm info:*)",
+      "Bash(npm view:*)",
+      "Bash(curl:*)",
+      "Bash(git push:*)",
+      "Bash(gh release create:*)"
     ]
   },
   "hooks": {

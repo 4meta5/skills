@@ -1,6 +1,6 @@
 {
   "name": "@4meta5/semantic-matcher",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "Hybrid keyword + embedding semantic matcher with RRF fusion",
   "type": "module",
   "main": "dist/index.js",
@@ -18,7 +18,8 @@
     "build": "tsc",
     "test": "vitest run",
     "test:watch": "vitest",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "prepublishOnly": "npm run build"
   },
   "keywords": [
     "semantic",
@@ -29,8 +30,17 @@
     "keyword",
     "similarity"
   ],
-  "author": "",
+  "author": "Amar Singh",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/4meta5/skills.git",
+    "directory": "packages/semantic-matcher"
+  },
+  "homepage": "https://github.com/4meta5/skills#readme",
+  "bugs": {
+    "url": "https://github.com/4meta5/skills/issues"
+  },
   "devDependencies": {
     "@types/node": "^20.10.0",
     "typescript": "^5.3.0",

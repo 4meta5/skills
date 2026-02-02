@@ -15,7 +15,8 @@
     "typecheck": "npm run typecheck --workspaces --if-present",
     "prepare": "lefthook install",
     "skills": "node packages/cli/bin/skills.js",
-    "sk": "node packages/cli/bin/skills.js"
+    "sk": "node packages/cli/bin/skills.js",
+    "publish:all": "npm run build && npm publish -w @4meta5/skill-loader --access public && npm publish -w @4meta5/project-detector --access public && npm publish -w @4meta5/semantic-matcher --access public && npm publish -w @4meta5/workflow-enforcer --access public && npm publish -w @4meta5/skills --access public && npm publish -w @4meta5/chain --access public && npm publish -w @4meta5/skills-cli --access public"
   },
   "devDependencies": {
     "lefthook": "^2.0.16"
