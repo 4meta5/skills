@@ -1,0 +1,31 @@
+{
+  "timestamp": "2026-02-02T18:17:09.940Z",
+  "runId": "57282d7e",
+  "repos": [
+    {
+      "repo": "affaan-m/everything-claude-code",
+      "tier2Score": 1,
+      "bundlePath": "focus/affaan-m/everything-claude-code"
+    },
+    {
+      "repo": "ThinkInAIXYZ/deepchat",
+      "tier2Score": 1,
+      "bundlePath": "focus/ThinkInAIXYZ/deepchat"
+    },
+    {
+      "repo": "danny-avila/LibreChat",
+      "tier2Score": 1,
+      "bundlePath": "focus/danny-avila/LibreChat"
+    },
+    {
+      "repo": "continuedev/continue",
+      "tier2Score": 1,
+      "bundlePath": "focus/continuedev/continue"
+    },
+    {
+      "repo": "liyupi/ai-guide",
+      "tier2Score": 0.8867635189884557,
+      "bundlePath": "focus/liyupi/ai-guide"
+    }
+  ]
+}

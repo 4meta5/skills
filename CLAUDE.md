@@ -9,7 +9,7 @@ This project provides a TypeScript library for managing Claude AI skills.
 ## Project Structure
 - `packages/skills/` - Main TypeScript library
 - `packages/cli/` - CLI for managing skills
-- `packages/web/` - Website (private)
+- `packages/chain/` - Skill chaining system
 - `.claude/skills/` - Local skill definitions
 
 ## Development Commands
@@ -89,23 +89,8 @@ If you skip this, respond: **"BLOCKED: DOGFOODING REQUIRED"**
 - @.claude/skills/differential-review/SKILL.md - Security-focused diff analysis
 - @.claude/skills/code-maturity-assessor/SKILL.md - Trail of Bits maturity framework
 
-### Frontend & UI
-- @.claude/skills/frontend-design/SKILL.md - Production-grade UI creation
-- @.claude/skills/baseline-ui/SKILL.md - Opinionated UI baseline
-- @.claude/skills/web-design-guidelines/SKILL.md - Web Interface Guidelines
-- @.claude/skills/fixing-accessibility/SKILL.md - Fix accessibility issues
-- @.claude/skills/fixing-motion-performance/SKILL.md - Fix animation performance
-
-### Svelte & SvelteKit
-- @.claude/skills/claude-svelte5-skill/SKILL.md - Comprehensive Svelte 5 reference
-- @.claude/skills/svelte-runes/SKILL.md - Svelte 5 runes guidance
-- @.claude/skills/sveltekit-structure/SKILL.md - File-based routing, layouts
-- @.claude/skills/sveltekit-data-flow/SKILL.md - Load functions, form actions
-- @.claude/skills/sveltekit-svelte5-tailwind-skill/SKILL.md - SvelteKit + Svelte 5 + Tailwind
-
 ### Documentation
 - @.claude/skills/markdown-writer/SKILL.md - Consistent markdown style
-- @.claude/skills/blog-writer/SKILL.md - Blog post creation
 - @.claude/skills/skill-maker/SKILL.md - Create Claude Code skills
 - @.claude/skills/readme-writer/SKILL.md - Write effective README files
 - @.claude/skills/monorepo-readme/SKILL.md - Monorepo README patterns

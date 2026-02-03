@@ -1,0 +1,66 @@
+[
+  {
+    "kind": "skill",
+    "confidence": 1,
+    "signals": [
+      "Has SKILL.md file",
+      "Has skills/ directory",
+      "Has .claude/skills directory"
+    ],
+    "searchHints": {
+      "keywords": [
+        "skill",
+        "claude-skill",
+        "ai-skill"
+      ],
+      "topics": [
+        "claude",
+        "ai-assistant",
+        "skill"
+      ],
+      "languageBias": "JavaScript"
+    }
+  },
+  {
+    "kind": "hook",
+    "confidence": 0.6,
+    "signals": [
+      "Has .claude/hooks directory",
+      "Has git hooks configuration"
+    ],
+    "searchHints": {
+      "keywords": [
+        "hook",
+        "git-hook",
+        "lifecycle-hook"
+      ],
+      "topics": [
+        "hooks",
+        "git-hooks",
+        "automation"
+      ],
+      "languageBias": "JavaScript"
+    }
+  },
+  {
+    "kind": "library",
+    "confidence": 0.5,
+    "signals": [
+      "Has package.json",
+      "Contains TypeScript/JavaScript code",
+      "Has TypeScript configuration"
+    ],
+    "searchHints": {
+      "keywords": [
+        "library",
+        "typescript"
+      ],
+      "topics": [
+        "library",
+        "typescript",
+        "nodejs"
+      ],
+      "languageBias": "TypeScript"
+    }
+  }
+]

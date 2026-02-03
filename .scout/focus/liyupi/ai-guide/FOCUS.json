@@ -1,0 +1,15 @@
+{
+  "repo": "liyupi/ai-guide",
+  "entrypoints": [
+    {
+      "kind": "library",
+      "path": "README.md",
+      "reason": "Priority entrypoint for library"
+    }
+  ],
+  "scopeRoots": [
+    "src",
+    "lib"
+  ],
+  "files": []
+}

@@ -23,7 +23,10 @@
       "Bash(gh release create:*)",
       "Skill(tdd)",
       "Bash(npm test:*)",
-      "Bash(node:*)"
+      "Bash(node:*)",
+      "Bash(wc:*)",
+      "Bash(ls:*)",
+      "Bash(git init:*)"
     ]
   },
   "hooks": {

@@ -1,0 +1,30 @@
+{
+  "repo": "danny-avila/LibreChat",
+  "entrypoints": [
+    {
+      "kind": "hook",
+      "path": ".husky/pre-commit",
+      "reason": "Priority entrypoint for hook"
+    },
+    {
+      "kind": "hook",
+      "path": "README.md",
+      "reason": "Priority entrypoint for hook"
+    }
+  ],
+  "scopeRoots": [
+    "src",
+    "lib",
+    ".husky"
+  ],
+  "files": [
+    {
+      "path": ".husky/lint-staged.config.js",
+      "sizeBytes": 127
+    },
+    {
+      "path": "src/tests/oidc-integration.test.ts",
+      "sizeBytes": 16208
+    }
+  ]
+}

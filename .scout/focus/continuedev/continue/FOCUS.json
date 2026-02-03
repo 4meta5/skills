@@ -1,0 +1,27 @@
+{
+  "repo": "continuedev/continue",
+  "entrypoints": [
+    {
+      "kind": "skill",
+      "path": "README.md",
+      "reason": "Priority entrypoint for skill"
+    },
+    {
+      "kind": "hook",
+      "path": ".husky/pre-commit",
+      "reason": "Priority entrypoint for hook"
+    }
+  ],
+  "scopeRoots": [
+    "src",
+    "lib",
+    "skills",
+    ".husky"
+  ],
+  "files": [
+    {
+      "path": "skills/cn-check/SKILL.md",
+      "sizeBytes": 5778
+    }
+  ]
+}

@@ -1,0 +1,102 @@
+{
+  "runId": "e4ac779b",
+  "timestamp": "2026-02-02T18:17:09.982Z",
+  "sourceProject": {
+    "root": "/Users/amar/skillex/skills",
+    "commit": "e719cb8c04020389ad6e681744e484e2e4089cca",
+    "targetKinds": []
+  },
+  "candidates": [
+    {
+      "repo": "affaan-m/everything-claude-code",
+      "tier1Score": 0.793370517793845,
+      "tier2Score": 1,
+      "matchedKinds": [
+        "skill",
+        "hook",
+        "plugin",
+        "library"
+      ],
+      "modernityScore": 0.16666666666666666,
+      "license": null,
+      "topEntrypoints": [
+        "skills/SKILL.md",
+        "skills/index.ts",
+        "hooks/index.ts",
+        "hooks/hook.ts",
+        "plugins/index.ts"
+      ]
+    },
+    {
+      "repo": "ThinkInAIXYZ/deepchat",
+      "tier1Score": 0.7751006096277181,
+      "tier2Score": 1,
+      "matchedKinds": [
+        "mcp-server",
+        "library"
+      ],
+      "modernityScore": 0.6666666666666666,
+      "license": null,
+      "topEntrypoints": [
+        "src/index.ts",
+        "src/main.ts"
+      ]
+    },
+    {
+      "repo": "danny-avila/LibreChat",
+      "tier1Score": 0.7280400455258951,
+      "tier2Score": 1,
+      "matchedKinds": [
+        "hook",
+        "library"
+      ],
+      "modernityScore": 0.3333333333333333,
+      "license": null,
+      "topEntrypoints": [
+        ".husky/index.ts",
+        ".husky/main.ts",
+        "src/index.ts",
+        "src/main.ts"
+      ]
+    },
+    {
+      "repo": "continuedev/continue",
+      "tier1Score": 0.7273357234005428,
+      "tier2Score": 1,
+      "matchedKinds": [
+        "skill",
+        "hook",
+        "library"
+      ],
+      "modernityScore": 0,
+      "license": null,
+      "topEntrypoints": [
+        "skills/SKILL.md",
+        "skills/index.ts",
+        ".husky/index.ts",
+        ".husky/main.ts",
+        "src/index.ts"
+      ]
+    },
+    {
+      "repo": "liyupi/ai-guide",
+      "tier1Score": 0.770096852321789,
+      "tier2Score": 0.8867635189884557,
+      "matchedKinds": [
+        "library"
+      ],
+      "modernityScore": 0,
+      "license": null,
+      "topEntrypoints": [
+        "src/index.ts",
+        "src/main.ts"
+      ]
+    }
+  ],
+  "summary": {
+    "totalDiscovered": 256,
+    "cloned": 5,
+    "validated": 5,
+    "topRecommendation": "affaan-m/everything-claude-code"
+  }
+}

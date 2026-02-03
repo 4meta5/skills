@@ -72,13 +72,12 @@ This CLI solves that:
 
 ## Architecture
 
-This monorepo contains 8 packages organized in layers:
+This monorepo contains 7 packages organized in layers:
 
 ```mermaid
 graph TD
     subgraph "Applications"
         CLI[cli]
-        WEB[web]
     end
 
     subgraph "Core Libraries"
@@ -97,7 +96,6 @@ graph TD
     CLI --> CHAIN
     CLI --> DETECTOR
     CLI --> MATCHER
-    WEB --> SKILLS
     SKILLS --> LOADER
     CHAIN --> ENFORCER
 ```
@@ -111,7 +109,6 @@ graph TD
 | `@4meta5/project-detector` | Detect project technology stack |
 | `@4meta5/semantic-matcher` | Hybrid keyword + embedding matching |
 | `@4meta5/workflow-enforcer` | State machine for workflow enforcement |
-| `web` (private) | Website for browsing and discovering skills |
 
 ## Features
 
@@ -372,7 +369,7 @@ skills source add https://github.com/trailofbits/skills
 
 ## Packages
 
-This monorepo contains 8 packages. See [Architecture](#architecture) for the dependency graph.
+This monorepo contains 7 packages. See [Architecture](#architecture) for the dependency graph.
 
 | Package | Path | npm |
 |---------|------|-----|
@@ -383,7 +380,6 @@ This monorepo contains 8 packages. See [Architecture](#architecture) for the dep
 | `@4meta5/project-detector` | `packages/project-detector` | [![npm](https://img.shields.io/npm/v/@4meta5/project-detector)](https://npmjs.com/package/@4meta5/project-detector) |
 | `@4meta5/semantic-matcher` | `packages/semantic-matcher` | [![npm](https://img.shields.io/npm/v/@4meta5/semantic-matcher)](https://npmjs.com/package/@4meta5/semantic-matcher) |
 | `@4meta5/workflow-enforcer` | `packages/workflow-enforcer` | [![npm](https://img.shields.io/npm/v/@4meta5/workflow-enforcer)](https://npmjs.com/package/@4meta5/workflow-enforcer) |
-| `web` (private) | `packages/web` | (not published) |
 
 ### Build Order
 
@@ -394,7 +390,6 @@ Packages must be built in dependency order:
 3. `skills` (depends on skill-loader)
 4. `chain` (depends on workflow-enforcer)
 5. `cli` (depends on skills, chain, project-detector, semantic-matcher)
-6. `web` (depends on skills)
 
 Run `npm run build` to build all packages in the correct order.
 
@@ -460,23 +455,13 @@ MIT. See [LICENSE](./LICENSE).
 | differential-review | upstream (tob) | security | Security-focused diff analysis |
 | code-maturity-assessor | upstream (tob) | security | Trail of Bits maturity framework |
 | markdown-writer | custom | documentation | Consistent markdown style |
-| blog-writer | custom | documentation | Blog post creation |
 | readme-writer | custom | documentation | Write effective README files |
 | monorepo-readme | custom | documentation | Monorepo README patterns |
-| frontend-design | custom | ui | Distinctive UI creation |
-| baseline-ui | custom | ui | Opinionated UI baseline |
-| web-design-guidelines | custom | ui | Web Interface Guidelines |
-| fixing-accessibility | custom | ui | Fix accessibility issues |
-| fixing-motion-performance | custom | ui | Fix animation performance |
-| svelte-runes | custom | svelte | Svelte 5 runes ($state, $derived, $effect) |
-| sveltekit-structure | custom | svelte | File-based routing, layouts |
-| sveltekit-data-flow | custom | svelte | Load functions, form actions |
-| claude-svelte5-skill | custom | svelte | Comprehensive Svelte 5 reference |
-| sveltekit-svelte5-tailwind-skill | custom | svelte | SvelteKit + Svelte 5 + Tailwind v4 |
 | imessage-tone | custom | communication | Two-mode iMessage tone (owner vs others) |
 | bluebubbles-setup | custom | communication | BlueBubbles iMessage integration setup |
 | engram-recall | upstream (engram) | memory | Recall past work before starting new tasks |
 | engram-generate | upstream (engram) | workflow | Generate project skills from Claude Code history |
+| engram-summarize | upstream (engram) | memory | Summarize coding sessions into learnings |
 
 **Origin key:**
 - `custom` - Created for this project

@@ -1,0 +1,59 @@
+{
+  "repo": "affaan-m/everything-claude-code",
+  "entrypoints": [
+    {
+      "kind": "skill",
+      "path": "README.md",
+      "reason": "Priority entrypoint for skill"
+    }
+  ],
+  "scopeRoots": [
+    "src",
+    "lib",
+    "hooks",
+    "skills",
+    "plugins"
+  ],
+  "files": [
+    {
+      "path": "skills/continuous-learning/config.json",
+      "sizeBytes": 391
+    },
+    {
+      "path": "skills/continuous-learning-v2/config.json",
+      "sizeBytes": 1111
+    },
+    {
+      "path": "plugins/README.md",
+      "sizeBytes": 2037
+    },
+    {
+      "path": "skills/continuous-learning/SKILL.md",
+      "sizeBytes": 3367
+    },
+    {
+      "path": "skills/continuous-learning-v2/agents/observer.md",
+      "sizeBytes": 4269
+    },
+    {
+      "path": "hooks/hooks.json",
+      "sizeBytes": 8364
+    },
+    {
+      "path": "skills/continuous-learning-v2/SKILL.md",
+      "sizeBytes": 8959
+    },
+    {
+      "path": "skills/clickhouse-io/SKILL.md",
+      "sizeBytes": 9972
+    },
+    {
+      "path": "skills/coding-standards/SKILL.md",
+      "sizeBytes": 11398
+    },
+    {
+      "path": "skills/backend-patterns/SKILL.md",
+      "sizeBytes": 13415
+    }
+  ]
+}
