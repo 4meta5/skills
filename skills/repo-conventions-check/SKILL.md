@@ -46,9 +46,9 @@ Tell the user explicitly:
 
 ```
 Based on existing skills in .claude/skills/, I will add the new skill to:
-  .claude/skills/my-new-skill/SKILL.md
+  skills/my-new-skill/SKILL.md
 
-NOT in packages/skills/skills/ (that's for something else).
+NOT in packages/skills/skills/ (generated output; do not edit).
 ```
 
 ### Step 3: Confirm Before Starting

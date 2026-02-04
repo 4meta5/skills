@@ -25,9 +25,9 @@ This project builds tools for discovering and installing Claude skills. If you d
 
 ### After Completing Any Feature/Bugfix
 
-1. **Run scan**: `./packages/skills-cli/bin/skills.js scan`
+1. **Run scan**: `./packages/cli/bin/skills.js scan`
 2. **Review recommendations**: Look at HIGH CONFIDENCE matches
-3. **Install relevant skills**: `./packages/skills-cli/bin/skills.js scan --all`
+3. **Install relevant skills**: `./packages/cli/bin/skills.js scan --all`
 4. **If skipping**: Document reason in your response
 
 ### Rationalizations (Do Not Skip)
@@ -48,7 +48,7 @@ If you complete a feature without running `skills scan`:
 **BLOCKED: DOGFOODING REQUIRED**
 
 You cannot proceed to the next task until you:
-1. Run `./packages/skills-cli/bin/skills.js scan`
+1. Run `./packages/cli/bin/skills.js scan`
 2. Acknowledge recommendations (list them)
 3. Install OR justify skipping each HIGH confidence recommendation
 
@@ -75,19 +75,19 @@ If any answer is "no", run the scan now before ending.
 
 ```bash
 # Scan for recommended skills
-./packages/skills-cli/bin/skills.js scan
+./packages/cli/bin/skills.js scan
 
 # Scan and show all matches (not just top per category)
-./packages/skills-cli/bin/skills.js scan --show-alternatives
+./packages/cli/bin/skills.js scan --show-alternatives
 
 # Install all high-confidence recommendations
-./packages/skills-cli/bin/skills.js scan --all
+./packages/cli/bin/skills.js scan --all
 
 # List currently installed skills
-./packages/skills-cli/bin/skills.js list
+./packages/cli/bin/skills.js list
 
 # Get help
-./packages/skills-cli/bin/skills.js --help
+./packages/cli/bin/skills.js --help
 ```
 
 ## Integration with Other Skills

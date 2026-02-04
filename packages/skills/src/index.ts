@@ -29,21 +29,8 @@ export * from './categories/index.js';
 export { newTsProject } from './templates/new-project.js';
 export { extendWithTesting, extendWithSecurity } from './templates/extend-project.js';
 
-// Bundled skills
+// Bundled skills (minimal API)
 export {
-  tdd,
-  unitTestWorkflow,
-  suggestTests,
-  noWorkarounds,
-  codeReview,
-  codeReviewTs,
-  codeReviewJs,
-  codeReviewRust,
-  prDescription,
-  refactorSuggestions,
-  securityAnalysis,
-  describeCodebase,
-  bundledSkills,
   getBundledSkill,
   listBundledSkillNames
 } from './bundled.js';

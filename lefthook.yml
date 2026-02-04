@@ -39,6 +39,11 @@ pre-commit:
       run: npx tsx packages/cli/src/index.ts claudemd sync && git add CLAUDE.md
       fail_text: "CLAUDE.md sync failed."
 
+    claude-settings:
+      glob: ".claude/settings.local.json"
+      run: ./scripts/check-claude-settings.sh
+      fail_text: ".claude/settings.local.json changes are blocked by default."
+
 # Optional: Uncomment to add property tests to pre-push hook instead
 # pre-push:
 #   commands:

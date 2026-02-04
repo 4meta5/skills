@@ -17,7 +17,7 @@ Create and validate Claude Code skills following best practices.
 
 **Create a new skill:**
 1. Choose a template: `simple`, `with-references`, or `full`
-2. Create directory: `.claude/skills/<skill-name>/`
+2. Create directory: `skills/<skill-name>/`
 3. Write SKILL.md following the template
 4. Run validation: `skills validate <skill-name>`
 
@@ -146,8 +146,10 @@ This skill works with:
 
 ## Directory Structure
 
+**All skills live in the root `skills/` directory** (canonical location):
+
 ```
-.claude/skills/<skill-name>/
+skills/<skill-name>/
 ├── SKILL.md              # Required: Main skill file
 ├── references/           # Optional: Supporting documentation
 │   ├── guide.md
@@ -156,6 +158,8 @@ This skill works with:
 ├── scripts/              # Optional: Helper scripts
 └── .provenance.json      # Optional: Source tracking
 ```
+
+The `.claude/skills/` symlink makes skills available to Claude Code. Never create skills directly in `packages/skills/skills/` (generated at build time).
 
 ## Tips
 

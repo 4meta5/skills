@@ -58,3 +58,33 @@ Generate unit tests for given function(s) in a codebase. Work in phases. Output 
 - Use meaningful test case names
 - Prefer pure helpers and table-driven tests
 - Analyze only within the given code. Do not invent missing context or external APIs
+
+## Skill Chaining
+
+### After Phase 7 (Run Tests)
+
+| Chain To | Condition |
+|----------|-----------|
+| property-based-testing | Pure functions, roundtrip patterns detected |
+| repo-hygiene | Always (terminal) |
+
+### Chains From
+
+| Source | When |
+|--------|------|
+| suggest-tests | HIGH risk functions identified |
+| tdd | Comprehensive generation needed |
+
+### Testing Pipeline Position
+
+unit-test-workflow is step 3 in the testing pipeline:
+
+```
+tdd → suggest-tests → unit-test-workflow → property-based-testing → repo-hygiene
+                            ↑
+                       (you are here)
+```
+
+### Terminal Chain
+
+After all tests pass: **repo-hygiene** (clean temporary test files)

@@ -1,0 +1,6 @@
+# Bundled skills are synced from root skills/ at build time
+# See scripts/sync-skills.sh
+skills/
+
+# Build output
+dist/

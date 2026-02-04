@@ -1,4 +1,4 @@
-import { readFileSync } from 'fs';
+import { readFileSync, existsSync } from 'fs';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
 import { parseFrontmatter } from './loader.js';
@@ -7,20 +7,57 @@ import type { Skill } from './types.js';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-/**
- * Get the path to bundled skills directory
- * From dist/src/bundled.js -> ../../skills
- */
-function getSkillsDir(): string {
-  return join(__dirname, '..', '..', 'skills');
-}
+// --- Path Resolution (Internal, Cached) ---
+
+let _skillsDir: string | null = null;
 
 /**
- * Load a bundled skill by name
+ * Resolve the bundled skills directory path.
+ * Probes candidate paths to support src/, dist/src/, and published package.
  */
-function loadBundledSkill(name: string): Skill {
+function getSkillsDir(): string {
+  if (_skillsDir !== null) {
+    return _skillsDir;
+  }
+
+  const candidates = [
+    // From dist/src -> go up 4 levels to repo root, then skills/
+    join(__dirname, '..', '..', '..', '..', 'skills'),
+    // From src -> go up 3 levels to repo root, then skills/
+    join(__dirname, '..', '..', '..', 'skills'),
+    // Published package: skills at package root
+    join(__dirname, '..', '..', 'skills'),
+  ];
+
+  for (const candidate of candidates) {
+    const probe = join(candidate, 'tdd', 'SKILL.md');
+    if (existsSync(probe)) {
+      _skillsDir = candidate;
+      return _skillsDir;
+    }
+  }
+
+  // Fallback to package skills
+  _skillsDir = join(__dirname, '..', '..', 'skills');
+  return _skillsDir;
+}
+
+// --- Lazy Loading Infrastructure ---
+
+const cache = new Map<string, Skill>();
+
+/**
+ * Load a skill from disk. Returns undefined if file missing. Throws on parse errors.
+ */
+function loadSkill(name: string): Skill | undefined {
   const skillPath = join(getSkillsDir(), name);
-  const content = readFileSync(join(skillPath, 'SKILL.md'), 'utf-8');
+  const skillFile = join(skillPath, 'SKILL.md');
+
+  if (!existsSync(skillFile)) {
+    return undefined;
+  }
+
+  const content = readFileSync(skillFile, 'utf-8');
   const { frontmatter, body } = parseFrontmatter(content);
 
   return {
@@ -30,65 +67,51 @@ function loadBundledSkill(name: string): Skill {
   };
 }
 
-// Testing skills
-export const tdd = loadBundledSkill('tdd');
-export const unitTestWorkflow = loadBundledSkill('unit-test-workflow');
-export const suggestTests = loadBundledSkill('suggest-tests');
-
-// Development skills
-export const noWorkarounds = loadBundledSkill('no-workarounds');
-export const codeReview = loadBundledSkill('code-review');
-export const codeReviewTs = loadBundledSkill('code-review-ts');
-export const codeReviewJs = loadBundledSkill('code-review-js');
-export const codeReviewRust = loadBundledSkill('code-review-rust');
-export const prDescription = loadBundledSkill('pr-description');
-
-// Refactoring skills
-export const refactorSuggestions = loadBundledSkill('refactor-suggestions');
-
-// Security skills
-export const securityAnalysis = loadBundledSkill('security-analysis');
-
-// Documentation skills
-export const describeCodebase = loadBundledSkill('describe-codebase');
-
 /**
- * Registry of all bundled skills
+ * Registry of bundled skill names (for lazy loading)
  */
-export const bundledSkills: Record<string, Skill> = {
-  // Testing
-  'tdd': tdd,
-  'unit-test-workflow': unitTestWorkflow,
-  'suggest-tests': suggestTests,
+const BUNDLED_SKILLS = [
+  'tdd',
+  'unit-test-workflow',
+  'suggest-tests',
+  'no-workarounds',
+  'code-review',
+  'code-review-ts',
+  'code-review-js',
+  'code-review-rust',
+  'pr-description',
+  'refactor-suggestions',
+  'security-analysis',
+  'describe-codebase',
+] as const;
 
-  // Development
-  'no-workarounds': noWorkarounds,
-  'code-review': codeReview,
-  'code-review-ts': codeReviewTs,
-  'code-review-js': codeReviewJs,
-  'code-review-rust': codeReviewRust,
-  'pr-description': prDescription,
+const bundledSet = new Set<string>(BUNDLED_SKILLS);
 
-  // Refactoring
-  'refactor-suggestions': refactorSuggestions,
-
-  // Security
-  'security-analysis': securityAnalysis,
-
-  // Documentation
-  'describe-codebase': describeCodebase
-};
+// --- Public API ---
 
 /**
- * Get a bundled skill by name
+ * Get a bundled skill by name. Lazy loads and caches.
+ * Returns undefined if skill not found or file missing.
  */
 export function getBundledSkill(name: string): Skill | undefined {
-  return bundledSkills[name];
+  if (!bundledSet.has(name)) {
+    return undefined;
+  }
+
+  if (cache.has(name)) {
+    return cache.get(name);
+  }
+
+  const skill = loadSkill(name);
+  if (skill) {
+    cache.set(name, skill);
+  }
+  return skill;
 }
 
 /**
- * List all bundled skill names
+ * List all bundled skill names (without loading).
  */
 export function listBundledSkillNames(): string[] {
-  return Object.keys(bundledSkills);
+  return [...BUNDLED_SKILLS];
 }

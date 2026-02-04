@@ -14,6 +14,7 @@ npx @4meta5/skills-cli scan
 - [What It Does](#what-it-does)
 - [Quick Start](#quick-start)
 - [Why Skills?](#why-skills)
+- [Claudette Baseline Requirements](#claudette-baseline-requirements)
 - [Architecture](#architecture)
 - [Features](#features)
 - [How Skills Get Activated](#how-skills-get-activated)
@@ -69,6 +70,50 @@ This CLI solves that:
 | "Are these skills any good?" | Confidence scoring and deduplication |
 | "How do I install them?" | `skills add name` or `skills scan --all` |
 | "Which skills did I write?" | `skills list --custom` filters by provenance |
+
+## Claudette Baseline Requirements
+
+These skills and commands are required by Claudette and must remain stable.
+
+### Required Skills (6)
+
+These skills are canonical in `skills/` and bundled into `packages/skills/skills/` during publish:
+
+| Skill | Purpose | Bundled |
+|-------|---------|---------|
+| `tdd` | Test-driven development workflow | Yes |
+| `no-workarounds` | Prevents manual workarounds when building tools | Yes |
+| `suggest-tests` | Recommend tests based on git diff | Yes |
+| `unit-test-workflow` | Multi-phase test generation | Yes |
+| `repo-hygiene` | Clean auto-generated test artifacts | No (root-only) |
+| `code-review` | Code review guidelines | Yes |
+
+**Note:** `repo-hygiene` lives only in `skills/` and is not bundled with the npm package. Users who need it should install via `skills add repo-hygiene`.
+
+### Required Hooks
+
+| Hook | Purpose |
+|------|---------|
+| `skill-forced-eval` | Forces skill evaluation on every prompt |
+| `usage-tracker` | Logs skill activations (optional but recommended) |
+| `semantic-router` | Routes prompts to skills (optional) |
+
+### Required CLI Commands
+
+```bash
+skills scan                   # Analyze project, recommend skills
+skills add <name>             # Install a skill
+skills list                   # List installed skills
+skills hook add/list/remove   # Manage hooks
+skills stats                  # Usage analytics
+skills validate [path]        # Validate skill format (defaults to all skills)
+```
+
+### Stable Interfaces
+
+- **SKILL.md format**: Must remain compatible with current spec
+- **skill-loader**: Loading and parsing must remain stable
+- **Chain enforcement**: Workflow enforcement via hooks/chain must remain available
 
 ## Architecture
 
@@ -230,6 +275,7 @@ If you skip hooks, skills still exist in `.claude/skills/` but Claude won't auto
 | `source list` | List configured skill sources |
 | `source add <url>` | Add a skill repository |
 | `stats` | Show usage analytics |
+| `validate [path]` | Validate skill format and quality (defaults to all skills) |
 
 ## Skill Format
 
@@ -260,23 +306,27 @@ See [SKILL_FORMAT.md](./docs/SKILL_FORMAT.md) for the full specification.
 
 ### How Skills Are Recognized
 
-A skill is any folder with a `SKILL.md` file. In this project, skills live in the root `skills/` directory for better visibility:
+A skill is any folder with a `SKILL.md` file. **All skills live in the root `skills/` directory** (canonical location):
 
 ```
-skills/                       ← Root-level for visibility
+skills/                       ← Canonical skill location (single source of truth)
 ├── tdd/
 │   └── SKILL.md              ← This makes it a skill
-├── svelte-runes/
-│   ├── SKILL.md              ← This makes it a skill
-│   └── references/           ← Optional supporting files
+├── code-review/
+│   └── SKILL.md
 └── my-custom-skill/
-    └── SKILL.md              ← This makes it a skill
+    ├── SKILL.md              ← Required
+    └── references/           ← Optional supporting files
 
 .claude/
 └── skills -> ../skills       ← Symlink for Claude Code compatibility
 ```
 
-Claude Code expects skills in `.claude/skills/`. We use a symlink so skills remain discoverable while being visible at root level.
+**Key points:**
+- All skills (bundled and custom) live in `skills/` at root
+- The `.claude/skills/` symlink makes them available to Claude Code
+- The npm package build copies bundled skills from `skills/` via `scripts/sync-skills.sh`
+- Never create skills in `packages/skills/skills/` directly (it's generated at build time)
 
 **Windows users**: Recreate the symlink with admin privileges:
 ```cmd

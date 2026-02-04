@@ -53,6 +53,12 @@ Pre-commit hook runs typecheck + unit tests in parallel. Property tests are excl
 If you skip this, respond: **"BLOCKED: DOGFOODING REQUIRED"**
 
 ## Installed Skills
+- @.claude/skills/code-review/SKILL.md
+- @.claude/skills/code-review-js/SKILL.md
+- @.claude/skills/code-review-rust/SKILL.md
+- @.claude/skills/describe-codebase/SKILL.md
+- @.claude/skills/pr-description/SKILL.md
+- @.claude/skills/refactor-suggestions/SKILL.md
 - @.claude/skills/npm-publish/SKILL.md
 - @.claude/skills/repo-conventions-check/SKILL.md
 - @.claude/skills/engram-summarize/SKILL.md

@@ -66,11 +66,8 @@ Chain owns session state. Tool-time enforcement is truth. Prompt-time is optimiz
 - [x] trackBlock(), trackRetry(), trackCompletion() methods
 - [x] Tests: 350 chain + 812 CLI passing
 
-**6.6: Event Bus (Later)**
-- [ ] Replace direct calls with internal event dispatcher
-- [ ] Keep payloads same (prompt:received, skill:matched, tool:requested)
-- [ ] Same behavior, pluggable integrations
-- [ ] Trigger: need parallel consumers (security scanner, linter, test runner)
+**6.6: Event Bus**
+- Deferred to later phase. See [Deferred](#deferred) section.
 
 ### Phase 5: Integration + Polish (Deferred)
 
@@ -88,12 +85,8 @@ Skills CLI enhancements.
 - [ ] Add skill update command for version bumps
 - [ ] Improve semantic matching accuracy
 
-### Package: web (Low Priority)
-
-- [ ] Add skill search functionality
-- [ ] Create skill detail pages
-- [ ] Add skill submission flow
-- [ ] Improve mobile responsiveness
+### Package: web
+- Deferred. See [Deferred](#deferred) section.
 
 ## Architectural Decisions
 
@@ -122,20 +115,58 @@ Skills CLI enhancements.
 - Soft: blocks high-impact until ack (reference skills)
 - None: guidance only (informational skills)
 
+**AD-6: Scope cut for core loop focus**
+- Semantic router hook is opt-in (install via `skills hook add semantic-router`)
+- Response validation is a library function available via hooks; not enabled by default
+- Embedding models: CLI uses @xenova/transformers as direct dependency; semantic-matcher uses hash fallback when embeddings unavailable
+- Core loop: scan → install → auto-evaluate → enforce workflow
+- Deferred: event bus, web package, analytics dashboard, large skill catalog
+
 ## Backlog
 
-### Skill Library Expansion
+### Infrastructure
+- [ ] Set up automated skill testing
+- [ ] Create skill quality metrics
+
+## Deferred
+
+Items explicitly deferred to focus on the core loop (scan → install → auto-evaluate → enforce workflow).
+
+### Event Bus (Phase 6.6)
+- [ ] Replace direct calls with internal event dispatcher
+- [ ] Keep payloads same (prompt:received, skill:matched, tool:requested)
+- [ ] Same behavior, pluggable integrations
+- [ ] Trigger: need parallel consumers (security scanner, linter, test runner)
+
+### Web Package / Skills Site
+- [ ] Add skill search functionality
+- [ ] Create skill detail pages
+- [ ] Add skill submission flow
+- [ ] Improve mobile responsiveness
+
+### Large Skill Catalog Expansion
 - [ ] Add more language-specific skills (Python, Rust, Go)
 - [ ] Add CI/CD skills (GitHub Actions, CircleCI)
 - [ ] Add database skills (Postgres, MongoDB patterns)
 - [ ] Add API design skills (REST, GraphQL)
 
-### Infrastructure
-- [ ] Set up automated skill testing
-- [ ] Create skill quality metrics
-- [ ] Add skill usage analytics dashboard
+### Analytics Dashboard
+- [ ] Add skill usage analytics dashboard (beyond JSONL)
+
+### Advanced Features
+- [ ] MCP integration
+- [ ] OPA policy engine
+- [ ] Human-in-the-loop (HITL) workflows
 
 ## Completed
+
+### 2026-02-03
+
+**Fix claudemd-sync ENOENT Bug (packages/skills)**
+- [x] Fixed path resolution in bundled.ts (probes 4, 3, 2 levels up from dist/src)
+- [x] Added lazy loading with cache (skills load only on getBundledSkill() call)
+- [x] Minimal API: only getBundledSkill() and listBundledSkillNames() exported
+- [x] Tests updated for lazy loading verification
 
 ### 2026-02-02
 
