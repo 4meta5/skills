@@ -1,6 +1,6 @@
 {
   "name": "@4meta5/skill-loader",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Parse and load SKILL.md files for Claude Code skills",
   "type": "module",
   "main": "dist/index.js",

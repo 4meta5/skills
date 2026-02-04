@@ -1,6 +1,6 @@
 {
   "name": "@4meta5/semantic-matcher",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Hybrid keyword + embedding semantic matcher with RRF fusion",
   "type": "module",
   "main": "dist/index.js",

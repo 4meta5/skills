@@ -180,7 +180,12 @@ LOW    aws-cdk                AWS CDK patterns (detected: cloudflare)
 
 ### Semantic Routing
 
-Skills activate based on context, not manual invocation. The router scores your prompt against skill descriptions and triggers the right one.
+Skills activate based on context, not manual invocation. The router uses:
+
+- **Intent mapping**: Detects task intent (fix bug, add feature, refactor) from prompt
+- **Keyword matching**: Fast matching against skill trigger conditions
+- **Embedding similarity**: Vector-based semantic matching for fuzzy matches
+- **RRF fusion**: Combines multiple signals with Reciprocal Rank Fusion
 
 ### Skill Chaining
 
@@ -202,7 +207,13 @@ chain next                  # Show next step in chain
 chain clear                 # Clear active session
 ```
 
-**Status:** Phases 0-6.5 complete (350 tests). Event bus pending.
+**Features:**
+- DAG-based skill resolution with dependency tracking
+- Enforcement tiers (hard/soft/none) for workflow control
+- Unified session state and usage tracking
+- Pre-tool-use hooks for corrective guidance
+- Intent mapping for smart skill activation
+- Polyglot test runner discovery
 
 ## How Skills Get Activated
 
@@ -494,13 +505,20 @@ MIT. See [LICENSE](./LICENSE).
 | claudeception | upstream (claudeception) | development | Extract learnings into skills |
 | typescript-circular-dependency | upstream (claudeception) | development | Detect circular imports |
 | skill-maker | custom | development | Create Claude Code skills |
+| repo-conventions-check | custom | development | Check repo patterns before adding files |
 | workflow-orchestrator | custom | workflow | Context detection and skill chaining |
 | project-init | custom | workflow | Scaffold new projects |
 | doc-maintenance | custom | workflow | Auto-update docs after tasks |
 | agent-orchestration | custom | workflow | Coordinate parallel agents |
 | research-to-plan | custom | workflow | Convert research to plans |
 | gitignore-hygiene | custom | workflow | Maintain gitignore patterns |
-| code-review-ts | custom | security | TypeScript review guidelines |
+| code-review | custom | review | Base code review guidelines |
+| code-review-ts | custom | review | TypeScript review guidelines |
+| code-review-js | custom | review | JavaScript review guidelines |
+| code-review-rust | custom | review | Rust review guidelines |
+| describe-codebase | custom | documentation | Generate codebase onboarding summary |
+| pr-description | custom | documentation | Generate PR descriptions from diff |
+| refactor-suggestions | custom | refactoring | Suggest refactors for modified code |
 | security-analysis | custom | security | Static security review |
 | differential-review | upstream (tob) | security | Security-focused diff analysis |
 | code-maturity-assessor | upstream (tob) | security | Trail of Bits maturity framework |

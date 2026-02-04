@@ -1,6 +1,6 @@
 {
   "name": "@4meta5/project-detector",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Detect project technology stack (languages, frameworks, databases, etc.)",
   "type": "module",
   "main": "dist/index.js",

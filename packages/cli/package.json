@@ -1,6 +1,6 @@
 {
   "name": "@4meta5/skills-cli",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "CLI for managing Claude Code skills",
   "type": "module",
   "main": "dist/src/index.js",

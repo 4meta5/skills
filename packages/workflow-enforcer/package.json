@@ -1,6 +1,6 @@
 {
   "name": "@4meta5/workflow-enforcer",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "State machine for workflow enforcement (TDD, code review, etc.)",
   "type": "module",
   "main": "dist/index.js",
