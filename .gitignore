@@ -66,3 +66,12 @@ playwright/.cache/
 # Chain state (session files)
 .chain-state.json
 **/chain_state/
+
+# Internal directories (not open source)
+.scout/
+.github/
+docs/
+
+# Claude Code local config (but NOT symlinks - those are committed)
+.claude/settings.local.json
+.claude/chain_state/

@@ -16,6 +16,11 @@ pre-commit:
       run: ./scripts/check-skill-location.sh
       fail_text: "Skills must be in skills/ (root level), not elsewhere. See error above."
 
+    hook-location:
+      glob: "**/*.sh"
+      run: ./scripts/check-hook-location.sh
+      fail_text: "Shell scripts must be in hooks/, scripts/, or packages/. See error above."
+
     typecheck:
       glob: "*.{ts,tsx}"
       root: "packages/skills-library"
@@ -38,10 +43,6 @@ pre-commit:
       glob: "skills/**/*"
       run: npx tsx packages/cli/src/index.ts claudemd sync && git add CLAUDE.md
       fail_text: "CLAUDE.md sync failed."
-
-    claude-settings:
-      glob: ".claude/settings.local.json"
-      run: ./scripts/check-claude-settings.sh
 
 # Optional: Uncomment to add property tests to pre-push hook instead
 # pre-push:

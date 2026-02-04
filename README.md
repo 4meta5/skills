@@ -240,7 +240,7 @@ skills hook add skill-forced-eval semantic-router usage-tracker
 skills hook list
 ```
 
-This creates `.claude/hooks/` with the shell scripts and configures `.claude/settings.local.json` to run them on every prompt.
+This creates hooks in `hooks/` (with a symlink at `.claude/hooks/`) and configures `.claude/settings.local.json` to run them on every prompt.
 
 ### How Each Hook Works
 
@@ -313,7 +313,7 @@ Instructions for Claude when this skill activates.
 Step-by-step guidance...
 ```
 
-See [SKILL_FORMAT.md](./docs/SKILL_FORMAT.md) for the full specification.
+See the `skill-maker` skill for the full specification.
 
 ### How Skills Are Recognized
 
@@ -400,11 +400,12 @@ Security review assesses risk using differential-review:
 
 | Location | Purpose |
 |----------|---------|
-| `skills/` | Project-level skills (visible at root) |
+| `skills/` | Project-level skills (canonical location) |
 | `.claude/skills/` | Symlink to `skills/` (Claude Code compatibility) |
+| `hooks/` | Hook scripts for skill activation (canonical location) |
+| `.claude/hooks/` | Symlink to `hooks/` (Claude Code compatibility) |
 | `~/.claude/skills/` | User-level skills (shared across projects) |
-| `.claude/hooks/` | Hook scripts for skill activation |
-| `.claude/settings.local.json` | Local Claude Code settings |
+| `.claude/settings.local.json` | Local Claude Code settings (gitignored) |
 | `~/.claude/usage.jsonl` | Usage analytics (if tracker enabled) |
 
 ### Environment Variables
@@ -482,9 +483,6 @@ MIT. See [LICENSE](./LICENSE).
 
 ## Links
 
-- [Documentation](./docs/)
-- [Skill Format Specification](./docs/SKILL_FORMAT.md)
-- [Implementation Status](./docs/DONE.md)
 - [Contributing Guide](./CONTRIBUTING.md)
 - [Changelog](./CHANGELOG.md)
 
