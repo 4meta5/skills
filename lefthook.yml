@@ -42,8 +42,6 @@ pre-commit:
     claude-settings:
       glob: ".claude/settings.local.json"
       run: ./scripts/check-claude-settings.sh
-      interactive: true
-      fail_text: ".claude/settings.local.json changes are blocked by default."
 
 # Optional: Uncomment to add property tests to pre-push hook instead
 # pre-push:
