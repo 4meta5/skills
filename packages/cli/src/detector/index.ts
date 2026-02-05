@@ -14,6 +14,7 @@ import { detectFrameworks } from './framework.js';
 import { detectDeployment } from './deployment.js';
 import { detectTesting } from './testing.js';
 import { detectDatabases } from './database.js';
+import { detectComposites } from './composites.js';
 
 // Re-export types
 export * from './types.js';
@@ -84,6 +85,18 @@ async function readCargoToml(projectPath: string): Promise<CargoToml | undefined
   try {
     const content = await readFile(join(projectPath, 'Cargo.toml'), 'utf-8');
     return parseToml(content) as CargoToml;
+  } catch {
+    return undefined;
+  }
+}
+
+/**
+ * Read and parse wrangler.toml if it exists
+ */
+async function readWranglerToml(projectPath: string): Promise<Record<string, unknown> | undefined> {
+  try {
+    const content = await readFile(join(projectPath, 'wrangler.toml'), 'utf-8');
+    return parseToml(content) as Record<string, unknown>;
   } catch {
     return undefined;
   }
@@ -335,7 +348,14 @@ async function expandWorkspaceGlob(basePath: string, pattern: string): Promise<s
  * Analyze a single path and return partial analysis
  */
 async function analyzeSinglePath(projectPath: string): Promise<ProjectAnalysis> {
-  const [packageJson, cargoToml, pyProjectToml, envVars, configFiles, existingSkills] = await Promise.all([
+  const [
+    packageJson,
+    cargoToml,
+    pyProjectToml,
+    envVars,
+    configFiles,
+    existingSkills
+  ] = await Promise.all([
     readPackageJson(projectPath),
     readCargoToml(projectPath),
     readPyProjectToml(projectPath),
@@ -344,13 +364,18 @@ async function analyzeSinglePath(projectPath: string): Promise<ProjectAnalysis> 
     findExistingSkills(projectPath)
   ]);
 
+  const wranglerToml = configFiles.includes('wrangler.toml')
+    ? await readWranglerToml(projectPath)
+    : undefined;
+
   const ctx: DetectionContext = {
     projectPath,
     packageJson,
     cargoToml,
     pyProjectToml,
     envVars,
-    configFiles
+    configFiles,
+    wranglerToml
   };
 
   const [languages, frameworks, deployment, testing, databases] = await Promise.all([
@@ -360,6 +385,21 @@ async function analyzeSinglePath(projectPath: string): Promise<ProjectAnalysis> 
     detectTesting(ctx),
     detectDatabases(ctx)
   ]);
+
+  const tagSet = new Set<string>();
+  for (const tech of [
+    ...languages,
+    ...frameworks,
+    ...deployment,
+    ...testing,
+    ...databases
+  ]) {
+    for (const tag of tech.tags) {
+      tagSet.add(tag.toLowerCase());
+    }
+  }
+
+  deployment.push(...detectComposites(ctx, tagSet));
 
   return {
     languages,

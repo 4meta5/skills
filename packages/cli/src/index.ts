@@ -289,9 +289,11 @@ cli
 cli
   .command('validate [path]', 'Validate installed skills')
   .option('-C, --cwd <path>', 'Target project directory (default: current directory)')
+  .option('--path <path>', 'Path to a specific skill to validate')
   .option('--json', 'Output as JSON')
   .action(async (path: string | undefined, options: ValidateCommandOptions) => {
-    await validateCommand({ ...options, path });
+    const resolvedPath = options.path ?? path;
+    await validateCommand({ ...options, path: resolvedPath });
   });
 
 cli

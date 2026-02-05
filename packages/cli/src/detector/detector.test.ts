@@ -174,9 +174,37 @@ describe('Framework Detector', () => {
     expect(result[0].tags).toContain('cloudflare');
     expect(result[0].tags).toContain('edge');
   });
+
+  it('does not detect Google OAuth globally', async () => {
+    const ctx = createContext({
+      envVars: {
+        GOOGLE_CLIENT_ID: 'test-id',
+        GOOGLE_CLIENT_SECRET: 'test-secret'
+      }
+    });
+
+    const result = await detectFrameworks(ctx);
+
+    expect(result).toHaveLength(0);
+  });
 });
 
 describe('Deployment Detector', () => {
+  it('detects Cloudflare Pages from wrangler.toml pages_build_output_dir', async () => {
+    const ctx = createContext({
+      configFiles: ['wrangler.toml'],
+      wranglerToml: {
+        pages_build_output_dir: '.svelte-kit/cloudflare'
+      }
+    });
+
+    const result = await detectDeployment(ctx);
+
+    const pages = result.find(d => d.name === 'Cloudflare Pages');
+    expect(pages).toBeDefined();
+    expect(pages!.tags).toContain('cloudflare-pages');
+  });
+
   it('detects Cloudflare Workers from wrangler.toml', async () => {
     const ctx = createContext({
       configFiles: ['wrangler.toml']

@@ -115,6 +115,7 @@ export interface DetectionContext {
   pyProjectToml?: PyProjectToml;
   envVars?: Record<string, string>;
   configFiles: string[];  // List of config files found
+  wranglerToml?: Record<string, unknown>;
 }
 
 /**

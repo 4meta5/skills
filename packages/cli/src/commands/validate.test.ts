@@ -336,6 +336,29 @@ description: The specific skill we want to validate
       expect(results.skills['target-skill']).toBeDefined();
     });
 
+    it('should validate absolute path without .claude/skills', async () => {
+      const skillDir = join(tempDir, 'standalone-skill');
+      await mkdir(skillDir, { recursive: true });
+      await writeFile(
+        join(skillDir, 'SKILL.md'),
+        `---
+name: standalone-skill
+description: A standalone skill with no .claude/skills directory
+category: testing
+---
+
+# Standalone Skill
+`,
+        'utf-8'
+      );
+
+      const results = await validateCommand({ cwd: tempDir, path: skillDir });
+
+      expect(results.total).toBe(1);
+      expect(results.skills['standalone-skill']).toBeDefined();
+      expect(results.skills['standalone-skill'].valid).toBe(true);
+    });
+
     it('should return JSON output when requested', async () => {
       const skillDir = join(tempDir, '.claude', 'skills', 'json-skill');
       await mkdir(skillDir, { recursive: true });

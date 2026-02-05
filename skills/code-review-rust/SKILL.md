@@ -1,7 +1,7 @@
 ---
 name: code-review-rust
 description: Rust-specific code review guidelines focusing on error handling, safety, and idiomatic patterns
-category: development
+category: code-quality
 disable-model-invocation: false
 user-invocable: true
 allowed-tools: Read, Grep, Glob, Bash

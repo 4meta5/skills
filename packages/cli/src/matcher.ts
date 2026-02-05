@@ -56,7 +56,7 @@ interface BundledSkillMapping {
   priority: number;  // Higher = better within same category
 }
 
-const BUNDLED_SKILL_MAPPINGS: Record<string, BundledSkillMapping> = {
+export const BUNDLED_SKILL_MAPPINGS: Record<string, BundledSkillMapping> = {
   'code-review-rust': {
     tags: ['rust', 'rs', 'cargo'],
     category: 'code-quality',
@@ -66,11 +66,6 @@ const BUNDLED_SKILL_MAPPINGS: Record<string, BundledSkillMapping> = {
     tags: ['typescript', 'ts'],
     category: 'code-quality',
     priority: 10
-  },
-  'test-first-bugfix': {
-    tags: ['testing', 'unit-testing', 'tdd'],
-    category: 'testing',
-    priority: 8  // Specialized workflow
   },
   'unit-test-workflow': {
     tags: ['testing', 'unit-testing'],
@@ -91,6 +86,31 @@ const BUNDLED_SKILL_MAPPINGS: Record<string, BundledSkillMapping> = {
     tags: ['security', 'code-review'],
     category: 'security',
     priority: 8  // More specialized than security-analysis
+  },
+  'deploy-mystack': {
+    tags: ['mystack'],
+    category: 'deployment',
+    priority: 12
+  },
+  'google-oauth': {
+    tags: ['oauth', 'google', 'auth', 'openid'],
+    category: 'security',
+    priority: 9
+  },
+  'svelte5-cloudflare-pages': {
+    tags: ['svelte5', 'sveltekit', 'cloudflare-pages', 'pages', 'wrangler'],
+    category: 'deployment',
+    priority: 9
+  },
+  'rust-aws-lambda': {
+    tags: ['rust', 'lambda', 'aws', 'lambda_http', 'lambda_runtime'],
+    category: 'deployment',
+    priority: 9
+  },
+  'neon-postgres': {
+    tags: ['neon', 'postgres', 'database', 'pgbouncer', 'pooler'],
+    category: 'database',
+    priority: 9
   }
 };
 

@@ -1,5 +1,5 @@
 import { readdir, readFile, stat } from 'fs/promises';
-import { join, basename } from 'path';
+import { join, basename, isAbsolute } from 'path';
 import { parse as parseYaml } from 'yaml';
 
 /**
@@ -11,7 +11,14 @@ const VALID_CATEGORIES = [
   'documentation',
   'refactoring',
   'security',
-  'performance'
+  'performance',
+  'code-quality',
+  'deployment',
+  'database',
+  'framework',
+  'workflow',
+  'memory',
+  'communication'
 ] as const;
 
 /**
@@ -263,6 +270,7 @@ export async function validateSkill(skillPath: string): Promise<ValidationResult
 export async function validateCommand(options: ValidateOptions = {}): Promise<ValidateCommandResult> {
   const cwd = options.cwd || process.cwd();
   const skillsDir = join(cwd, '.claude', 'skills');
+  const isAbsolutePath = options.path ? isAbsolute(options.path) : false;
 
   const results: ValidateCommandResult = {
     total: 0,
@@ -271,15 +279,17 @@ export async function validateCommand(options: ValidateOptions = {}): Promise<Va
     skills: {}
   };
 
-  // Check if skills directory exists
-  try {
-    await stat(skillsDir);
-  } catch {
-    // No skills directory
-    if (!options.json) {
-      console.log('No .claude/skills directory found.');
+  // Check if skills directory exists (only when needed)
+  if (!isAbsolutePath) {
+    try {
+      await stat(skillsDir);
+    } catch {
+      // No skills directory
+      if (!options.json) {
+        console.log('No .claude/skills directory found.');
+      }
+      return results;
     }
-    return results;
   }
 
   // Get list of skills to validate
@@ -287,10 +297,12 @@ export async function validateCommand(options: ValidateOptions = {}): Promise<Va
 
   if (options.path) {
     // Validate specific skill
-    const specificPath = join(skillsDir, options.path);
+    const specificPath = isAbsolute(options.path)
+      ? options.path
+      : join(skillsDir, options.path);
     try {
       await stat(specificPath);
-      skillDirs = [options.path];
+      skillDirs = [specificPath];
     } catch {
       if (!options.json) {
         console.error(`Skill not found: ${options.path}`);
@@ -311,11 +323,12 @@ export async function validateCommand(options: ValidateOptions = {}): Promise<Va
 
   // Validate each skill
   for (const skillDir of skillDirs) {
-    const skillPath = join(skillsDir, skillDir);
+    const skillPath = isAbsolute(skillDir) ? skillDir : join(skillsDir, skillDir);
+    const skillName = isAbsolute(skillDir) ? basename(skillDir) : skillDir;
     const result = await validateSkill(skillPath);
 
     results.total++;
-    results.skills[skillDir] = result;
+    results.skills[skillName] = result;
 
     if (result.valid) {
       results.valid++;
@@ -327,15 +340,15 @@ export async function validateCommand(options: ValidateOptions = {}): Promise<Va
     if (!options.json) {
       if (result.valid) {
         if (result.warnings.length > 0) {
-          console.log(`! ${skillDir}`);
+          console.log(`! ${skillName}`);
           for (const warning of result.warnings) {
             console.log(`  - ${warning}`);
           }
         } else {
-          console.log(`+ ${skillDir}`);
+          console.log(`+ ${skillName}`);
         }
       } else {
-        console.log(`x ${skillDir}`);
+        console.log(`x ${skillName}`);
         for (const error of result.errors) {
           console.log(`  - ${error}`);
         }

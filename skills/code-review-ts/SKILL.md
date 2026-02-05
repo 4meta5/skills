@@ -1,7 +1,7 @@
 ---
 name: code-review-ts
 description: TypeScript-specific code review guidelines focusing on type safety and TypeScript idioms
-category: development
+category: code-quality
 disable-model-invocation: false
 user-invocable: true
 allowed-tools: Read, Grep, Glob, Bash

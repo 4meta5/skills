@@ -6,6 +6,17 @@ import type { DetectedTechnology, DetectionContext } from './types.js';
 export async function detectDeployment(ctx: DetectionContext): Promise<DetectedTechnology[]> {
   const deployment: DetectedTechnology[] = [];
 
+  // Cloudflare Pages detection (wrangler.toml pages_build_output_dir)
+  if (ctx.wranglerToml && typeof ctx.wranglerToml.pages_build_output_dir === 'string') {
+    deployment.push({
+      name: 'Cloudflare Pages',
+      category: 'deployment',
+      confidence: 'high',
+      evidence: 'wrangler.toml pages_build_output_dir',
+      tags: ['cloudflare-pages', 'pages']
+    });
+  }
+
   // Cloudflare Workers detection
   if (ctx.configFiles.includes('wrangler.toml') || ctx.configFiles.includes('wrangler.json')) {
     deployment.push({
