@@ -160,6 +160,11 @@ Items explicitly deferred to focus on the core loop (scan → install → auto-e
 
 ## Completed
 
+### 2026-02-05
+
+**Documentation Update**
+- [x] Updated README skills list with deploy-mystack, rick-rubin, component skills, and npm-publish
+
 ### 2026-02-03
 
 **Fix claudemd-sync ENOENT Bug (packages/skills)**

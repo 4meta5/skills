@@ -1,4 +1,5 @@
 import { readdir, readFile, rm, stat } from 'fs/promises';
+import { tmpdir } from 'os';
 import { join, basename } from 'path';
 
 /**
@@ -8,7 +9,8 @@ export type SlopType =
   | 'test-skill'      // test-skill-* pattern
   | 'timestamped'     // Ends with timestamp
   | 'placeholder-content'  // Contains placeholder text
-  | 'temp-prefix';    // _temp_* prefix
+  | 'temp-prefix'     // _temp_* prefix
+  | 'temp-project';   // Temp test project directory
 
 /**
  * Actions that can be taken on slop
@@ -59,6 +61,7 @@ export interface CleanResult {
  */
 interface ScanOptions {
   recursive?: boolean;
+  includeTemp?: boolean;
 }
 
 /**
@@ -77,6 +80,7 @@ interface HygieneOptions {
   confirm?: boolean;
   json?: boolean;
   recursive?: boolean;
+  includeTemp?: boolean;
 }
 
 /**
@@ -99,6 +103,24 @@ export const SLOP_PATTERNS = {
   // _temp_ prefix
   tempPrefix: /^_temp_/,
 };
+
+const TEMP_PROJECT_PREFIXES = [
+  'skills-add-source-',
+  'skills-add-test-',
+  'skills-evaluate-test-',
+  'skills-embed-test-',
+  'skills-hook-test-',
+  'skills-hygiene-test-',
+  'skills-projects-',
+  'skills-provenance-test-',
+  'skills-remove-test-',
+  'skills-source-',
+  'skills-stale-project-',
+  'skills-sync-project-',
+  'skills-target-',
+  'skills-update-review-test-',
+  'skills-validate-test-'
+];
 
 /**
  * Check if a skill name matches slop patterns.
@@ -169,6 +191,35 @@ async function findSkillsDirectories(
   return skillsDirs;
 }
 
+async function findTempTestProjects(projectDir: string): Promise<string[]> {
+  const tempRoot = tmpdir();
+  const tempProjects: string[] = [];
+  let entries;
+  try {
+    entries = await readdir(tempRoot, { withFileTypes: true });
+  } catch {
+    return tempProjects;
+  }
+
+  for (const entry of entries) {
+    if (!entry.isDirectory()) continue;
+
+    const name = entry.name;
+    if (!TEMP_PROJECT_PREFIXES.some(prefix => name.startsWith(prefix))) {
+      continue;
+    }
+
+    const fullPath = join(tempRoot, name);
+    if (fullPath === projectDir) {
+      continue;
+    }
+
+    tempProjects.push(fullPath);
+  }
+
+  return tempProjects;
+}
+
 /**
  * Check if skill content has placeholder patterns
  */
@@ -191,6 +242,7 @@ export async function scanForSlop(
 ): Promise<ScanResult> {
   const items: SlopItem[] = [];
   const scannedPaths: string[] = [];
+  const includeTemp = options.includeTemp ?? true;
 
   // Find all skills directories
   const skillsDirs = await findSkillsDirectories(projectDir, options.recursive);
@@ -257,6 +309,20 @@ export async function scanForSlop(
           reason: 'Contains placeholder content (e.g., "NEW content with improvements!")'
         });
       }
+    }
+  }
+
+  if (includeTemp) {
+    const tempProjects = await findTempTestProjects(projectDir);
+    for (const tempProject of tempProjects) {
+      items.push({
+        name: basename(tempProject),
+        path: tempProject,
+        type: 'temp-project',
+        action: 'delete',
+        reason: 'Temp test project directory in OS temp'
+      });
+      scannedPaths.push(tempProject);
     }
   }
 
@@ -387,7 +453,10 @@ export async function hygieneCommand(
   const cwd = options.cwd || process.cwd();
 
   // Scan for slop
-  const scanResult = await scanForSlop(cwd, { recursive: options.recursive });
+  const scanResult = await scanForSlop(cwd, {
+    recursive: options.recursive,
+    includeTemp: options.includeTemp
+  });
 
   if (subcommand === 'scan') {
     if (!options.json) {

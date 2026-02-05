@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { mkdtemp, rm, writeFile, mkdir, readdir } from 'fs/promises';
-import { join } from 'path';
+import { join, basename } from 'path';
 import { tmpdir } from 'os';
 
 // Import functions to test (these don't exist yet - tests will fail)
@@ -75,7 +75,7 @@ describe('hygiene command', () => {
         'utf-8'
       );
 
-      const result = await scanForSlop(tempDir);
+      const result = await scanForSlop(tempDir, { includeTemp: false });
 
       expect(result.items.length).toBeGreaterThan(0);
       expect(result.items.some(item =>
@@ -93,7 +93,7 @@ describe('hygiene command', () => {
         'utf-8'
       );
 
-      const result = await scanForSlop(tempDir);
+      const result = await scanForSlop(tempDir, { includeTemp: false });
 
       expect(result.items.some(item =>
         item.type === 'timestamped' && item.name.includes('1706625000000')
@@ -109,7 +109,7 @@ describe('hygiene command', () => {
         'utf-8'
       );
 
-      const result = await scanForSlop(tempDir);
+      const result = await scanForSlop(tempDir, { includeTemp: false });
 
       expect(result.items.some(item =>
         item.type === 'placeholder-content'
@@ -133,7 +133,7 @@ This is real content that provides value.
         'utf-8'
       );
 
-      const result = await scanForSlop(tempDir);
+      const result = await scanForSlop(tempDir, { includeTemp: false });
 
       expect(result.items.length).toBe(0);
     });
@@ -147,7 +147,7 @@ This is real content that provides value.
         'utf-8'
       );
 
-      const result = await scanForSlop(tempDir);
+      const result = await scanForSlop(tempDir, { includeTemp: false });
 
       expect(result.items.some(item =>
         item.type === 'temp-prefix' && item.name === '_temp_my-skill'
@@ -167,11 +167,24 @@ This is real content that provides value.
       await mkdir(join(pkgSkills, 'test-skill-222'), { recursive: true });
       await writeFile(join(pkgSkills, 'test-skill-222', 'SKILL.md'), '# Test', 'utf-8');
 
-      const result = await scanForSlop(tempDir, { recursive: true });
+      const result = await scanForSlop(tempDir, { recursive: true, includeTemp: false });
 
       expect(result.items.length).toBe(2);
       expect(result.items.some(item => item.name === 'test-skill-111')).toBe(true);
       expect(result.items.some(item => item.name === 'test-skill-222')).toBe(true);
+    });
+
+    it('should detect temp test project directories outside the repo', async () => {
+      const tempProject = await mkdtemp(join(tmpdir(), 'skills-sync-project-a-'));
+      try {
+        const result = await scanForSlop(tempDir, { includeTemp: true });
+
+        expect(result.items.some(item =>
+          item.type === 'temp-project' && item.name === basename(tempProject)
+        )).toBe(true);
+      } finally {
+        await rm(tempProject, { recursive: true, force: true });
+      }
     });
   });
 
@@ -181,7 +194,7 @@ This is real content that provides value.
       await mkdir(join(skillsDir, 'test-skill-123'), { recursive: true });
       await writeFile(join(skillsDir, 'test-skill-123', 'SKILL.md'), '# Test', 'utf-8');
 
-      const scanResult = await scanForSlop(tempDir);
+      const scanResult = await scanForSlop(tempDir, { includeTemp: false });
       const cleanResult = await cleanSlop(tempDir, scanResult.items.filter(i => i.action === 'delete'));
 
       expect(cleanResult.deleted.length).toBe(1);
@@ -197,7 +210,7 @@ This is real content that provides value.
       await mkdir(join(skillsDir, 'test-skill-456'), { recursive: true });
       await writeFile(join(skillsDir, 'test-skill-456', 'SKILL.md'), '# Test', 'utf-8');
 
-      const scanResult = await scanForSlop(tempDir);
+      const scanResult = await scanForSlop(tempDir, { includeTemp: false });
       const cleanResult = await cleanSlop(
         tempDir,
         scanResult.items.filter(i => i.action === 'delete'),
@@ -217,7 +230,7 @@ This is real content that provides value.
       await mkdir(join(skillsDir, '_temp_keep-this'), { recursive: true });
       await writeFile(join(skillsDir, '_temp_keep-this', 'SKILL.md'), '# Keep', 'utf-8');
 
-      const scanResult = await scanForSlop(tempDir);
+      const scanResult = await scanForSlop(tempDir, { includeTemp: false });
       const cleanResult = await cleanSlop(
         tempDir,
         scanResult.items.filter(i => i.action === 'delete')
@@ -250,7 +263,7 @@ This is real content that provides value.
       await mkdir(join(skillsDir, 'test-skill-789'), { recursive: true });
       await writeFile(join(skillsDir, 'test-skill-789', 'SKILL.md'), '# Test', 'utf-8');
 
-      const result = await hygieneCommand('scan', { cwd: tempDir });
+      const result = await hygieneCommand('scan', { cwd: tempDir, includeTemp: false });
 
       expect(result.type).toBe('scan');
       expect(result.scanResult?.items.length).toBeGreaterThan(0);
@@ -261,7 +274,7 @@ This is real content that provides value.
       await mkdir(join(skillsDir, 'test-skill-999'), { recursive: true });
       await writeFile(join(skillsDir, 'test-skill-999', 'SKILL.md'), '# Test', 'utf-8');
 
-      const result = await hygieneCommand('clean', { cwd: tempDir, dryRun: true });
+      const result = await hygieneCommand('clean', { cwd: tempDir, dryRun: true, includeTemp: false });
 
       expect(result.type).toBe('clean');
       expect(result.cleanResult?.wouldDelete.length).toBeGreaterThan(0);
@@ -278,7 +291,7 @@ This is real content that provides value.
       const beforeClean = await readdir(skillsDir);
       expect(beforeClean).toContain('test-skill-abc');
 
-      const result = await hygieneCommand('clean', { cwd: tempDir, confirm: true });
+      const result = await hygieneCommand('clean', { cwd: tempDir, confirm: true, includeTemp: false });
 
       expect(result.type).toBe('clean');
       expect(result.cleanResult?.deleted.length).toBeGreaterThan(0);
@@ -290,7 +303,7 @@ This is real content that provides value.
       await mkdir(join(skillsDir, 'test-skill-json'), { recursive: true });
       await writeFile(join(skillsDir, 'test-skill-json', 'SKILL.md'), '# Test', 'utf-8');
 
-      const result = await hygieneCommand('scan', { cwd: tempDir, json: true });
+      const result = await hygieneCommand('scan', { cwd: tempDir, json: true, includeTemp: false });
 
       expect(() => JSON.stringify(result)).not.toThrow();
     });
@@ -298,7 +311,7 @@ This is real content that provides value.
     it('should handle missing skills directory gracefully', async () => {
       // No .claude/skills directory exists
 
-      const result = await hygieneCommand('scan', { cwd: tempDir });
+      const result = await hygieneCommand('scan', { cwd: tempDir, includeTemp: false });
 
       expect(result.scanResult?.items.length).toBe(0);
     });
@@ -324,7 +337,7 @@ This is real content that provides value.
 
       try {
         // Run scan with recursive flag
-        await hygieneCommand('scan', { cwd: tempDir, recursive: true });
+        await hygieneCommand('scan', { cwd: tempDir, recursive: true, includeTemp: false });
 
         // Verify the suggestion includes -r flag
         const suggestionLine = logs.find(line => line.includes('skills hygiene clean'));
@@ -355,7 +368,7 @@ This is real content that provides value.
 
       try {
         // Run scan without recursive flag
-        await hygieneCommand('scan', { cwd: tempDir, recursive: false });
+        await hygieneCommand('scan', { cwd: tempDir, recursive: false, includeTemp: false });
 
         // Verify the suggestion does NOT include -r flag
         const suggestionLine = logs.find(line => line.includes('skills hygiene clean'));
@@ -391,7 +404,7 @@ This is real content that provides value.
         'utf-8'
       );
 
-      const result = await scanForSlop(tempDir);
+      const result = await scanForSlop(tempDir, { includeTemp: false });
 
       expect(result.claudemdIssues).toBeDefined();
       expect(result.claudemdIssues?.staleReferences.length).toBe(2);
