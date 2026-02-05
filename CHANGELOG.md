@@ -1,5 +1,26 @@
 # Changelog
 
+## [Unreleased]
+
+### Changed
+
+- **Moved svelte5-rustaws-neon-devops** - Skill moved to [openclaw-skills](https://github.com/4meta5/openclaw-skills) repository
+- **Merged no-workarounds into dogfood** - The no-workarounds skill has been folded into dogfood for a unified "use your tools, fix when broken" enforcement
+
+### Remaining Skills (9)
+
+| Skill | Description |
+|-------|-------------|
+| code-review-rust | Rust code review guidelines |
+| code-review-ts | TypeScript code review guidelines |
+| differential-review | Security-focused code review for diffs |
+| dogfood | Enforces dogfooding and prevents manual workarounds |
+| refactor-suggestions | Suggest refactors for modified code |
+| repo-hygiene | Repository housekeeping and documentation |
+| rick-rubin | Scope discipline and simplicity |
+| skill-maker | Create Claude Code skills |
+| tdd | Test-driven development workflow |
+
 ## [0.3.0] - 2026-02-05
 
 ### Breaking Changes
@@ -17,22 +38,6 @@
 - Fixed symlink bug that caused skill resolution failures
 - Fixed test bugs
 - Cleaned up precommit hook artifacts from extraction
-
-### Remaining Skills (Curated Collection)
-
-| Skill | Description |
-|-------|-------------|
-| code-review-rust | Rust code review guidelines |
-| code-review-ts | TypeScript code review guidelines |
-| differential-review | Security-focused code review for diffs |
-| dogfood | Enforces dogfooding for tool projects |
-| no-workarounds | Prevents manual workarounds when building tools |
-| refactor-suggestions | Suggest refactors for modified code |
-| repo-hygiene | Repository housekeeping and documentation |
-| rick-rubin | Scope discipline and simplicity |
-| skill-maker | Create Claude Code skills |
-| svelte5-rustaws-neon-devops | Deploy Svelte5/Rust/Neon stack |
-| tdd | Test-driven development workflow |
 
 ## [0.2.0] - 2026-02-03
 

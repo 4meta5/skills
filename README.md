@@ -19,8 +19,7 @@ A curated collection of Claude Code skills for development workflows.
 ### Development Enforcement
 | Skill | Description |
 |-------|-------------|
-| dogfood | Enforces using tools you build |
-| no-workarounds | Prevents manual workarounds when building tools |
+| dogfood | Enforces using tools you build + prevents manual workarounds |
 | rick-rubin | Scope discipline and simplicity |
 
 ### Repository Maintenance
@@ -33,11 +32,6 @@ A curated collection of Claude Code skills for development workflows.
 | Skill | Description |
 |-------|-------------|
 | skill-maker | Create Claude Code skills |
-
-### Deployment
-| Skill | Description |
-|-------|-------------|
-| svelte5-rustaws-neon-devops | Deploy Svelte5/Rust/Neon stack |
 
 ## Installation
 
