@@ -7,31 +7,31 @@ A curated collection of Claude Code skills for development workflows.
 ### Code Review
 | Skill | Description |
 |-------|-------------|
-| code-review-rust | Rust code review guidelines (error handling, safety, idioms) |
-| code-review-ts | TypeScript code review guidelines (type safety, idioms) |
-| differential-review | Security-focused review for PRs and diffs |
+| [code-review-rust](./code-review-rust/SKILL.md) | Rust code review guidelines (error handling, safety, idioms) |
+| [code-review-ts](./code-review-ts/SKILL.md) | TypeScript code review guidelines (type safety, idioms) |
+| [differential-review](./differential-review/SKILL.md) | Security-focused review for PRs and diffs |
 
 ### Testing
 | Skill | Description |
 |-------|-------------|
-| tdd | Test-driven development (RED → GREEN → REFACTOR) |
+| [tdd](./tdd/SKILL.md) | Test-driven development (RED → GREEN → REFACTOR) |
 
 ### Development Enforcement
 | Skill | Description |
 |-------|-------------|
-| dogfood | Enforces using tools you build + prevents manual workarounds |
-| rick-rubin | Scope discipline and simplicity |
+| [dogfood](./dogfood/SKILL.md) | Enforces using tools you build + prevents manual workarounds |
+| [rick-rubin](./rick-rubin/SKILL.md) | Scope discipline and simplicity |
 
 ### Repository Maintenance
 | Skill | Description |
 |-------|-------------|
-| repo-hygiene | Pre-work checks, documentation updates, cleanup |
-| refactor-suggestions | Suggest refactors for modified code |
+| [repo-hygiene](./repo-hygiene/SKILL.md) | Pre-work checks, documentation updates, cleanup |
+| [refactor-suggestions](./refactor-suggestions/SKILL.md) | Suggest refactors for modified code |
 
 ### Creation
 | Skill | Description |
 |-------|-------------|
-| skill-maker | Create Claude Code skills |
+| [skill-maker](./skill-maker/SKILL.md) | Create Claude Code skills |
 
 ## Installation
 

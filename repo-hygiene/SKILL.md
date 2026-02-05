@@ -91,6 +91,26 @@ Update when:
 - New command available
 - Installation steps changed
 
+### Link Validation
+
+Verify all markdown links resolve before committing:
+
+```bash
+# Find all markdown links and check they exist
+grep -oE '\[.*?\]\(\.?/?[^)]+\)' README.md | \
+  sed -E 's/.*\(([^)]+)\)/\1/' | \
+  while read link; do
+    [ -e "$link" ] || echo "BROKEN: $link"
+  done
+```
+
+Check for:
+- **Relative links** (./path/to/file.md): Must resolve from README location
+- **Anchor links** (#section): Must match a heading in the target file
+- **External links**: Verify with curl if critical
+
+Run validation after any documentation update.
+
 ### Pre-Merge Cleanup
 
 When preparing to merge:
