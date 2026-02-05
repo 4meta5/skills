@@ -287,7 +287,7 @@ describe('Category-based Deduplication', () => {
 
     const tsSkill = getAllRecommendations(result).find(r => r.name === 'code-review-ts');
     expect(tsSkill).toBeDefined();
-    expect(tsSkill!.category).toBe('code-quality');
+    expect(tsSkill!.category).toBe('refactoring');
   });
 
   it('includes category in curated skill recommendations', async () => {

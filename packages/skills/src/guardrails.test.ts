@@ -82,12 +82,12 @@ describe('Project Structure Guardrails', () => {
         return; // No skills to check
       }
 
-      const rootSkillsDir = join(repoRoot, 'skills');
+      // Skills are at repo root, not in a skills/ subdirectory
       const missingFromRoot: string[] = [];
 
       for (const skillPath of foundSkills) {
         const skillName = dirname(skillPath.replace(generatedSkillsDir + '/', ''));
-        const rootSkillPath = join(rootSkillsDir, skillName, 'SKILL.md');
+        const rootSkillPath = join(repoRoot, skillName, 'SKILL.md');
 
         try {
           await stat(rootSkillPath);
@@ -110,7 +110,14 @@ describe('Project Structure Guardrails', () => {
 });
 
 /**
- * Recursively find all SKILL.md files in a directory
+ * Directories to exclude when searching for SKILL.md files.
+ * These contain generated/vendored content, not canonical skills.
+ */
+const EXCLUDED_DIRS = ['packages', 'node_modules', '.git'];
+
+/**
+ * Recursively find all SKILL.md files in a directory.
+ * Excludes generated directories to avoid finding stale slop.
  */
 async function findSkillFiles(dir: string): Promise<string[]> {
   const results: string[] = [];
@@ -119,6 +126,11 @@ async function findSkillFiles(dir: string): Promise<string[]> {
     const entries = await readdir(dir, { withFileTypes: true });
 
     for (const entry of entries) {
+      // Skip excluded directories (generated output, deps, git)
+      if (entry.isDirectory() && EXCLUDED_DIRS.includes(entry.name)) {
+        continue;
+      }
+
       const fullPath = join(dir, entry.name);
 
       if (entry.isDirectory()) {

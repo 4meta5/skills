@@ -163,6 +163,17 @@ Items explicitly deferred to focus on the core loop (scan → install → auto-e
 
 ### 2026-02-05
 
+**Skills Cleanup: Flatten Structure and Remove Deleted Skills**
+- [x] Removed 9 skills (agent-orchestration, bluebubbles-setup, claudeception, imessage-tone, monorepo-readme, pr-description, project-init, research-to-plan, typescript-circular-dependency)
+- [x] Merged typescript-circular-dependency content into code-review-ts skill
+- [x] Fixed sync-skills.sh to copy from repo root (skills now at root, not skills/ subdirectory)
+- [x] Fixed guardrails.test.ts path resolution for new skill locations
+- [x] Fixed matcher.ts category mappings to match actual skill frontmatter (refactoring, development instead of code-quality, deployment)
+- [x] Added refactoring to CLI SkillCategory type
+- [x] Updated matcher.test.ts expectations
+- [x] All 1,450 tests passing across 86 test files
+- [x] Synced 20 bundled skills to packages/skills/skills/
+
 **Root Cause Fix: Sync-Test-Skill Artifact Leak**
 - [x] Removed name-based slop skip from sync command (was causing design conflict)
 - [x] Sync command now syncs any skill regardless of name
@@ -350,4 +361,4 @@ None currently.
 - Slop detection is for hygiene commands only (scan, clean, validate). Sync does not filter by name.
 - Tests use `test-skill-*` patterns. Isolation comes from temp directories, not name evasion.
 - Some skills are marked _temp_ pending proper naming.
-- Test counts: chain 350, cli 839, skill-loader 28, project-detector 29, semantic-matcher 72, workflow-enforcer 69, skills 26, web 18. Total: 1,431.
+- Test counts: chain 350, cli 850, skill-loader 32, project-detector 29, semantic-matcher 72, workflow-enforcer 69, skills 48. Total: 1,450.

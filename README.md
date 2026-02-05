@@ -500,38 +500,29 @@ MIT. See [LICENSE](./LICENSE).
 | repo-hygiene | custom | testing | Clean auto-generated test artifacts |
 | dogfood-skills | custom | development | Enforces using tools you build |
 | no-workarounds | custom | development | Prevents manual workarounds |
-| claudeception | upstream (claudeception) | development | Extract learnings into skills |
-| typescript-circular-dependency | upstream (claudeception) | development | Detect circular imports |
 | skill-maker | custom | development | Create Claude Code skills |
 | repo-conventions-check | custom | development | Check repo patterns before adding files |
 | npm-publish | custom | development | Publish npm packages with 2FA guidance |
 | rick-rubin | custom | development | Enforce scope discipline and simplicity |
 | workflow-orchestrator | custom | workflow | Context detection and skill chaining |
-| project-init | custom | workflow | Scaffold new projects |
 | doc-maintenance | custom | workflow | Auto-update docs after tasks |
-| agent-orchestration | custom | workflow | Coordinate parallel agents |
-| research-to-plan | custom | workflow | Convert research to plans |
 | gitignore-hygiene | custom | workflow | Maintain gitignore patterns |
 | deploy-mystack | custom | deployment | Deploy the full mystack architecture |
 | rust-aws-lambda | custom | deployment | Deploy Rust AWS Lambda functions |
 | svelte5-cloudflare-pages | custom | deployment | Deploy Svelte 5 and SvelteKit to Cloudflare Pages |
 | neon-postgres | custom | database | Configure Neon Postgres for serverless workloads |
+| google-oauth | custom | security | Configure and maintain Google OAuth |
 | code-review | custom | review | Base code review guidelines |
-| code-review-ts | custom | review | TypeScript review guidelines |
+| code-review-ts | custom | review | TypeScript review (includes circular dependency detection) |
 | code-review-js | custom | review | JavaScript review guidelines |
 | code-review-rust | custom | review | Rust review guidelines |
 | describe-codebase | custom | documentation | Generate codebase onboarding summary |
-| pr-description | custom | documentation | Generate PR descriptions from diff |
 | refactor-suggestions | custom | refactoring | Suggest refactors for modified code |
 | security-analysis | custom | security | Static security review |
-| google-oauth | custom | security | Configure and maintain Google OAuth |
 | differential-review | upstream (tob) | security | Security-focused diff analysis |
 | code-maturity-assessor | upstream (tob) | security | Trail of Bits maturity framework |
 | markdown-writer | custom | documentation | Consistent markdown style |
 | readme-writer | custom | documentation | Write effective README files |
-| monorepo-readme | custom | documentation | Monorepo README patterns |
-| imessage-tone | custom | communication | Two-mode iMessage tone (owner vs others) |
-| bluebubbles-setup | custom | communication | BlueBubbles iMessage integration setup |
 | engram-recall | upstream (engram) | memory | Recall past work before starting new tasks |
 | engram-generate | upstream (engram) | workflow | Generate project skills from Claude Code history |
 | engram-summarize | upstream (engram) | memory | Summarize coding sessions into learnings |
@@ -539,7 +530,6 @@ MIT. See [LICENSE](./LICENSE).
 **Origin key:**
 - `custom` - Created for this project
 - `upstream (tob)` - From [Trail of Bits](https://github.com/trailofbits/skills)
-- `upstream (claudeception)` - From [Claudeception](https://github.com/blader/Claudeception)
 - `upstream (engram)` - From [engram](https://github.com/bobamatcha/engram)
 
 </details>

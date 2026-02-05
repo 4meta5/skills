@@ -59,22 +59,16 @@ If you skip this, respond: **"BLOCKED: DOGFOODING REQUIRED"**
 - @.claude/skills/code-review-js/SKILL.md
 - @.claude/skills/code-review-rust/SKILL.md
 - @.claude/skills/describe-codebase/SKILL.md
-- @.claude/skills/pr-description/SKILL.md
 - @.claude/skills/refactor-suggestions/SKILL.md
 - @.claude/skills/npm-publish/SKILL.md
 - @.claude/skills/repo-conventions-check/SKILL.md
 - @.claude/skills/engram-summarize/SKILL.md
 - @.claude/skills/engram-generate/SKILL.md
-- @.claude/skills/bluebubbles-setup/SKILL.md
-- @.claude/skills/imessage-tone/SKILL.md
 
 ### Workflow Orchestration
 - @.claude/skills/workflow-orchestrator/SKILL.md - **Always-on workflow orchestration**
-- @.claude/skills/project-init/SKILL.md - Scaffold new projects
 - @.claude/skills/doc-maintenance/SKILL.md - Update documentation after tasks
-- @.claude/skills/agent-orchestration/SKILL.md - Coordinate parallel agents
 - @.claude/skills/gitignore-hygiene/SKILL.md - Maintain gitignore patterns
-- @.claude/skills/research-to-plan/SKILL.md - Convert research to plans
 
 ### Testing Pipeline
 - @.claude/skills/tdd/SKILL.md - Test-driven development (RED → GREEN → REFACTOR)
@@ -86,7 +80,6 @@ If you skip this, respond: **"BLOCKED: DOGFOODING REQUIRED"**
 ### Development Enforcement
 - @.claude/skills/dogfood-skills/SKILL.md - **Enforces dogfooding (READ THIS)**
 - @.claude/skills/no-workarounds/SKILL.md - **Prevents manual workarounds when building tools**
-- @.claude/skills/claudeception/SKILL.md - Extract learnings as skills
 
 ### Memory
 - @.claude/skills/engram-recall/SKILL.md - Recall past work before starting new tasks
@@ -101,8 +94,6 @@ If you skip this, respond: **"BLOCKED: DOGFOODING REQUIRED"**
 - @.claude/skills/markdown-writer/SKILL.md - Consistent markdown style
 - @.claude/skills/skill-maker/SKILL.md - Create Claude Code skills
 - @.claude/skills/readme-writer/SKILL.md - Write effective README files
-- @.claude/skills/monorepo-readme/SKILL.md - Monorepo README patterns
-- @.claude/skills/typescript-circular-dependency/SKILL.md - Resolve circular imports
 
 ## Workflow Orchestration
 
@@ -110,7 +101,6 @@ The **workflow-orchestrator** skill is always active. It detects context and cha
 
 | Context | Chain |
 |---------|-------|
-| New project | project-init → dogfood-skills |
 | Task completion | doc-maintenance → repo-hygiene |
 | Testing | tdd → suggest-tests → unit-test-workflow → property-based-testing → repo-hygiene |
 | Feature done | dogfood-skills → repo-hygiene → doc-maintenance |

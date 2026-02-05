@@ -63,6 +63,22 @@ Preferred:
 signal.addEventListener("abort", controller.abort.bind(controller));
 ```
 
+## Circular Dependency Detection
+
+The reviewer MUST:
+- Flag import cycles when errors like "Cannot access 'X' before initialization" appear
+- Recommend `madge --circular --extensions ts,tsx src/` for cycle detection
+
+Common resolution strategies:
+1. Extract shared dependencies to separate modules
+2. Use dependency injection instead of direct imports
+3. Use `import type` for type-only imports (erased at runtime)
+4. Restructure barrel files (`index.ts`) to avoid re-export cycles
+
+The reviewer SHOULD:
+- Check for barrel file re-export cycles (common source of issues)
+- Verify Jest/Vitest module resolution matches bundler behavior
+
 ## Additional TypeScript Guidelines
 
 The reviewer SHOULD:

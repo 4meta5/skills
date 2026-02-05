@@ -59,12 +59,12 @@ interface BundledSkillMapping {
 export const BUNDLED_SKILL_MAPPINGS: Record<string, BundledSkillMapping> = {
   'code-review-rust': {
     tags: ['rust', 'rs', 'cargo'],
-    category: 'code-quality',
+    category: 'refactoring',
     priority: 10
   },
   'code-review-ts': {
     tags: ['typescript', 'ts'],
-    category: 'code-quality',
+    category: 'refactoring',
     priority: 10
   },
   'unit-test-workflow': {
@@ -89,7 +89,7 @@ export const BUNDLED_SKILL_MAPPINGS: Record<string, BundledSkillMapping> = {
   },
   'deploy-mystack': {
     tags: ['mystack'],
-    category: 'deployment',
+    category: 'development',
     priority: 12
   },
   'google-oauth': {
@@ -99,17 +99,17 @@ export const BUNDLED_SKILL_MAPPINGS: Record<string, BundledSkillMapping> = {
   },
   'svelte5-cloudflare-pages': {
     tags: ['svelte5', 'sveltekit', 'cloudflare-pages', 'pages', 'wrangler'],
-    category: 'deployment',
+    category: 'development',
     priority: 9
   },
   'rust-aws-lambda': {
     tags: ['rust', 'lambda', 'aws', 'lambda_http', 'lambda_runtime'],
-    category: 'deployment',
+    category: 'development',
     priority: 9
   },
   'neon-postgres': {
     tags: ['neon', 'postgres', 'database', 'pgbouncer', 'pooler'],
-    category: 'database',
+    category: 'development',
     priority: 9
   }
 };

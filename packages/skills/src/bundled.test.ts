@@ -16,7 +16,6 @@ const EXPECTED_SKILLS = [
   'code-review-ts',
   'code-review-js',
   'code-review-rust',
-  'pr-description',
   'refactor-suggestions',
   'security-analysis',
   'describe-codebase',

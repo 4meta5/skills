@@ -26,7 +26,6 @@ BUNDLED_SKILLS=(
   "google-oauth"
   "neon-postgres"
   "no-workarounds"
-  "pr-description"
   "refactor-suggestions"
   "rust-aws-lambda"
   "security-analysis"

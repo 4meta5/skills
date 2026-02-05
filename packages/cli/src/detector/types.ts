@@ -15,6 +15,7 @@ export type SkillCategory =
   | 'deployment'
   | 'database'
   | 'code-quality'
+  | 'refactoring'
   | 'documentation'
   | 'workflow';
 
