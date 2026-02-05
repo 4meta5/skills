@@ -8,9 +8,8 @@ Thumbs.db
 *.swp
 *.swo
 
-# Claude Code local config
-.claude/settings.local.json
-.claude/chain_state/
+# Claude Code
+.claude/
 
 # Internal directories
 .scout/
