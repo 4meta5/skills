@@ -104,6 +104,57 @@ Body content.`;
   });
 });
 
+describe('parseFrontmatter - type safety', () => {
+  it('should throw on invalid YAML that parses to non-object', () => {
+    // YAML that parses to a string instead of object
+    const content = `---
+"just a string value"
+---
+
+Body content`;
+
+    expect(() => parseFrontmatter(content)).toThrow(/invalid|name|description/i);
+  });
+
+  it('should throw when name is not a string', () => {
+    const content = `---
+name: 123
+description: A description
+---
+
+Body`;
+
+    // name should be a string, not a number
+    expect(() => parseFrontmatter(content)).toThrow(/name.*string|invalid.*name/i);
+  });
+
+  it('should throw when description is not a string', () => {
+    const content = `---
+name: valid-name
+description:
+  - item1
+  - item2
+---
+
+Body`;
+
+    // description should be a string, not an array
+    expect(() => parseFrontmatter(content)).toThrow(/description.*string|invalid.*description/i);
+  });
+
+  it('should throw on invalid category value', () => {
+    const content = `---
+name: valid-name
+description: Valid description
+category: not-a-valid-category
+---
+
+Body`;
+
+    expect(() => parseFrontmatter(content)).toThrow(/invalid.*category/i);
+  });
+});
+
 describe('formatSkillMd', () => {
   it('formats basic skill metadata', () => {
     const content = formatSkillMd(

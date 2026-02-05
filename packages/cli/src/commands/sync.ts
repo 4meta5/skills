@@ -9,7 +9,10 @@ import {
   saveConfig,
   trackProjectInstallation
 } from '../config.js';
-import { isSlop } from './hygiene.js';
+import { assertTestSafeProjectPath } from '../test/guard.js';
+// Note: Slop detection is for hygiene commands (scan, clean, validate), NOT for sync.
+// Sync operates on any skill regardless of name. Test isolation comes from
+// temp directories, not name-based filtering.
 
 interface SyncOptions {
   all?: boolean;
@@ -93,16 +96,8 @@ export async function syncCommand(names: string[], options: SyncOptions = {}): P
   console.log(options.dryRun ? 'Dry run mode - no changes will be made\n' : '');
 
   let totalSynced = 0;
-  let slopSkipped = 0;
 
   for (const skillName of skillsToSync) {
-    // Check if skill name matches slop patterns
-    const slopType = isSlop(skillName);
-    if (slopType) {
-      console.log(`x ${skillName} - skipped (detected as slop: ${slopType})`);
-      slopSkipped++;
-      continue;
-    }
     // Get the source skill content - prefer local .claude/skills/, fall back to bundled
     let sourceSkillPath = join(sourceDir, '.claude', 'skills', skillName);
     const localSkillMdPath = join(sourceSkillPath, 'SKILL.md');
@@ -153,6 +148,8 @@ export async function syncCommand(names: string[], options: SyncOptions = {}): P
       if (resolve(projectPath) === sourceDir) {
         continue;
       }
+
+      assertTestSafeProjectPath(projectPath);
 
       const targetSkillPath = join(projectPath, '.claude', 'skills', skillName);
 
@@ -213,9 +210,5 @@ export async function syncCommand(names: string[], options: SyncOptions = {}): P
 
   if (!options.dryRun && totalSynced > 0) {
     console.log(`\nSynced ${totalSynced} project(s)`);
-  }
-
-  if (slopSkipped > 0) {
-    console.log(`\nSkipped ${slopSkipped} slop skill(s). Run 'skills hygiene clean --confirm' to remove them.`);
   }
 }

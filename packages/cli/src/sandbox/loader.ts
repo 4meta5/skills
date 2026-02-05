@@ -2,6 +2,7 @@ import { parse as parseYaml } from 'yaml';
 import { readFile, stat } from 'fs/promises';
 import { join } from 'path';
 import type { SandboxConfig, SandboxPolicy, TDDPhase } from './types.js';
+import { isValidTDDPhase } from './types.js';
 
 /**
  * Interface for frontmatter that may contain a sandbox section
@@ -57,7 +58,12 @@ export function parseSandboxConfig(frontmatter: Record<string, unknown>): Sandbo
     throw new Error('Invalid sandbox config: missing required "profiles" field');
   }
 
-  const state = sandbox.state as TDDPhase;
+  // Validate that state is a valid TDDPhase
+  if (!isValidTDDPhase(sandbox.state)) {
+    throw new Error(`Invalid sandbox config: state "${sandbox.state}" is not a valid TDD phase (BLOCKED, RED, GREEN, COMPLETE)`);
+  }
+
+  const state = sandbox.state;
   const rawProfiles = sandbox.profiles as Record<string, Record<string, unknown>>;
 
   // Validate that state exists in profiles

@@ -2,6 +2,7 @@ import { rm, stat } from 'fs/promises';
 import { join } from 'path';
 import { untrackProjectInstallation, untrackInstalledSkill } from '../config.js';
 import { updateClaudeMd } from '../claudemd.js';
+import { assertTestSafeProjectPath } from '../test/guard.js';
 
 interface RemoveOptions {
   cwd?: string;
@@ -12,6 +13,7 @@ interface RemoveOptions {
  */
 export async function removeCommand(names: string[], options: RemoveOptions = {}): Promise<void> {
   const projectDir = options.cwd || process.cwd();
+  assertTestSafeProjectPath(projectDir, 'write project');
 
   if (names.length === 0) {
     console.log('Usage: skills remove <skill-names...>');

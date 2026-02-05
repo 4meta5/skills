@@ -14,7 +14,7 @@ import {
 } from './hygiene.js';
 
 describe('isSlop', () => {
-  it('should detect test-skill-* pattern', async () => {
+  it('should detect test-skill-* pattern with numeric suffix', async () => {
     const { isSlop } = await import('./hygiene.js');
 
     // Returns the slop type when matched, not just true
@@ -22,12 +22,23 @@ describe('isSlop', () => {
     expect(isSlop('test-skill-9999999999999')).toBe('test-skill');
   });
 
+  it('should detect test-skill-* pattern with alphanumeric suffix', async () => {
+    const { isSlop } = await import('./hygiene.js');
+
+    // All test-skill-* patterns are caught (tests MUST use this pattern)
+    expect(isSlop('test-skill-abc123')).toBe('test-skill');
+    expect(isSlop('test-skill-a1b2c3')).toBe('test-skill');
+    expect(isSlop('test-skill-xyz')).toBe('test-skill');
+    expect(isSlop('test-skill-generator')).toBe('test-skill');
+  });
+
   it('should NOT flag legitimate skill names', async () => {
     const { isSlop } = await import('./hygiene.js');
 
     expect(isSlop('tdd')).toBe(false);
     expect(isSlop('code-review')).toBe(false);
-    expect(isSlop('my-test-skill')).toBe(false); // Has 'test-skill' but not at start with timestamp
+    expect(isSlop('my-test-skill')).toBe(false); // Has 'test-skill' but not at start
+    expect(isSlop('test-runner')).toBe(false); // Doesn't match test-skill-*
   });
 
   it('should detect timestamped skill names', async () => {

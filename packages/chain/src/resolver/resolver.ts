@@ -69,6 +69,7 @@ export function resolve(
       if (!capabilityProviders.has(cap)) {
         capabilityProviders.set(cap, []);
       }
+      // INVARIANT: cap was just set on line 70 if not present
       capabilityProviders.get(cap)!.push(skill);
     }
   }
@@ -86,6 +87,7 @@ export function resolve(
     const conflicts: ConflictError[] = [];
 
     for (const selected of selectedSkills) {
+      // INVARIANT: selectedSkills only contains names that were added to skillByName
       const selectedSkill = skillByName.get(selected)!;
 
       // Check if selected skill conflicts with new skill
@@ -225,6 +227,7 @@ export function resolve(
   }
 
   // Build final graph to get proper ordering
+  // INVARIANT: chain only contains names that were added to skillByName via selectSkill
   const selectedSkillSpecs = chain.map(name => skillByName.get(name)!);
   const graph = new CapabilityGraph(selectedSkillSpecs);
   const sorted = graph.topologicalSort();
@@ -242,6 +245,7 @@ export function resolve(
 
   // Re-order chain according to topological sort
   const orderedChain = sorted;
+  // INVARIANT: explanations has an entry for every skill in chain, added by selectSkill
   const orderedExplanations = orderedChain.map(name =>
     explanations.find(e => e.skill === name)!
   );
@@ -285,6 +289,7 @@ export function validateChain(
 ): { valid: boolean; errors: string[] } {
   const errors: string[] = [];
   const skillByName = new Map(skills.map(s => [s.name, s]));
+  // INVARIANT: filter(Boolean) removes any undefined values from missing skills
   const graph = new CapabilityGraph(chain.map(name => skillByName.get(name)!).filter(Boolean));
 
   // Check for missing skills
@@ -301,6 +306,7 @@ export function validateChain(
   }
 
   // Check for conflicts
+  // INVARIANT: filter(Boolean) removes any undefined values from missing skills
   const chainSkills = chain.map(name => skillByName.get(name)!).filter(Boolean);
   const conflicts = detectConflicts(chainSkills);
   for (const conflict of conflicts) {

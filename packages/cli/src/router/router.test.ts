@@ -105,6 +105,56 @@ describe('router', () => {
     });
   });
 
+  describe('createRouter - type safety', () => {
+    let testDir: string;
+
+    beforeAll(async () => {
+      testDir = join(tmpdir(), `router-type-test-${Date.now()}`);
+      await mkdir(testDir, { recursive: true });
+    });
+
+    afterAll(async () => {
+      await rm(testDir, { recursive: true, force: true });
+    });
+
+    it('should throw on corrupted JSON file', async () => {
+      const corruptedPath = join(testDir, 'corrupted.json');
+      await writeFile(corruptedPath, 'not valid json {{{');
+
+      const router = await createRouter({ vectorStorePath: corruptedPath });
+      await expect(router.initialize()).rejects.toThrow();
+    });
+
+    it('should throw on JSON with wrong structure (array instead of object)', async () => {
+      const arrayPath = join(testDir, 'array.json');
+      await writeFile(arrayPath, JSON.stringify([1, 2, 3]));
+
+      const router = await createRouter({ vectorStorePath: arrayPath });
+      await expect(router.initialize()).rejects.toThrow(/invalid vector store/i);
+    });
+
+    it('should throw on JSON missing required VectorStore fields', async () => {
+      const incompletePath = join(testDir, 'incomplete.json');
+      await writeFile(incompletePath, JSON.stringify({ version: '1.0.0' }));
+
+      const router = await createRouter({ vectorStorePath: incompletePath });
+      await expect(router.initialize()).rejects.toThrow(/invalid vector store/i);
+    });
+
+    it('should throw on invalid skill vector structure', async () => {
+      const badSkillsPath = join(testDir, 'bad-skills.json');
+      await writeFile(badSkillsPath, JSON.stringify({
+        version: '1.0.0',
+        model: 'test',
+        generatedAt: new Date().toISOString(),
+        skills: [{ name: 'missing-fields' }] // Missing skillName, embedding, etc.
+      }));
+
+      const router = await createRouter({ vectorStorePath: badSkillsPath });
+      await expect(router.initialize()).rejects.toThrow(/invalid/i);
+    });
+  });
+
   describe('createRouter', () => {
     let testDir: string;
     let vectorStorePath: string;

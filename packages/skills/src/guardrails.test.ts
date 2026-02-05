@@ -134,3 +134,95 @@ async function findSkillFiles(dir: string): Promise<string[]> {
 
   return results;
 }
+
+/**
+ * Skill Invariant Tests
+ * These tests enforce invariants across ALL installed skills to prevent:
+ * 1. Shell-eval failures when Skill() loads content
+ * 2. Nested duplicate directory slop
+ * 3. Invalid frontmatter category values
+ */
+describe('Skill Invariants (all skills)', () => {
+  const repoRoot = join(__dirname, '..', '..', '..'); // packages/skills/src -> repo root
+  const installedSkillsDir = join(repoRoot, '.claude', 'skills');
+  const validCategories = ['testing', 'development', 'documentation', 'refactoring', 'security', 'performance'];
+
+  it('should not contain shell-unsafe patterns in any SKILL.md', async () => {
+    // Bug: Skill() tool passes content through shell eval, causing parse errors
+    // Known failure pattern: `!`) (backtick-bang-backtick-closeparen)
+    // This triggers bash history expansion + subshell parse error
+    const skillFiles = await findSkillFiles(installedSkillsDir);
+    const violations: string[] = [];
+
+    for (const skillPath of skillFiles) {
+      const content = await readFile(skillPath, 'utf-8');
+      // The specific pattern that caused "parse error near ')'"
+      if (/`[^`]*!`\)/.test(content)) {
+        const relPath = skillPath.replace(repoRoot + '/', '');
+        violations.push(relPath);
+      }
+    }
+
+    expect(violations).toEqual([]);
+  });
+
+  it('should not have nested duplicate directories (skill/skill/)', async () => {
+    // Bug: Slop like code-review-ts/code-review-ts/ can accumulate
+    const violations: string[] = [];
+
+    try {
+      const skillDirs = await readdir(installedSkillsDir, { withFileTypes: true });
+
+      for (const entry of skillDirs) {
+        if (!entry.isDirectory()) continue;
+
+        const skillName = entry.name;
+        const nestedPath = join(installedSkillsDir, skillName, skillName);
+
+        try {
+          const s = await stat(nestedPath);
+          if (s.isDirectory()) {
+            violations.push(`${skillName}/${skillName}/`);
+          }
+        } catch {
+          // Doesn't exist, which is correct
+        }
+      }
+    } catch {
+      // Skills dir doesn't exist
+    }
+
+    expect(violations).toEqual([]);
+  });
+
+  it('should have valid category in all skill frontmatter', async () => {
+    // Bug: Invalid categories like "code-quality" are not in SkillCategory enum
+    const skillFiles = await findSkillFiles(installedSkillsDir);
+    const violations: string[] = [];
+
+    for (const skillPath of skillFiles) {
+      const content = await readFile(skillPath, 'utf-8');
+      const categoryMatch = content.match(/^category:\s*(.+)$/m);
+
+      if (categoryMatch) {
+        const category = categoryMatch[1].trim();
+        if (!validCategories.includes(category)) {
+          const relPath = skillPath.replace(repoRoot + '/', '');
+          violations.push(`${relPath}: invalid category "${category}"`);
+        }
+      }
+    }
+
+    expect(violations).toEqual([]);
+  });
+
+  it('should have code-review-ts with category refactoring', async () => {
+    // Specific assertion: code-review-ts must be refactoring category
+    const skillPath = join(installedSkillsDir, 'code-review-ts', 'SKILL.md');
+    const content = await readFile(skillPath, 'utf-8');
+    const categoryMatch = content.match(/^category:\s*(.+)$/m);
+
+    expect(categoryMatch).not.toBeNull();
+    expect(categoryMatch![1].trim()).toBe('refactoring');
+  });
+});

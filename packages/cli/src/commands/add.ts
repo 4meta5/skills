@@ -16,6 +16,7 @@ import { parseSkillRef, loadRemoteSkill, resolveSkillRef } from '../registry.js'
 import { join } from 'path';
 import { homedir } from 'os';
 import { isSlop } from './hygiene.js';
+import { assertTestSafeProjectPath } from '../test/guard.js';
 
 interface AddOptions {
   defaults?: boolean;
@@ -38,6 +39,10 @@ export async function addCommand(names: string[], options: AddOptions = {}): Pro
   const sourceLibrary = createSkillsLibrary({ cwd: sourceDir });
   const targetLibrary = createSkillsLibrary({ cwd: projectDir });
   const location = options.user ? 'user' : 'project';
+  const targetDir = location === 'user'
+    ? join(homedir(), '.claude', 'skills')
+    : join(projectDir, '.claude', 'skills');
+  assertTestSafeProjectPath(targetDir, 'write skills');
 
   let skillNames: string[];
 
@@ -103,10 +108,6 @@ export async function addCommand(names: string[], options: AddOptions = {}): Pro
         sourceTrack = sourceName;
 
         // Copy skill to target directory
-        const targetDir = location === 'user'
-          ? join(homedir(), '.claude', 'skills')
-          : join(projectDir, '.claude', 'skills');
-
         await copySkillFromSource(source, skillName, targetDir);
 
         // Track installation
@@ -151,10 +152,6 @@ export async function addCommand(names: string[], options: AddOptions = {}): Pro
             // Found in a registered source
             const source = await getSource(resolved.source);
             if (source) {
-              const targetDir = location === 'user'
-                ? join(homedir(), '.claude', 'skills')
-                : join(projectDir, '.claude', 'skills');
-
               await copySkillFromSource(source, skillName, targetDir);
 
               const commit = await getSourceCommit(source);
@@ -268,6 +265,7 @@ async function installFromGitUrl(
   const targetDir = options.user
     ? join(homedir(), '.claude', 'skills')
     : join(projectDir, '.claude', 'skills');
+  assertTestSafeProjectPath(targetDir, 'write skills');
 
   const library = createSkillsLibrary({ cwd: projectDir });
   let installed = 0;

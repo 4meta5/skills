@@ -1,5 +1,5 @@
 import { simpleGit, type SimpleGit } from 'simple-git';
-import { mkdir, rm, stat, readdir, copyFile } from 'fs/promises';
+import { mkdir, rm, stat, readdir, copyFile, realpath } from 'fs/promises';
 import { join, dirname, basename } from 'path';
 import { getSourcesCacheDir, type SkillSource } from './config.js';
 import { createProvenance, type ProvenanceSource } from './provenance.js';
@@ -291,6 +291,15 @@ export async function copySkillFromSource(
 ): Promise<void> {
   const skillPath = await getSkillPathInSource(source, skillName);
   const targetPath = join(targetDir, skillName);
+
+  // Prevent copying skill into itself (causes nested directories)
+  const resolvedSkill = await realpath(skillPath).catch(() => skillPath);
+  const resolvedTarget = await realpath(targetDir).catch(() => targetDir);
+  const resolvedTargetPath = join(resolvedTarget, skillName);
+
+  if (resolvedTargetPath.startsWith(resolvedSkill) || resolvedSkill.startsWith(resolvedTargetPath)) {
+    throw new Error(`Cannot copy skill "${skillName}": source and target paths overlap`);
+  }
 
   await mkdir(targetPath, { recursive: true });
 

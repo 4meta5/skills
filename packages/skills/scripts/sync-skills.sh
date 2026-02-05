@@ -7,7 +7,7 @@ set -e
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PKG_DIR="$(dirname "$SCRIPT_DIR")"
 ROOT_DIR="$(dirname "$(dirname "$PKG_DIR")")"
-SRC_SKILLS="$ROOT_DIR/skills"
+SRC_SKILLS="$ROOT_DIR"
 DEST_SKILLS="$PKG_DIR/skills"
 
 # List of skills to bundle with the package

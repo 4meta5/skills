@@ -20,6 +20,7 @@ import {
 import { join } from 'path';
 import { homedir } from 'os';
 import { updateClaudeMd } from '../claudemd.js';
+import { assertTestSafeProjectPath } from '../test/guard.js';
 
 interface ScanOptions {
   json?: boolean;
@@ -34,6 +35,9 @@ interface ScanOptions {
 
 export async function scanCommand(options: ScanOptions = {}): Promise<void> {
   const projectPath = options.cwd || process.cwd();
+  if (options.install || options.all) {
+    assertTestSafeProjectPath(projectPath, 'write project');
+  }
 
   console.log('Analyzing project...\n');
 

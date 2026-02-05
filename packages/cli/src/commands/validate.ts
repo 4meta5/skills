@@ -35,8 +35,9 @@ const SLOP_PATTERNS = {
     /^# Test Skill\s*$/m, // Exact match for placeholder heading
   ],
   // Naming patterns that indicate auto-generated skills
+  // Tests MUST use test-skill-* pattern - no bypassing allowed
   naming: [
-    /^test-skill-\d+$/,
+    /^test-skill-[a-z0-9]+$/i,
   ],
   // Placeholder patterns that indicate incomplete content
   // Only match when at the start of a line (not in tables/examples)

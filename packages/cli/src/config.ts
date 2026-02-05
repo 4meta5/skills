@@ -1,6 +1,7 @@
 import { readFile, writeFile, mkdir } from 'fs/promises';
 import { join, dirname } from 'path';
 import { homedir } from 'os';
+import { assertTestSafeProjectPath } from './test/guard.js';
 
 /**
  * A git-based skill source
@@ -39,9 +40,32 @@ export interface SkillsConfig {
   projectInstallations?: Record<string, ProjectInstallation>;
 }
 
-const CONFIG_DIR = join(homedir(), '.config', 'claude-skills');
-const CONFIG_FILE = join(CONFIG_DIR, 'config.json');
-const SOURCES_CACHE_DIR = join(CONFIG_DIR, 'sources');
+function resolveConfigDir(): string {
+  const envConfigDir = process.env.SKILLS_CONFIG_DIR?.trim();
+  if (envConfigDir) {
+    return envConfigDir;
+  }
+
+  const envConfigPath = process.env.SKILLS_CONFIG_PATH?.trim();
+  if (envConfigPath) {
+    return dirname(envConfigPath);
+  }
+
+  return join(homedir(), '.config', 'claude-skills');
+}
+
+function resolveConfigPath(): string {
+  const envConfigPath = process.env.SKILLS_CONFIG_PATH?.trim();
+  if (envConfigPath) {
+    return envConfigPath;
+  }
+
+  return join(resolveConfigDir(), 'config.json');
+}
+
+function resolveSourcesCacheDir(): string {
+  return join(resolveConfigDir(), 'sources');
+}
 
 const DEFAULT_CONFIG: SkillsConfig = {
   defaults: [],
@@ -51,16 +75,16 @@ const DEFAULT_CONFIG: SkillsConfig = {
 };
 
 export function getSourcesCacheDir(): string {
-  return SOURCES_CACHE_DIR;
+  return resolveSourcesCacheDir();
 }
 
 export function getConfigDir(): string {
-  return CONFIG_DIR;
+  return resolveConfigDir();
 }
 
 export async function loadConfig(): Promise<SkillsConfig> {
   try {
-    const content = await readFile(CONFIG_FILE, 'utf-8');
+    const content = await readFile(resolveConfigPath(), 'utf-8');
     return { ...DEFAULT_CONFIG, ...JSON.parse(content) };
   } catch {
     return { ...DEFAULT_CONFIG };
@@ -68,8 +92,10 @@ export async function loadConfig(): Promise<SkillsConfig> {
 }
 
 export async function saveConfig(config: SkillsConfig): Promise<void> {
-  await mkdir(dirname(CONFIG_FILE), { recursive: true });
-  await writeFile(CONFIG_FILE, JSON.stringify(config, null, 2), 'utf-8');
+  const configPath = resolveConfigPath();
+  assertTestSafeProjectPath(configPath, 'write config');
+  await mkdir(dirname(configPath), { recursive: true });
+  await writeFile(configPath, JSON.stringify(config, null, 2), 'utf-8');
 }
 
 export async function getDefaults(): Promise<string[]> {
@@ -98,7 +124,7 @@ export async function removeDefaults(skills: string[]): Promise<void> {
 }
 
 export function getConfigPath(): string {
-  return CONFIG_FILE;
+  return resolveConfigPath();
 }
 
 // Source management functions

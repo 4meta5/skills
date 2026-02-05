@@ -9,6 +9,7 @@
  */
 
 import { readFile } from 'fs/promises';
+import { z } from 'zod';
 import {
   initializeModel,
   generateEmbedding,
@@ -27,6 +28,40 @@ import type {
   ActivationMode,
   DEFAULT_ROUTER_CONFIG,
 } from './types.js';
+
+/**
+ * Zod schema for validating SkillVector structure
+ */
+const SkillVectorSchema = z.object({
+  skillName: z.string(),
+  description: z.string(),
+  triggerExamples: z.array(z.string()),
+  embedding: z.array(z.number()),
+  keywords: z.array(z.string()),
+});
+
+/**
+ * Zod schema for validating VectorStore structure
+ */
+const VectorStoreSchema = z.object({
+  version: z.string(),
+  model: z.string(),
+  generatedAt: z.string(),
+  skills: z.array(SkillVectorSchema),
+});
+
+/**
+ * Validate and parse a VectorStore from unknown JSON data
+ * @throws Error with descriptive message if validation fails
+ */
+function parseVectorStore(data: unknown): VectorStore {
+  const result = VectorStoreSchema.safeParse(data);
+  if (!result.success) {
+    const issues = result.error.issues.map(e => `${e.path.join('.')}: ${e.message}`).join(', ');
+    throw new Error(`Invalid vector store format: ${issues}`);
+  }
+  return result.data;
+}
 
 /**
  * Result of keyword matching
@@ -146,9 +181,10 @@ export async function createRouter(config: RouterConfig): Promise<Router> {
         return;
       }
 
-      // Load vector store
+      // Load vector store with validation
       const content = await readFile(fullConfig.vectorStorePath, 'utf-8');
-      vectorStore = JSON.parse(content) as VectorStore;
+      const parsed = JSON.parse(content);
+      vectorStore = parseVectorStore(parsed);
 
       // Build keyword patterns
       keywordPatterns = buildKeywordPatterns(vectorStore.skills);

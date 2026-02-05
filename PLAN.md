@@ -81,7 +81,8 @@ Chain owns session state. Tool-time enforcement is truth. Prompt-time is optimiz
 
 Skills CLI enhancements.
 
-- [x] Add slop detection to sync/add commands (prevents test-skill-* from being synced)
+- [x] Slop detection for hygiene commands (scan, clean, validate)
+- [x] Removed name-based skip from sync command (isolation via temp dirs, not name patterns)
 - [ ] Add skill update command for version bumps
 - [ ] Improve semantic matching accuracy
 
@@ -162,6 +163,23 @@ Items explicitly deferred to focus on the core loop (scan → install → auto-e
 
 ### 2026-02-05
 
+**Root Cause Fix: Sync-Test-Skill Artifact Leak**
+- [x] Removed name-based slop skip from sync command (was causing design conflict)
+- [x] Sync command now syncs any skill regardless of name
+- [x] Slop detection remains in hygiene commands (scan, clean, validate)
+- [x] Tests now use `test-skill-*` patterns (no bypass prefixes needed)
+- [x] Test isolation via temp directories, not name-based filtering
+- [x] Cleaned 478 leaked artifacts from claudette project
+- [x] Dogfooded: `skills scan`, `skills hygiene scan`, `skills hygiene clean`
+
+**TypeScript Type Safety Fixes**
+- [x] Added VectorStore Zod validation in router.ts (HIGH severity)
+- [x] Added TDDPhase validation in sandbox/loader.ts (HIGH severity)
+- [x] Added SkillMetadata validation in skill-loader/parser.ts (MEDIUM severity)
+- [x] Replaced module-level `any` types in both embedding.ts files (MEDIUM severity)
+- [x] Added invariant comments to 15 non-null assertions in graph.ts and resolver.ts
+- [x] Added tests for all validation scenarios (TDD workflow)
+
 **Documentation Update**
 - [x] Updated README skills list with deploy-mystack, rick-rubin, component skills, and npm-publish
 
@@ -175,15 +193,13 @@ Items explicitly deferred to focus on the core loop (scan → install → auto-e
 
 ### 2026-02-02
 
-**Slop Detection in Sync/Add Commands**
+**Slop Detection in Hygiene Commands** (updated 2026-02-05)
 - [x] Added `isSlop()` function to hygiene module (detects test-skill-*, timestamped, _temp_ patterns)
-- [x] Sync command now skips slop skills with warning message
-- [x] Add command now skips slop skills with warning message
-- [x] Updated test suite to use non-slop naming convention (sync-test-skill-* with short random suffix)
+- [x] Hygiene commands (scan, clean, validate) use `isSlop()` for detection
 - [x] Cleaned 76 test-skill-* directories from affected project (amarsingh.dev)
 - [x] Cleaned 76 stale CLAUDE.md references from affected project
 - [x] Cleaned 16 stale CLAUDE.md references from packages/cli
-- [x] Tests: 821 CLI tests passing, 5 new tests for isSlop() and slop detection
+- Note: Original sync skip logic was removed 2026-02-05 (root cause fix)
 
 ### 2026-02-01
 
@@ -331,6 +347,7 @@ None currently.
 
 ## Notes
 
-- Test skills (test-skill-*) are now blocked from sync/add commands. The test suite uses `sync-test-skill-*` with short random suffixes to avoid triggering slop detection.
+- Slop detection is for hygiene commands only (scan, clean, validate). Sync does not filter by name.
+- Tests use `test-skill-*` patterns. Isolation comes from temp directories, not name evasion.
 - Some skills are marked _temp_ pending proper naming.
-- Test counts: chain 350, cli 821, skill-loader 28, project-detector 29, semantic-matcher 72, workflow-enforcer 69, skills 26, web 18. Total: 1,413.
+- Test counts: chain 350, cli 839, skill-loader 28, project-detector 29, semantic-matcher 72, workflow-enforcer 69, skills 26, web 18. Total: 1,431.

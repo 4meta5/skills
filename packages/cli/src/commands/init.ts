@@ -4,6 +4,7 @@ import { join, resolve } from 'path';
 import { selectSkills, confirmAction } from '../interactive.js';
 import { getDefaults } from '../config.js';
 import { updateClaudeMd } from '../claudemd.js';
+import { assertTestSafeProjectPath } from '../test/guard.js';
 
 interface InitOptions {
   defaults?: boolean;
@@ -60,6 +61,7 @@ export async function initCommand(path: string = '.', options: InitOptions = {})
 
   // Install selected skills
   if (skillNames.length > 0) {
+    assertTestSafeProjectPath(targetPath, 'write project');
     console.log(`\nInitializing project at ${targetPath}...`);
 
     for (const name of skillNames) {

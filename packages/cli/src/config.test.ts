@@ -453,6 +453,18 @@ describe('project installation tracking logic', () => {
   });
 });
 
+describe('config path overrides', () => {
+  it('uses SKILLS_CONFIG_DIR when provided', async () => {
+    const { getConfigDir, getConfigPath, getSourcesCacheDir } = await import('./config.js');
+
+    const envDir = process.env.SKILLS_CONFIG_DIR;
+    expect(envDir).toBeDefined();
+    expect(getConfigDir()).toBe(envDir);
+    expect(getConfigPath()).toBe(join(envDir!, 'config.json'));
+    expect(getSourcesCacheDir()).toBe(join(envDir!, 'sources'));
+  });
+});
+
 // Integration tests for the actual implementation functions
 describe('project installation tracking functions', () => {
   // Track all created project paths for cleanup

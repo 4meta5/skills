@@ -42,6 +42,7 @@ export class CapabilityGraph {
         if (!this.capabilityProviders.has(cap)) {
           this.capabilityProviders.set(cap, []);
         }
+        // INVARIANT: cap was just set on line 43 if not present
         this.capabilityProviders.get(cap)!.push(skill.name);
       }
     }
@@ -57,6 +58,7 @@ export class CapabilityGraph {
               to: skill.name,
               capability: req,
             });
+            // INVARIANT: adjacency initialized for all skills in constructor at line 36
             this.adjacency.get(provider)!.push(skill.name);
           }
         }
@@ -179,6 +181,7 @@ export class CapabilityGraph {
 
     while (queue.length > 0) {
       // Always take the first (sorted) element for determinism
+      // INVARIANT: loop condition guarantees queue.length > 0
       const node = queue.shift()!;
       result.push(node);
 
@@ -206,6 +209,7 @@ export class CapabilityGraph {
    * Compare skills for tie-breaking: risk (asc) → cost (asc) → name (alpha)
    */
   private compareSkills(a: string, b: string): number {
+    // INVARIANT: compareSkills only called for skill names that exist in this.skills
     const skillA = this.skills.get(a)!;
     const skillB = this.skills.get(b)!;
 
@@ -232,6 +236,7 @@ export class CapabilityGraph {
 
     // Find all skills that provide needed capabilities
     while (queue.length > 0) {
+      // INVARIANT: loop condition guarantees queue.length > 0
       const cap = queue.shift()!;
       const providers = this.capabilityProviders.get(cap) || [];
 
@@ -239,6 +244,7 @@ export class CapabilityGraph {
         if (!needed.has(provider)) {
           needed.add(provider);
           // Add this skill's requirements to the queue
+          // INVARIANT: provider from capabilityProviders contains only existing skill names
           const skill = this.skills.get(provider)!;
           for (const req of skill.requires) {
             if (!queue.includes(req)) {
@@ -250,6 +256,7 @@ export class CapabilityGraph {
     }
 
     // Create new graph with only needed skills
+    // INVARIANT: needed set only contains verified skill names added through provider lookup
     const neededSkills = Array.from(needed).map(n => this.skills.get(n)!);
     return new CapabilityGraph(neededSkills);
   }

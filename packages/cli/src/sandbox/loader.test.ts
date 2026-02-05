@@ -137,6 +137,34 @@ describe('sandbox loader', () => {
 
       expect(() => parseSandboxConfig(frontmatter)).toThrow('Invalid sandbox config: state "BLOCKED" not found in profiles');
     });
+
+    it('should throw on invalid TDDPhase value', () => {
+      const frontmatter = {
+        name: 'bad-phase',
+        description: 'Bad phase skill',
+        sandbox: {
+          state: 'INVALID_PHASE', // Not a valid TDDPhase
+          profiles: {
+            INVALID_PHASE: { allowCommands: ['npm test'] }
+          }
+        }
+      };
+
+      expect(() => parseSandboxConfig(frontmatter)).toThrow(/invalid.*state|TDD.*phase/i);
+    });
+
+    it('should throw on wrong type for sandbox.profiles object', () => {
+      const frontmatter = {
+        name: 'wrong-profiles-type',
+        description: 'Wrong profiles type',
+        sandbox: {
+          state: 'RED',
+          profiles: 'not-an-object' // Should be an object
+        }
+      };
+
+      expect(() => parseSandboxConfig(frontmatter)).toThrow(/profiles/i);
+    });
   });
 
   describe('getPolicyForPhase', () => {

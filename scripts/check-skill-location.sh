@@ -1,30 +1,35 @@
 #!/usr/bin/env bash
-# Enforce skills are placed in skills/ (root level), not elsewhere
+# Enforce skills are placed at repo root level, not in packages/ or elsewhere
 #
-# Skills live at root skills/ for visibility.
-# .claude/skills is a symlink to ../skills for Claude Code compatibility.
+# Skills live at repo root: <skill-name>/SKILL.md
+# .claude/skills is a symlink to .. for Claude Code compatibility.
 #
 # This prevents the mistake of adding skills to packages/skills/skills/
-# which is a different directory structure.
+# or other nested locations.
 
 set -euo pipefail
 
-# Get staged files that contain SKILL.md
-staged_skills=$(git diff --cached --name-only | grep "SKILL.md" || true)
+# Get staged files that contain SKILL.md (only ADDED files, not deletions)
+staged_skills=$(git diff --cached --name-only --diff-filter=A | grep "SKILL.md" || true)
 
 if [ -z "$staged_skills" ]; then
   # No SKILL.md files staged, nothing to check
   exit 0
 fi
 
+# Directories that are NOT skill directories
+non_skill_dirs="packages|node_modules|docs|hooks|scripts|\.claude|\.git"
+
 # Check each staged SKILL.md
 errors=0
 while IFS= read -r file; do
-  # Allow skills/ at root (primary location) or .claude/skills (symlink)
-  if [[ ! "$file" =~ ^skills/ ]] && [[ ! "$file" =~ ^\.claude/skills/ ]]; then
+  # Skills should be at root level: <skill-name>/SKILL.md or <skill-name>/subdir/SKILL.md
+  # But NOT in packages/, node_modules/, docs/, hooks/, scripts/, .claude/, .git/
+  if [[ "$file" =~ ^($non_skill_dirs)/ ]]; then
     echo "❌ ERROR: Skill in wrong location: $file"
-    echo "   Skills MUST go in skills/, not elsewhere."
-    echo "   Correct path: skills/$(basename $(dirname $file))/SKILL.md"
+    echo "   Skills MUST go at repo root level, not in packages/ or system directories."
+    skill_name=$(echo "$file" | cut -d'/' -f2)
+    echo "   Correct path: $skill_name/SKILL.md"
     errors=$((errors + 1))
   fi
 done <<< "$staged_skills"
@@ -32,9 +37,8 @@ done <<< "$staged_skills"
 if [ $errors -gt 0 ]; then
   echo ""
   echo "🚫 BLOCKED: $errors skill(s) in wrong location."
-  echo "   Move them to skills/<skill-name>/SKILL.md"
+  echo "   Move them to <skill-name>/SKILL.md at repo root"
   exit 1
 fi
 
-echo "✅ All skills in correct location (skills/)"
 exit 0

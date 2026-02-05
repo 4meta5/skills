@@ -14,12 +14,12 @@ pre-commit:
     skill-location:
       glob: "**/SKILL.md"
       run: ./scripts/check-skill-location.sh
-      fail_text: "Skills must be in skills/ (root level), not elsewhere. See error above."
+      fail_text: "Skills must be at repo root level (<skill-name>/SKILL.md), not in packages/ or elsewhere. See error above."
 
     hook-location:
       glob: "**/*.sh"
       run: ./scripts/check-hook-location.sh
-      fail_text: "Shell scripts must be in hooks/, scripts/, or packages/. See error above."
+      fail_text: "Shell scripts must be in hooks/, scripts/, packages/, or <skill>/scripts/. See error above."
 
     typecheck:
       glob: "*.{ts,tsx}"
@@ -40,7 +40,7 @@ pre-commit:
       fail_text: "Chain validation failed. Fix skills.yaml or profiles.yaml errors."
 
     claudemd-sync:
-      glob: "skills/**/*"
+      glob: "**/SKILL.md"
       run: npx tsx packages/cli/src/index.ts claudemd sync && git add CLAUDE.md
       fail_text: "CLAUDE.md sync failed."
 

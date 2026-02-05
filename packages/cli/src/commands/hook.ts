@@ -2,6 +2,7 @@ import { mkdir, writeFile, readdir, stat, chmod, readFile } from 'fs/promises';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
 import { trackProjectInstallation, untrackProjectInstallation } from '../config.js';
+import { assertTestSafeProjectPath } from '../test/guard.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -279,6 +280,9 @@ export async function hookCommand(
   options: HookOptions = {}
 ): Promise<void> {
   const projectDir = options.cwd || process.cwd();
+  if (subcommand === 'add' || subcommand === 'remove') {
+    assertTestSafeProjectPath(projectDir, 'write project');
+  }
 
   switch (subcommand) {
     case 'add':

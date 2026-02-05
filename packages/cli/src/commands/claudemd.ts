@@ -15,6 +15,7 @@ import {
   parseClaudeMd,
   updateClaudeMd
 } from '../claudemd.js';
+import { assertTestSafeProjectPath } from '../test/guard.js';
 
 interface ClaudemdOptions {
   cwd?: string;
@@ -42,14 +43,17 @@ export async function claudemdCommand(
       break;
 
     case 'sync':
+      assertTestSafeProjectPath(projectDir, 'write project');
       await syncCommand(projectDir);
       break;
 
     case 'add':
+      assertTestSafeProjectPath(projectDir, 'write project');
       await addCommand(projectDir, args);
       break;
 
     case 'remove':
+      assertTestSafeProjectPath(projectDir, 'write project');
       await removeCommand(projectDir, args);
       break;
 

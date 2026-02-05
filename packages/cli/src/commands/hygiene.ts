@@ -96,8 +96,9 @@ interface HygieneCommandResult {
  * Slop detection patterns
  */
 export const SLOP_PATTERNS = {
-  // test-skill-* with any suffix
-  testSkill: /^test-skill-\d+$/,
+  // test-skill-* with numeric or short alphanumeric suffix
+  // Tests MUST use this pattern - no bypassing allowed
+  testSkill: /^test-skill-[a-z0-9]+$/i,
   // Ends with 13-digit timestamp (milliseconds since epoch)
   timestamped: /-\d{13}$/,
   // _temp_ prefix

@@ -5,16 +5,23 @@ import { fileURLToPath } from 'url';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = resolve(__dirname, '..', '..', '..');
-const SKILLS_DIR = join(REPO_ROOT, 'skills');
+// Skills are at repo root level (not in skills/ subdirectory)
+const SKILLS_DIR = REPO_ROOT;
 
-async function findSkillMdFiles(dir: string): Promise<string[]> {
+async function findSkillMdFiles(dir: string, depth: number = 0): Promise<string[]> {
   const entries = await readdir(dir, { withFileTypes: true });
   const results: string[] = [];
 
+  // Skip non-skill directories at root level
+  const skipDirs = ['node_modules', 'packages', 'docs', 'hooks', 'scripts', '.claude', '.git'];
+
   for (const entry of entries) {
+    if (depth === 0 && skipDirs.includes(entry.name)) continue;
+    if (entry.name.startsWith('.')) continue;
+
     const fullPath = join(dir, entry.name);
     if (entry.isDirectory()) {
-      results.push(...await findSkillMdFiles(fullPath));
+      results.push(...await findSkillMdFiles(fullPath, depth + 1));
     } else if (entry.isFile() && entry.name === 'SKILL.md') {
       results.push(fullPath);
     }

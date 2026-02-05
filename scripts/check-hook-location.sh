@@ -11,8 +11,8 @@
 
 set -euo pipefail
 
-# Get staged .sh files
-staged_scripts=$(git diff --cached --name-only | grep -E '\.sh$' || true)
+# Get staged .sh files (only ADDED files, not deletions)
+staged_scripts=$(git diff --cached --name-only --diff-filter=A | grep -E '\.sh$' || true)
 
 if [ -z "$staged_scripts" ]; then
   exit 0
@@ -22,6 +22,12 @@ errors=0
 while IFS= read -r file; do
   # Allow only hooks/, scripts/, or packages/
   if [[ "$file" =~ ^hooks/ ]] || [[ "$file" =~ ^scripts/ ]] || [[ "$file" =~ ^packages/ ]]; then
+    continue
+  fi
+
+  # Allow skill scripts (single directory depth with scripts/ subdir)
+  # Pattern: <skill-name>/scripts/<script>.sh (skills at repo root)
+  if [[ "$file" =~ ^[^/]+/scripts/[^/]+\.sh$ ]]; then
     continue
   fi
 

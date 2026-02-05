@@ -5,9 +5,31 @@
  * This avoids API latency and privacy concerns.
  */
 
+/**
+ * Type for the feature extraction function returned by pipeline.
+ * This is a simplified interface for our usage of @xenova/transformers.
+ */
+interface FeatureExtractor {
+  (text: string, options?: { pooling?: string; normalize?: boolean }): Promise<{
+    data: Float32Array;
+  }>;
+}
+
+/**
+ * Type for the pipeline function from @xenova/transformers.
+ * Using a function type that accepts the specific parameters we use.
+ */
+interface TransformersPipeline {
+  (
+    task: 'feature-extraction',
+    model: string,
+    options?: { quantized?: boolean }
+  ): Promise<FeatureExtractor>;
+}
+
 // Dynamic import to handle ESM module loading
-let pipeline: any = null;
-let extractor: any = null;
+let pipeline: TransformersPipeline | null = null;
+let extractor: FeatureExtractor | null = null;
 let initialized = false;
 
 // Default model - small, fast, good quality
@@ -94,10 +116,12 @@ export async function initializeModel(modelName?: string): Promise<void> {
 
   // Dynamic import for ESM compatibility
   const { pipeline: pipelineFn } = await import('@xenova/transformers');
-  pipeline = pipelineFn;
+  // Type assertion: transformers.pipeline is compatible with our usage pattern
+  pipeline = pipelineFn as unknown as TransformersPipeline;
 
   // Create feature extraction pipeline
-  extractor = await pipeline('feature-extraction', model, {
+  // INVARIANT: pipeline is set above, non-null here
+  extractor = await pipeline!('feature-extraction', model, {
     quantized: true, // Use quantized model for smaller size
   });
 
