@@ -121,6 +121,31 @@ NEW content with improvements!
       }
     });
 
+    it('should include action description in test mode error message (not undefined)', async () => {
+      const { syncCommand } = await import('./sync.js');
+
+      const outsideProject = join(process.cwd(), `skills-non-tmp-${Date.now()}`);
+      await trackProjectInstallation(outsideProject, testSkillName, 'skill');
+
+      const sourceDir = await mkdtemp(join(tmpdir(), 'skills-source-'));
+      await mkdir(join(sourceDir, '.claude', 'skills', testSkillName), { recursive: true });
+      await writeFile(
+        join(sourceDir, '.claude', 'skills', testSkillName, 'SKILL.md'),
+        sourceSkillContent,
+        'utf-8'
+      );
+
+      try {
+        // The error message should contain a real action like "sync" not "undefined"
+        await expect(
+          syncCommand([testSkillName], { cwd: sourceDir, push: true })
+        ).rejects.toThrow(/refusing to sync/i);
+      } finally {
+        await untrackProjectInstallation(outsideProject, testSkillName, 'skill');
+        await rm(sourceDir, { recursive: true, force: true });
+      }
+    });
+
     it('should show what would be updated with --dry-run', async () => {
       const { syncCommand } = await import('./sync.js');
 

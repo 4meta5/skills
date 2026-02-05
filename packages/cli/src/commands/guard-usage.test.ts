@@ -78,4 +78,5 @@ describe('command write guards', () => {
     const { claudemdCommand } = await import('./claudemd.js');
     await expect(claudemdCommand('sync', [], { cwd: process.cwd() })).rejects.toThrow('guard');
   });
+
 });

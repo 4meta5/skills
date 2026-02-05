@@ -149,7 +149,7 @@ export async function syncCommand(names: string[], options: SyncOptions = {}): P
         continue;
       }
 
-      assertTestSafeProjectPath(projectPath);
+      assertTestSafeProjectPath(projectPath, 'sync skills');
 
       const targetSkillPath = join(projectPath, '.claude', 'skills', skillName);
 
