@@ -1,102 +1,138 @@
 ---
 name: skill-maker
 description: |
-  Create new Claude Code skills following project conventions. Use when: (1) creating
-  a new skill from scratch, (2) converting learnings into reusable skills, (3) validating
-  existing skills against quality standards. Provides templates, frontmatter specification,
-  and quality checklist.
+  Create and validate Claude Code skills following this repository's existing conventions.
+  Use when: (1) adding a new skill to this repo, (2) turning concrete learnings into a
+  reusable skill, (3) validating an existing skill for quality and correctness.
+  This skill focuses on correct structure, minimal scope, and adherence to repo standards.
 category: development
 user-invocable: true
 ---
 
 # Skill Maker
 
-Create and validate Claude Code skills following best practices.
+Create and validate Claude Code skills without expanding scope or inventing new conventions.
 
-## Quick Start
+This skill is for adding a skill cleanly and correctly to this repository. It is not a mandate to redesign the skills system, research external best practices, or refactor unrelated parts of the repo.
 
-**Create a new skill:**
-1. Choose a template: `simple`, `with-references`, or `full`
-2. Create directory: `skills/<skill-name>/`
-3. Write SKILL.md following the template
-4. Run validation: `skills validate <skill-name>`
+## Core Principles
+
+- Follow existing repo conventions exactly.
+- Prefer the simplest valid skill structure.
+- Do not add files, metadata, or tooling unless required.
+- Treat validation failures as the source of truth.
+- If something is unclear, ask or note it; do not guess.
+
+## When to Use This Skill
+
+Use skill-maker when you are:
+- Adding a new skill under skills/<skill-name>/
+- Converting a specific, proven workflow into a reusable skill
+- Validating an existing skill for quality and correctness
+- Fixing validation or quality issues in a skill
+
+Do not use skill-maker to:
+- Perform web research or add citations
+- Redesign the skills framework
+- Add new global documentation or tooling
+- Refactor unrelated skills or folders
+- Improve conventions beyond what the repo already enforces
+
+## Quick Start (Minimal Path)
+
+1. Choose the simplest template that works (default: simple).
+2. Create directory: skills/<skill-name>/
+3. Write SKILL.md with valid frontmatter and actionable content.
+4. Add references/ only if necessary.
+5. Run: skills validate <skill-name>
+6. Fix only what validation flags.
 
 ## Templates
 
 | Template | Structure | Use Case |
 |----------|-----------|----------|
-| simple | SKILL.md only | Single-file guidance, quick tips |
-| with-references | + references/ | Multi-section documentation |
-| full | + docs/, templates/, provenance | Comprehensive skills with examples |
+| simple | SKILL.md only | Most skills |
+| with-references | SKILL.md + references/ | Multiple artifacts or longer guidance |
+| full | + docs/, templates/, provenance | Rare; only when clearly justified |
 
-See [templates/](templates/) for complete templates.
+Default to simple. Escalate only with a clear reason.
 
 ## Frontmatter Specification
 
-Required fields:
+Every skill must include YAML frontmatter.
+
+### Required fields
+
 ```yaml
 ---
 name: skill-name          # kebab-case, unique identifier
-description: |            # Multi-line recommended
-  What the skill does. Use when: (1) condition, (2) condition.
-  Specific symptoms, error messages, or file types it handles.
+description: |            # Multi-line strongly recommended
+  What the skill does.
+  Use when: (1) condition, (2) condition.
 ---
 ```
 
-Optional fields:
+### Optional fields (use sparingly)
+
 ```yaml
 category: testing|development|documentation|refactoring|security|performance
-user-invocable: true      # Can be called via /skill-name
-disable-model-invocation: false  # Prevent automatic loading
-allowed-tools: Read,Write # Comma-separated tool names
-context: fork|inline      # How skill is invoked
-agent: agent-name         # Specific agent to use
+user-invocable: true
+disable-model-invocation: false
+allowed-tools: Read,Write
+context: fork|inline
+agent: agent-name
 ```
 
-See [references/frontmatter-spec.md](references/frontmatter-spec.md) for details.
+If a field is not clearly needed, omit it.
 
-## Description Quality
+Authoritative spec: references/frontmatter-spec.md
 
-Good descriptions enable semantic matching. Include:
+## Description Quality (Critical)
 
-1. **What it does** (1 sentence)
-2. **Trigger conditions** (Use when:, Helps with:)
-3. **Specific context** (error messages, file types, frameworks)
+The description drives discovery and correct usage. It must be concrete.
 
-### Good Example
+Include:
+
+1. What it does (plain language)
+2. When to use it (explicit trigger conditions)
+3. What context it applies to (files, errors, tools, frameworks)
+
+Good example:
+
 ```yaml
 description: |
-  Fix "ENOENT: no such file or directory" errors in npm monorepos.
-  Use when: (1) npm run fails with ENOENT, (2) paths work in root
-  but not packages, (3) symlinks cause resolution failures.
-  Covers Lerna, Turborepo, and npm workspaces.
+  Fix ENOENT errors in npm monorepos caused by incorrect working directories.
+  Use when: (1) npm run fails with ENOENT, (2) commands work at repo root
+  but fail in packages, (3) symlinked paths break resolution.
+  Applies to npm workspaces, Lerna, and Turborepo.
 ```
 
-### Bad Example
+Bad example:
+
 ```yaml
-description: A skill that helps with npm problems.
+description: A skill that helps with npm issues.
 ```
 
-See [references/description-guide.md](references/description-guide.md).
+If the description is vague, the skill is not ready.
 
-## Quality Checklist
+## Quality Checklist (Required)
 
-Before finalizing a skill, verify:
+Before considering a skill complete:
 
-- [ ] Name is kebab-case and descriptive
-- [ ] Description > 50 characters
-- [ ] Description includes trigger conditions
-- [ ] Category is valid (if specified)
-- [ ] Referenced files exist (references/, docs/)
-- [ ] No slop patterns (placeholder content)
-- [ ] Content is actionable and specific
-- [ ] Tested with `skills validate`
+- [ ] Name is kebab-case and specific
+- [ ] Description is clear and > 50 characters
+- [ ] Description includes explicit trigger conditions
+- [ ] Category is valid (if present)
+- [ ] All referenced files exist
+- [ ] No placeholder or filler content
+- [ ] Guidance is actionable, not abstract
+- [ ] skills validate <skill-name> passes
 
-See [references/quality-checklist.md](references/quality-checklist.md).
+Details: references/quality-checklist.md
 
 ## Validation
 
-Run validation on your skill:
+Always validate locally.
 
 ```bash
 # Validate specific skill
@@ -109,62 +145,74 @@ skills validate
 skills validate --json
 ```
 
-Validation checks:
-- Frontmatter format and required fields
-- Description quality (length, trigger conditions)
+Validation typically enforces:
+
+- Frontmatter correctness
+- Description quality
 - Category validity
-- Slop pattern detection
-- Reference file existence
+- Slop/placeholder detection
+- Reference file integrity
 
-## Slop Detection
+Do not bypass validation.
 
-The validator detects common slop patterns:
+## Slop Detection (Non-Negotiable)
 
-| Pattern | Example | Action |
-|---------|---------|--------|
-| test-skill-* | `test-skill-1234567890` | Delete |
-| Placeholder content | "NEW content with improvements!" | Rewrite |
-| Generic names | "# Test Skill" | Rename |
-| Lorem ipsum | Any placeholder text | Remove |
+The validator flags common failure modes:
 
-## Skill Chaining
+| Pattern | Example | Required Action |
+|---------|---------|-----------------|
+| Test names | test-skill-12345 | Rename |
+| Placeholder text | TODO improve later | Rewrite |
+| Generic titles | # Test Skill | Replace |
+| Lorem ipsum | Any | Delete |
 
-This skill works with:
+If flagged, fix it. Do not argue with the validator.
 
-- **claudeception**: Extract learnings → create skill with skill-maker
-- **tdd**: Write tests first when adding CLI validation features
-- **dogfood-skills**: Use `skills validate` after creating skills
+## Directory Structure (Canonical)
 
-## Creating Your First Skill
-
-1. **Identify the knowledge**: What non-obvious solution did you discover?
-2. **Check existing skills**: Is there already a skill for this?
-3. **Choose template**: Start with `simple` unless you need references
-4. **Write SKILL.md**: Follow frontmatter spec and description guidelines
-5. **Validate**: Run `skills validate <name>`
-6. **Test**: Use the skill in a real scenario
-
-## Directory Structure
-
-**All skills live in the root `skills/` directory** (canonical location):
+All skills live in skills/:
 
 ```
 skills/<skill-name>/
-├── SKILL.md              # Required: Main skill file
-├── references/           # Optional: Supporting documentation
-│   ├── guide.md
-│   └── examples.md
-├── templates/            # Optional: Code/config templates
-├── scripts/              # Optional: Helper scripts
-└── .provenance.json      # Optional: Source tracking
+├── SKILL.md              # Required
+├── references/           # Optional
+├── templates/            # Optional
+├── scripts/              # Optional
+└── .provenance.json      # Optional
 ```
 
-The `.claude/skills/` symlink makes skills available to Claude Code. Never create skills directly in `packages/skills/skills/` (generated at build time).
+Do not place skills directly in packages/skills/skills/ (generated output).
 
-## Tips
+## Skill Chaining (Informational)
 
-- Start simple, add complexity only when needed
-- Keep SKILL.md focused on actionable guidance
-- Use references/ for detailed documentation
-- Include concrete examples, not just theory
-- Update skills when you learn more
+This skill pairs well with:
+
+- tdd (when adding validation logic)
+- claudeception (extracting learnings into skills)
+- dogfood-skills (self-validation)
+
+Chaining is optional. Keep each skill usable on its own.
+
+## Anti-Patterns (Scope Creep)
+
+Do not do these when creating a skill:
+
+- Adding new scripts or tooling to make it easier
+- Adding new global docs or repo-wide guidelines
+- Refactoring other skills while you're there
+- Turning a simple skill into a framework
+- Researching external standards and retrofitting the repo to match
+- Adding extra files by default (references/, docs/, templates/) without need
+
+If you believe additional changes are necessary:
+
+- Do not implement them during skill creation.
+- Write a short note listing what and why.
+
+## Final Guidance
+
+- Start small.
+- Add only what is necessary.
+- Delete anything you can justify deleting.
+- If unsure, write a note instead of code.
+- A boring, correct skill is better than a clever one.
