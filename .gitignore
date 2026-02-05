@@ -1,38 +1,6 @@
-# Dependencies
-node_modules/
-
-# Build outputs
-dist/
-*.js
-*.d.ts
-*.js.map
-*.d.ts.map
-
-# Keep source TypeScript files
-!src/**/*.ts
-!skills/**/*.ts
-
-# Keep CLI bin entry points
-!packages/cli/bin/*.js
-
-# Keep config files (both root and nested)
-!*.config.ts
-!*.config.js
-!**/*.config.ts
-!**/*.config.js
-!**/svelte.config.js
-!**/vite.config.ts
-!**/vitest.config.ts
-
-# Test coverage and reports
-coverage/
-.nyc_output/
-playwright-report/
-test-results/
-
-# SvelteKit
-.svelte-kit/
-build/
+# OS files
+.DS_Store
+Thumbs.db
 
 # IDE
 .idea/
@@ -40,38 +8,9 @@ build/
 *.swp
 *.swo
 
-# OS files
-.DS_Store
-Thumbs.db
-
-# Logs
-*.log
-npm-debug.log*
-
-# Environment
-.env
-.env.local
-.env.*.local
-
-# Lock files (optional - uncomment if you want to ignore)
-# package-lock.json
-
-# Vite
-vite.config.js.timestamp-*
-vite.config.ts.timestamp-*
-
-# Playwright
-playwright/.cache/
-
-# Chain state (session files)
-.chain-state.json
-**/chain_state/
-
-# Internal directories (not open source)
-.scout/
-.github/
-docs/
-
-# Claude Code local config (but NOT symlinks - those are committed)
+# Claude Code local config
 .claude/settings.local.json
 .claude/chain_state/
+
+# Internal directories
+.scout/

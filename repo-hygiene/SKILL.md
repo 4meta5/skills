@@ -1,25 +1,163 @@
 ---
 name: repo-hygiene
 description: |
-  Detect and clean AI-generated slop from skills directories. Use when: (1) test-skill-*
-  directories accumulate from testing, (2) CLAUDE.md has stale skill references,
-  (3) placeholder content exists in skills. Provides scan, clean, and CLAUDE.md sync.
+  Comprehensive repository housekeeping: pre-work checks, documentation updates,
+  writing style, and cleanup. Use when: (1) starting work on a repo, (2) completing
+  tasks, (3) editing markdown files, (4) cleaning up test artifacts.
 category: development
 user-invocable: true
 ---
 
 # Repo Hygiene
 
-Detect and clean AI-generated slop (test skills, placeholder content) from your project.
+Comprehensive repository housekeeping: pre-work validation, documentation updates, writing style, and cleanup.
 
-## Quick Start
+---
+
+## Pre-Work Checks
+
+**MANDATORY** before adding files or making structural changes.
+
+### Before Adding Files
+
+1. **Find existing examples** of similar files
+2. **State the correct location** based on those examples
+3. **Tell the user your plan** and wait for confirmation
+4. **Send updates** during work
+
+If you skip any step: **BLOCKED**
+
+### Finding Patterns
+
+```bash
+# For skills
+ls -la .claude/skills/ | head -10
+find . -name "SKILL.md" -type f | head -10
+
+# For any file type
+find . -name "*.ts" -type f | head -10
+```
+
+### Self-Check Before File Creation
+
+1. Did I check existing patterns?
+2. Did I tell the user my plan?
+3. Did I wait for confirmation?
+4. Did I send updates during work?
+
+If any answer is "no": **STOP and fix it.**
+
+---
+
+## Documentation Updates
+
+Automatically update project documentation after task completion.
+
+### Trigger Conditions
+
+Invoke after:
+- Completing any task
+- Adding a new feature
+- Fixing a bug
+- Refactoring code
+
+### PLAN.md Updates
+
+All plan updates go to root `PLAN.md`. This is the single source of truth.
+
+**Mark completed items:**
+```markdown
+## Current Sprint
+- [x] Implement user authentication  # Was [ ]
+```
+
+**Add discovered work:**
+```markdown
+## Backlog
+- [ ] (discovered) New task from implementation
+```
+
+**Move completed items with timestamp:**
+```markdown
+## Completed
+- [x] Task description (2026-01-30)
+```
+
+### README.md Updates
+
+Update when:
+- New user-facing feature added
+- API changed
+- New command available
+- Installation steps changed
+
+### Pre-Merge Cleanup
+
+When preparing to merge:
+
+```bash
+# 1. Sync CLAUDE.md with installed skills
+skills claudemd sync
+
+# 2. Scan for test artifacts and slop
+skills hygiene scan
+
+# 3. If slop found, clean it
+skills hygiene clean --confirm
+
+# 4. Update PLAN.md with completed work
+
+# 5. Commit and push
+git add -A && git commit -m "chore: pre-merge cleanup" && git push
+```
+
+---
+
+## Writing Style
+
+Use for all markdown files: README.md, PLAN.md, documentation.
+
+### Voice
+
+- Write like speaking to an intelligent friend
+- Short sentences. Direct claims. No hedging.
+- Active voice, not passive
+- State claims confidently
+
+### Punctuation Rules
+
+- **Never use em dashes (—)**
+- Use periods and new sentences for separate thoughts
+- Use commas for simple asides
+- Use parentheses for clarifying information
+- Use colons for lists or elaboration
+
+### Structure
+
+- Start with the point, not background
+- One idea per paragraph
+- Headers should be claims, not topics
+- End sections when the point is made
+
+### Quality Checklist
+
+- [ ] No em dashes in content
+- [ ] Sentences are short and direct
+- [ ] Opens with the main point
+- [ ] Code examples are minimal
+- [ ] Tables used for structured data
+
+---
+
+## Slop Cleanup
+
+Detect and clean AI-generated slop from your project.
+
+### Quick Start
 
 ```bash
 # Scan for slop
 skills hygiene scan
-
-# Scan including package subdirectories
-skills hygiene scan -r
 
 # Preview what would be deleted
 skills hygiene clean --dry-run
@@ -28,85 +166,24 @@ skills hygiene clean --dry-run
 skills hygiene clean --confirm
 ```
 
-## What is Slop?
-
-Slop is auto-generated or placeholder content that shouldn't be committed:
+### What is Slop?
 
 | Pattern | Example | Action |
 |---------|---------|--------|
 | `test-skill-*` | `test-skill-1234567890` | Delete |
 | Timestamped | `my-skill-1706625000000` | Review |
-| `_temp_*` | `_temp_claude-svelte5-skill` | Review (may need rename) |
+| `_temp_*` | `_temp_claude-svelte5-skill` | Review |
 | Placeholder | "NEW content with improvements!" | Delete |
 
-## Detection Patterns
+### CLAUDE.md Cleanup
 
-### test-skill-* (Auto-Delete)
-
-Skills matching `/^test-skill-\d+$/` are auto-generated test data.
-These are always safe to delete.
-
-### Timestamped Names (Review)
-
-Skills ending with 13-digit timestamps (`-1706625000000`) may be
-auto-generated. Review before deleting.
-
-### _temp_ Prefix (Review)
-
-Skills starting with `_temp_` were likely created as temporary work.
-They may contain valuable content that needs proper naming.
-
-**Recommended action**: Rename to remove prefix if content is valuable,
-or delete if it's truly temporary.
-
-### Placeholder Content (Auto-Delete)
-
-Skills containing these patterns are incomplete:
-- `# Test Skill` (exact match)
-- `NEW content with improvements!`
-
-## Slop Locations
-
-The scan checks these locations:
-
-1. `.claude/skills/` - Root project skills
-2. `packages/*/\.claude/skills/` - Package-level skills (with `-r`)
-
-## CLAUDE.md Cleanup
-
-The scan also checks CLAUDE.md for:
-
+Check for:
 - **Stale references**: Skills listed but not installed
 - **Duplicate references**: Same skill listed multiple times
 
-Run `skills claudemd sync` to fix CLAUDE.md references.
+Run `skills claudemd sync` to fix.
 
-## Workflow
-
-### Daily Cleanup
-
-After testing or development:
-
-```bash
-skills hygiene scan
-skills hygiene clean --confirm
-skills claudemd sync
-```
-
-### Pre-Commit Check
-
-Add to your workflow:
-
-```bash
-# Check for slop before committing
-skills hygiene scan
-if [ $? -ne 0 ]; then
-  echo "Slop detected! Run: skills hygiene clean --confirm"
-  exit 1
-fi
-```
-
-## Decision Tree
+### Decision Tree
 
 ```
 Found test-skill-*?
@@ -120,12 +197,7 @@ Found test-skill-*?
       └─ Run: skills claudemd sync
 ```
 
-## Safety
-
-- `--dry-run` shows what would happen without changes
-- `--confirm` is required for actual deletion
-- `_temp_*` skills are never auto-deleted (review required)
-- Timestamped skills are flagged for review, not auto-deleted
+---
 
 ## Related Commands
 
@@ -133,48 +205,24 @@ Found test-skill-*?
 - `skills claudemd sync` - Sync CLAUDE.md with installed skills
 - `skills list` - Show installed skills
 
-## Skill Chaining
+---
 
-Works with:
-- **skill-maker**: Create clean skills to replace slop
-- **claudeception**: Extract learnings before deleting temp skills
-- **workflow-orchestrator**: Include hygiene in project workflow
+## Rationalizations (Do Not Skip)
 
-## Terminal Chain (Always Run Last)
+| Excuse | Why It's Wrong | Required Action |
+|--------|----------------|-----------------|
+| "I know where it goes" | You were wrong last time | Check existing patterns |
+| "Too small to document" | Small changes accumulate | Update PLAN.md |
+| "I'll remember" | Context is lost between sessions | Write it down |
+| "It's obvious" | Clearly it wasn't | Confirm with user |
+| "Just a bug fix" | Bugs deserve tracking | Mark complete |
 
-This skill runs after testing workflows complete:
+---
 
-| After Skill | Cleanup Needed |
-|-------------|----------------|
-| tdd | test-skill-* directories |
-| suggest-tests | Analysis artifacts |
-| unit-test-workflow | Generated test stubs |
-| property-based-testing | Fast-check artifacts |
-| doc-maintenance | Stale references |
-| gitignore-hygiene | Final verification |
+## Reference Files
 
-When any testing skill completes, run:
-- `skills hygiene scan`
-- `skills hygiene clean --confirm` (if slop detected)
-
-### Testing Pipeline Position
-
-repo-hygiene is the terminal step in the testing pipeline:
-
-```
-tdd → suggest-tests → unit-test-workflow → property-based-testing → repo-hygiene
-                                                                         ↑
-                                                                    (TERMINAL)
-```
-
-All testing workflows should end with repo-hygiene to ensure clean state.
-
-### Feature Completion Flow
-
-In feature completion contexts, repo-hygiene chains to doc-maintenance:
-
-```
-feature done → dogfood-skills → repo-hygiene → doc-maintenance
-```
-
-After cleanup, doc-maintenance updates PLAN.md to mark tasks complete.
+For README writing guidelines, see:
+- `references/readme-structure.md` - Section ordering
+- `references/readme-badges.md` - Badge patterns
+- `references/readme-cli-docs.md` - CLI documentation
+- `references/readme-checklist.md` - Full checklist

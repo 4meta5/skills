@@ -20,6 +20,26 @@ These complement the generic patterns below.
 
 ---
 
+## General Vulnerability Patterns (From security-analysis)
+
+Static security review checklist. Identify vulnerabilities or risky patterns:
+
+- **Reentrancy**: State changes after external calls
+- **Unchecked inputs**: Missing validation on user-provided data
+- **Unsafe deserialization**: Parsing untrusted data without validation
+- **Race conditions**: Time-of-check to time-of-use vulnerabilities
+- **Privilege escalation**: Missing or weak authorization checks
+- **Misuse of cryptography**: Weak algorithms, hardcoded keys, predictable randomness
+- **Injection vulnerabilities**: SQL, command, LDAP, XPath injection
+- **Path traversal**: Unvalidated file paths allowing directory escape
+- **XSS/CSRF potential**: Unescaped output, missing CSRF tokens
+
+Also check:
+- Non-compliance with internal security policies or coding standards
+- Dependency or permission risks from new imports or external calls
+
+---
+
 ## Security Regressions
 
 **Pattern:** Previously removed code is re-added
