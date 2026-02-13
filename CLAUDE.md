@@ -12,6 +12,7 @@ A curated collection of Claude Code skills for development workflows.
 | dogfood | Enforces dogfooding and prevents manual workarounds |
 | function-analyzer | Per-function deep analysis for audit context |
 | model-router | Model tier routing for cost and reliability |
+| paul-graham | Paul Graham inspired writing and markdown/README editing |
 | refactor-suggestions | Suggest refactors for modified code |
 | repo-hygiene | Repository housekeeping and documentation |
 | rick-rubin | Scope discipline and simplicity |

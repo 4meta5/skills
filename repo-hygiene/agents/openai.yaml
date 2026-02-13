@@ -1,0 +1,4 @@
+interface:
+  display_name: "Repo Hygiene"
+  short_description: "Repository housekeeping and docs hygiene"
+  default_prompt: "Use $repo-hygiene to apply repo housekeeping and documentation updates."

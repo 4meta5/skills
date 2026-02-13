@@ -1,0 +1,4 @@
+interface:
+  display_name: "Dogfood"
+  short_description: "Enforce using the tools built in-repo"
+  default_prompt: "Use $dogfood to ensure we dogfood our own tooling in this task."

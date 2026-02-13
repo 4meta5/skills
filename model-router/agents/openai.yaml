@@ -1,0 +1,4 @@
+interface:
+  display_name: "Model Router"
+  short_description: "Route work to the right model tier"
+  default_prompt: "Use $model-router to choose the right model tier for this task."

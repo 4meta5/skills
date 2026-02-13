@@ -1,0 +1,4 @@
+interface:
+  display_name: "Code Review Rust"
+  short_description: "Rust code review guidelines and checks"
+  default_prompt: "Use $code-review-rust to review this Rust code change."

@@ -259,3 +259,6 @@ For README writing guidelines, see:
 - `references/readme-badges.md` - Badge patterns
 - `references/readme-cli-docs.md` - CLI documentation
 - `references/readme-checklist.md` - Full checklist
+
+For prose quality and markdown rewriting support, use:
+- `../paul-graham/SKILL.md` - Direct, high-signal writing and editing workflow

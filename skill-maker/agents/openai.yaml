@@ -1,0 +1,4 @@
+interface:
+  display_name: "Skill Maker"
+  short_description: "Create and validate skills by repo rules"
+  default_prompt: "Use $skill-maker to create or refine a skill in this repository."

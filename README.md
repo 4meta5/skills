@@ -28,6 +28,7 @@ A curated collection of Claude Code skills for development workflows.
 |-------|-------------|
 | [dogfood](./dogfood/SKILL.md) | Enforces using tools you build + prevents manual workarounds |
 | [model-router](./model-router/SKILL.md) | Model tier routing for cost and reliability |
+| [paul-graham](./paul-graham/SKILL.md) | Paul Graham inspired writing and markdown/README editing |
 | [rick-rubin](./rick-rubin/SKILL.md) | Scope discipline and simplicity |
 
 ### Repository Maintenance

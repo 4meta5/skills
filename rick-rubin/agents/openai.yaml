@@ -1,0 +1,4 @@
+interface:
+  display_name: "Rick Rubin"
+  short_description: "Scope discipline and simplicity guardrails"
+  default_prompt: "Use $rick-rubin to simplify scope and keep this work focused."

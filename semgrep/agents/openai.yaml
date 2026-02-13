@@ -1,0 +1,4 @@
+interface:
+  display_name: "Semgrep"
+  short_description: "Parallel Semgrep scan and triage workflow"
+  default_prompt: "Use $semgrep to run a structured security scan and triage process."

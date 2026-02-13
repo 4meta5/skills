@@ -1,0 +1,4 @@
+interface:
+  display_name: "Refactor Suggestions"
+  short_description: "Suggest practical refactors for changed code"
+  default_prompt: "Use $refactor-suggestions to propose refactors for this modified code."

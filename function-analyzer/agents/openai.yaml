@@ -1,0 +1,4 @@
+interface:
+  display_name: "Function Analyzer"
+  short_description: "Per-function deep audit context analysis"
+  default_prompt: "Use $function-analyzer to deeply analyze these functions for audit context."

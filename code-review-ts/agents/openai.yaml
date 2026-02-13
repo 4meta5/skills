@@ -1,0 +1,4 @@
+interface:
+  display_name: "Code Review TS"
+  short_description: "TypeScript code review guidance and checks"
+  default_prompt: "Use $code-review-ts to review this TypeScript code change."
