@@ -1,6 +1,11 @@
 ---
 name: refactor-suggestions
-description: Suggest refactors for modified code focusing on security, maintainability, readability, and functional programming purity
+description: |
+  Suggest refactors for modified code focusing on security, maintainability, readability,
+  and functional programming purity.
+  Use when: (1) reviewing changed functions for cleanup opportunities,
+  (2) preparing scoped refactor follow-up work,
+  (3) identifying non-blocking improvement candidates after implementation.
 category: refactoring
 disable-model-invocation: false
 user-invocable: true

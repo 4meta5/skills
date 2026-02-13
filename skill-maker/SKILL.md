@@ -187,6 +187,7 @@ Do not place skills directly in packages/skills/skills/ (generated output).
 
 This skill pairs well with:
 
+- model-router (when a skill needs explicit task-class routing guidance; keep it short and avoid provider pricing tables)
 - tdd (when adding validation logic)
 - claudeception (extracting learnings into skills)
 - dogfood-skills (self-validation)

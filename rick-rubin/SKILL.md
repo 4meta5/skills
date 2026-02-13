@@ -232,6 +232,7 @@ Default strictness is moderate. Escalate only with signal.
 
 ## Guardrails
 
+- For routine execution work, prefer lower-cost model tiers; for ambiguous root-cause reasoning, escalate deliberately. Reference `model-router` when explicit routing guidance is needed.
 - Inject one prompt per task.
 - Do not stack prompts.
 - Do not plan refactors without reflection.

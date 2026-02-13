@@ -4,10 +4,11 @@
 
 ### Changed
 
+- **Added model-router** - New core skill for ROUTINE/MODERATE/COMPLEX model tier routing with explicit escalation and sub-agent defaults
 - **Moved svelte5-rustaws-neon-devops** - Skill moved to [openclaw-skills](https://github.com/4meta5/openclaw-skills) repository
 - **Merged no-workarounds into dogfood** - The no-workarounds skill has been folded into dogfood for a unified "use your tools, fix when broken" enforcement
 
-### Remaining Skills (9)
+### Remaining Skills (10)
 
 | Skill | Description |
 |-------|-------------|
@@ -18,6 +19,7 @@
 | refactor-suggestions | Suggest refactors for modified code |
 | repo-hygiene | Repository housekeeping and documentation |
 | rick-rubin | Scope discipline and simplicity |
+| model-router | Model tier routing for cost and reliability |
 | skill-maker | Create Claude Code skills |
 | tdd | Test-driven development workflow |
 

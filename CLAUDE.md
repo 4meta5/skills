@@ -13,6 +13,7 @@ A curated collection of Claude Code skills for development workflows.
 | refactor-suggestions | Suggest refactors for modified code |
 | repo-hygiene | Repository housekeeping and documentation |
 | rick-rubin | Scope discipline and simplicity |
+| model-router | Model tier routing for cost and reliability |
 | skill-maker | Create Claude Code skills |
 | tdd | Test-driven development workflow |
 
