@@ -11,6 +11,11 @@ A curated collection of Claude Code skills for development workflows.
 | [code-review-ts](./code-review-ts/SKILL.md) | TypeScript code review guidelines (type safety, idioms) |
 | [differential-review](./differential-review/SKILL.md) | Security-focused review for PRs and diffs |
 
+### Security
+| Skill | Description |
+|-------|-------------|
+| [semgrep](./semgrep/SKILL.md) | Semgrep static analysis with parallel scan/triage workflow |
+
 ### Testing
 | Skill | Description |
 |-------|-------------|
@@ -29,10 +34,28 @@ A curated collection of Claude Code skills for development workflows.
 | [repo-hygiene](./repo-hygiene/SKILL.md) | Pre-work checks, documentation updates, cleanup |
 | [refactor-suggestions](./refactor-suggestions/SKILL.md) | Suggest refactors for modified code |
 
+### Workflow
+| Skill | Description |
+|-------|-------------|
+| [workflow](./workflow/SKILL.md) | Structured development cycle (brainstorm → plan → work → review → compound) |
+
 ### Creation
 | Skill | Description |
 |-------|-------------|
 | [skill-maker](./skill-maker/SKILL.md) | Create Claude Code skills |
+
+## Naming
+
+All skill names and folder names use **kebab-case** (lowercase, hyphens only).
+
+## Validation
+
+```bash
+./validate.sh            # all skills
+./validate.sh semgrep    # single skill
+```
+
+Requires `../hooks` repo (see [hooks](https://github.com/4meta5/hooks)).
 
 ## Installation
 
