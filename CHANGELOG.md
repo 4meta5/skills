@@ -1,13 +1,23 @@
 # Changelog
 
-## [0.6.0] - 2026-02-13
+## [0.5.0] - 2026-02-13
 
 ### Added
 
-- **spec-compliance-checker** - New skill for specification-to-code compliance analysis (7-phase IR workflow), ported from Trail of Bits audit-skills
-- **function-analyzer** - New skill for ultra-granular per-function deep analysis for security audit context building, ported from Trail of Bits audit-skills
+- **paul-graham** - Writing and markdown editing skill. Direct prose, structural editing, README conventions.
+- **semgrep** - Semgrep static analysis with parallel scan/triage workflow. Scanner and triager run as separate sub-agents.
+- **workflow** - Structured development cycle with five phases: brainstorm, plan, work, review, compound.
+- **function-analyzer** - Ultra-granular per-function deep analysis for security audit context building. Ported from Trail of Bits audit-skills.
+- **spec-compliance-checker** - Specification-to-code compliance analysis using a 7-phase IR workflow. Ported from Trail of Bits audit-skills.
+- **validate.sh** - Root-level validation script using the hooks CLI.
+- **OpenAI Codex support** - Added `agents/openai.yaml` config to every skill for Codex agent usage.
 
-### Skills (14)
+### Changed
+
+- **repo-hygiene** - Added alphabetical ordering rules, link validation, and paul-graham cross-reference.
+- **differential-review** - Minor SKILL.md cleanup.
+
+### Skills (15)
 
 | Skill | Description |
 |-------|-------------|
@@ -17,37 +27,13 @@
 | dogfood | Enforces dogfooding and prevents manual workarounds |
 | function-analyzer | Per-function deep analysis for audit context |
 | model-router | Model tier routing for cost and reliability |
+| paul-graham | Writing and markdown/README editing |
 | refactor-suggestions | Suggest refactors for modified code |
 | repo-hygiene | Repository housekeeping and documentation |
 | rick-rubin | Scope discipline and simplicity |
 | semgrep | Semgrep static analysis with parallel scan/triage |
-| skill-maker | Create Claude Code skills |
+| skill-maker | Create agentic skills |
 | spec-compliance-checker | Spec-to-code compliance analysis |
-| tdd | Test-driven development workflow |
-| workflow | Structured development cycle |
-
-## [0.5.0] - 2026-02-13
-
-### Added
-
-- **semgrep** - New skill for Semgrep static analysis with parallel scan/triage workflow
-- **workflow** - New skill for structured development cycle (brainstorm, plan, work, review, compound)
-- **validate.sh** - Root-level validation script using hooks CLI
-
-### Skills (12)
-
-| Skill | Description |
-|-------|-------------|
-| code-review-rust | Rust code review guidelines |
-| code-review-ts | TypeScript code review guidelines |
-| differential-review | Security-focused code review for diffs |
-| dogfood | Enforces dogfooding and prevents manual workarounds |
-| model-router | Model tier routing for cost and reliability |
-| refactor-suggestions | Suggest refactors for modified code |
-| repo-hygiene | Repository housekeeping and documentation |
-| rick-rubin | Scope discipline and simplicity |
-| semgrep | Semgrep static analysis with parallel scan/triage |
-| skill-maker | Create Claude Code skills |
 | tdd | Test-driven development workflow |
 | workflow | Structured development cycle |
 
@@ -82,7 +68,7 @@
 | refactor-suggestions | Suggest refactors for modified code |
 | repo-hygiene | Repository housekeeping and documentation |
 | rick-rubin | Scope discipline and simplicity |
-| skill-maker | Create Claude Code skills |
+| skill-maker | Create agentic skills |
 | tdd | Test-driven development workflow |
 
 ## [0.3.0] - 2026-02-05

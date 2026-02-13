@@ -1,6 +1,6 @@
 # Skills Collection
 
-A curated collection of Claude Code skills for development workflows.
+A curated collection of agentic skills for AI-assisted development workflows. Works with Claude Code and OpenAI Codex.
 
 ## Skills
 
@@ -17,12 +17,14 @@ A curated collection of Claude Code skills for development workflows.
 | repo-hygiene | Repository housekeeping and documentation |
 | rick-rubin | Scope discipline and simplicity |
 | semgrep | Semgrep static analysis with parallel scan/triage |
-| skill-maker | Create Claude Code skills |
+| skill-maker | Create agentic skills |
 | spec-compliance-checker | Spec-to-code compliance analysis |
 | tdd | Test-driven development workflow |
 | workflow | Structured development cycle |
 
 ## Installation
+
+### Claude Code
 
 Copy skills to your project's `.claude/skills/` directory:
 
@@ -36,6 +38,10 @@ Then reference in your CLAUDE.md:
 ## Installed Skills
 - @.claude/skills/<skill-name>/SKILL.md
 ```
+
+### OpenAI Codex
+
+Every skill includes an `agents/openai.yaml` config for Codex agent usage.
 
 ## TypeScript Tooling
 
