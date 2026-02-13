@@ -1,5 +1,31 @@
 # Changelog
 
+## [0.6.0] - 2026-02-13
+
+### Added
+
+- **spec-compliance-checker** - New skill for specification-to-code compliance analysis (7-phase IR workflow), ported from Trail of Bits audit-skills
+- **function-analyzer** - New skill for ultra-granular per-function deep analysis for security audit context building, ported from Trail of Bits audit-skills
+
+### Skills (14)
+
+| Skill | Description |
+|-------|-------------|
+| code-review-rust | Rust code review guidelines |
+| code-review-ts | TypeScript code review guidelines |
+| differential-review | Security-focused code review for diffs |
+| dogfood | Enforces dogfooding and prevents manual workarounds |
+| function-analyzer | Per-function deep analysis for audit context |
+| model-router | Model tier routing for cost and reliability |
+| refactor-suggestions | Suggest refactors for modified code |
+| repo-hygiene | Repository housekeeping and documentation |
+| rick-rubin | Scope discipline and simplicity |
+| semgrep | Semgrep static analysis with parallel scan/triage |
+| skill-maker | Create Claude Code skills |
+| spec-compliance-checker | Spec-to-code compliance analysis |
+| tdd | Test-driven development workflow |
+| workflow | Structured development cycle |
+
 ## [0.5.0] - 2026-02-13
 
 ### Added

@@ -14,7 +14,9 @@ A curated collection of Claude Code skills for development workflows.
 ### Security
 | Skill | Description |
 |-------|-------------|
+| [function-analyzer](./function-analyzer/SKILL.md) | Ultra-granular per-function analysis for audit context building |
 | [semgrep](./semgrep/SKILL.md) | Semgrep static analysis with parallel scan/triage workflow |
+| [spec-compliance-checker](./spec-compliance-checker/SKILL.md) | Spec-to-code compliance analysis (7-phase IR workflow) |
 
 ### Testing
 | Skill | Description |
@@ -25,14 +27,14 @@ A curated collection of Claude Code skills for development workflows.
 | Skill | Description |
 |-------|-------------|
 | [dogfood](./dogfood/SKILL.md) | Enforces using tools you build + prevents manual workarounds |
-| [rick-rubin](./rick-rubin/SKILL.md) | Scope discipline and simplicity |
 | [model-router](./model-router/SKILL.md) | Model tier routing for cost and reliability |
+| [rick-rubin](./rick-rubin/SKILL.md) | Scope discipline and simplicity |
 
 ### Repository Maintenance
 | Skill | Description |
 |-------|-------------|
-| [repo-hygiene](./repo-hygiene/SKILL.md) | Pre-work checks, documentation updates, cleanup |
 | [refactor-suggestions](./refactor-suggestions/SKILL.md) | Suggest refactors for modified code |
+| [repo-hygiene](./repo-hygiene/SKILL.md) | Pre-work checks, documentation updates, cleanup |
 
 ### Workflow
 | Skill | Description |

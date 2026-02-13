@@ -10,12 +10,14 @@ A curated collection of Claude Code skills for development workflows.
 | code-review-ts | TypeScript code review guidelines |
 | differential-review | Security-focused code review for diffs |
 | dogfood | Enforces dogfooding and prevents manual workarounds |
+| function-analyzer | Per-function deep analysis for audit context |
 | model-router | Model tier routing for cost and reliability |
 | refactor-suggestions | Suggest refactors for modified code |
 | repo-hygiene | Repository housekeeping and documentation |
 | rick-rubin | Scope discipline and simplicity |
 | semgrep | Semgrep static analysis with parallel scan/triage |
 | skill-maker | Create Claude Code skills |
+| spec-compliance-checker | Spec-to-code compliance analysis |
 | tdd | Test-driven development workflow |
 | workflow | Structured development cycle |
 

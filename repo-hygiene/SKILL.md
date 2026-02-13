@@ -91,6 +91,19 @@ Update when:
 - New command available
 - Installation steps changed
 
+### Alphabetical Ordering
+
+All skill lists and tables in documentation (README.md, CLAUDE.md) must be sorted alphabetically by skill name. Within categorized sections, sort alphabetically within each category.
+
+**Check after any skill addition or rename:**
+```bash
+# Verify alphabetical order in markdown tables
+grep '^\| \[' README.md  # Visual check: names should be A-Z within each section
+grep '^\|' CLAUDE.md     # Visual check: names should be A-Z
+```
+
+If out of order: **fix before committing.**
+
 ### Link Validation
 
 Verify all markdown links resolve before committing:

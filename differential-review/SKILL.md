@@ -114,13 +114,13 @@ Before delivering:
 
 ## Integration
 
-**audit-context-building skill:**
-- Pre-Analysis: Build baseline context
-- Phase 4: Deep context on HIGH RISK changes
+**function-analyzer skill:**
+- Pre-Analysis: Build baseline context for critical functions
+- Phase 4: Deep per-function context on HIGH RISK changes
 
-**issue-writer skill:**
-- Transform findings into formal audit reports
-- Command: `issue-writer --input DIFFERENTIAL_REVIEW_REPORT.md --format audit-report`
+**spec-compliance-checker skill:**
+- When reviewing changes against a formal specification
+- Use spec-compliance-checker for full spec-to-code alignment, then differential-review for the change delta
 
 ---
 
