@@ -1,14 +1,25 @@
 # Changelog
 
-## [Unreleased]
+## [0.4.0] - 2026-02-13
+
+### Added
+
+- **model-router** - New skill for ROUTINE/MODERATE/COMPLEX model tier routing with explicit escalation and sub-agent defaults
 
 ### Changed
 
-- **Added model-router** - New core skill for ROUTINE/MODERATE/COMPLEX model tier routing with explicit escalation and sub-agent defaults
+- **Merged no-workarounds into dogfood** - Consolidated into a single "use your tools, fix when broken" skill
 - **Moved svelte5-rustaws-neon-devops** - Skill moved to [openclaw-skills](https://github.com/4meta5/openclaw-skills) repository
-- **Merged no-workarounds into dogfood** - The no-workarounds skill has been folded into dogfood for a unified "use your tools, fix when broken" enforcement
+- **README links** - All skill table entries now link to their SKILL.md files
+- **Skill descriptions** - Added `Use when:` trigger phrases to code-review-ts, differential-review, refactor-suggestions
+- **Cross-references** - rick-rubin and skill-maker now reference model-router
 
-### Remaining Skills (10)
+### Removed
+
+- **no-workarounds** - Merged into dogfood
+- **svelte5-rustaws-neon-devops** - Moved to openclaw-skills
+
+### Skills (10)
 
 | Skill | Description |
 |-------|-------------|
@@ -16,10 +27,10 @@
 | code-review-ts | TypeScript code review guidelines |
 | differential-review | Security-focused code review for diffs |
 | dogfood | Enforces dogfooding and prevents manual workarounds |
+| model-router | Model tier routing for cost and reliability |
 | refactor-suggestions | Suggest refactors for modified code |
 | repo-hygiene | Repository housekeeping and documentation |
 | rick-rubin | Scope discipline and simplicity |
-| model-router | Model tier routing for cost and reliability |
 | skill-maker | Create Claude Code skills |
 | tdd | Test-driven development workflow |
 
