@@ -1,6 +1,6 @@
 # Skills
 
-16 curated agentic skills organized into five permanent categories.
+17 curated agentic skills organized into five permanent categories.
 
 ## Categories
 

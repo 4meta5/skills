@@ -1,5 +1,49 @@
 # Changelog
 
+## [0.6.0] - 2026-02-14
+
+### Stabilized
+
+- **Canonical skill taxonomy is now stable.** The five categories — `meta`, `audit`, `principles`, `habits`, `hot` — are final and will not change going forward.
+
+### Categories
+
+| Category | Skills |
+|----------|--------|
+| **meta** | make-skill, install-skill |
+| **audit** | code-review-rust, code-review-ts, diff-review, function-analyzer, semantic-grep, spec-checker |
+| **principles** | tdd, refactor-suggestions, dogfood, model-router, rick-rubin |
+| **habits** | compound-workflow, repo-hygiene, paul-graham |
+| **hot** | svelte5-cloudflare |
+
+### Changed
+
+- **Renamed skills** - `skill-maker` → `make-skill`, `semgrep` → `semantic-grep`, `workflow` → `compound-workflow`
+- **Added install-skill** - Skill installation workflow using the hooks CLI
+- **Added svelte5-cloudflare** - Svelte 5 + SvelteKit on Cloudflare Workers skill (hot category)
+
+### Skills (17)
+
+| Skill | Category |
+|-------|----------|
+| code-review-rust | audit |
+| code-review-ts | audit |
+| compound-workflow | habits |
+| diff-review | audit |
+| dogfood | principles |
+| function-analyzer | audit |
+| install-skill | meta |
+| make-skill | meta |
+| model-router | principles |
+| paul-graham | habits |
+| refactor-suggestions | principles |
+| repo-hygiene | habits |
+| rick-rubin | principles |
+| semantic-grep | audit |
+| spec-checker | audit |
+| svelte5-cloudflare | hot |
+| tdd | principles |
+
 ## [0.5.0] - 2026-02-13
 
 ### Added
