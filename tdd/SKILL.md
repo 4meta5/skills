@@ -5,7 +5,7 @@ description: |
   test generation, and property-based testing. Use when: (1) implementing new features,
   (2) fixing bugs, (3) refactoring code, (4) reviewing test coverage.
   Enforces RED → GREEN → REFACTOR cycle.
-category: testing
+category: principles
 disable-model-invocation: false
 user-invocable: true
 allowed-tools: Read, Grep, Glob, Bash, Write, Edit

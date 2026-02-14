@@ -1,0 +1,4 @@
+interface:
+  display_name: "Svelte5 Cloudflare"
+  short_description: "Safe SvelteKit + Cloudflare deploy and operations workflow"
+  default_prompt: "Use $svelte5-cloudflare to configure, validate, and deploy this SvelteKit app to Cloudflare without runtime/secret mistakes."

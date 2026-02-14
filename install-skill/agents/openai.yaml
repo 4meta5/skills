@@ -1,0 +1,4 @@
+interface:
+  display_name: "Install Skill"
+  short_description: "Install skills locally via ../hooks without publish"
+  default_prompt: "Use $install-skill to install this skill from ../skills into the target project using local ../hooks packages."

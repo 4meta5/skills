@@ -1,0 +1,18 @@
+{
+  "updated_at_utc": "2026-02-14T19:13:43.624Z",
+  "tooling": {
+    "sveltekit": "^2.50.1",
+    "adapter_cloudflare": "^6.0.1",
+    "vite": "^7.3.1",
+    "wrangler_cli": "4.65.0"
+  },
+  "fingerprints": {
+    "svelte_config_sha256": "ae6e84ffabf7ccbdc5258a75f51f5e660b34d49311502085ed937341a0b1c1bb",
+    "waitlist_api_sha256": "531daf6e4a2b3f745e744f0cd430cbca009ee002420457a3add0e7898ba3b47e"
+  },
+  "deploy": {
+    "worker_entry": ".svelte-kit/cloudflare/_worker.js",
+    "assets_dir": ".svelte-kit/cloudflare",
+    "worker_secret_key": "GOOGLE_APPS_SCRIPT_URL"
+  }
+}

@@ -4,7 +4,7 @@ description: |
   Comprehensive repository housekeeping: pre-work checks, documentation updates,
   writing style, and cleanup. Use when: (1) starting work on a repo, (2) completing
   tasks, (3) editing markdown files, (4) cleaning up test artifacts.
-category: development
+category: habits
 user-invocable: true
 ---
 

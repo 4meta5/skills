@@ -6,7 +6,7 @@ description: |
   Use when: (1) reviewing changed functions for cleanup opportunities,
   (2) preparing scoped refactor follow-up work,
   (3) identifying non-blocking improvement candidates after implementation.
-category: refactoring
+category: principles
 disable-model-invocation: false
 user-invocable: true
 allowed-tools: Read, Grep, Glob, Bash

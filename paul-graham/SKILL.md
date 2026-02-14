@@ -5,7 +5,7 @@ description: |
   technical posts, READMEs, and markdown docs. Use when: (1) drafting from notes,
   (2) rewriting weak or bloated prose, (3) tightening argument flow and clarity,
   (4) enforcing markdown readability and README structure quality.
-category: documentation
+category: habits
 user-invocable: true
 ---
 

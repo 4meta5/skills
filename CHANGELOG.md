@@ -8,14 +8,14 @@
 - **semgrep** - Semgrep static analysis with parallel scan/triage workflow. Scanner and triager run as separate sub-agents.
 - **workflow** - Structured development cycle with five phases: brainstorm, plan, work, review, compound.
 - **function-analyzer** - Ultra-granular per-function deep analysis for security audit context building. Ported from Trail of Bits audit-skills.
-- **spec-compliance-checker** - Specification-to-code compliance analysis using a 7-phase IR workflow. Ported from Trail of Bits audit-skills.
+- **spec-checker** - Specification-to-code compliance analysis using a 7-phase IR workflow. Ported from Trail of Bits audit-skills.
 - **validate.sh** - Root-level validation script using the hooks CLI.
 - **OpenAI Codex support** - Added `agents/openai.yaml` config to every skill for Codex agent usage.
 
 ### Changed
 
 - **repo-hygiene** - Added alphabetical ordering rules, link validation, and paul-graham cross-reference.
-- **differential-review** - Minor SKILL.md cleanup.
+- **diff-review** - Minor SKILL.md cleanup.
 
 ### Skills (15)
 
@@ -23,7 +23,7 @@
 |-------|-------------|
 | code-review-rust | Rust code review guidelines |
 | code-review-ts | TypeScript code review guidelines |
-| differential-review | Security-focused code review for diffs |
+| diff-review | Security-focused code review for diffs |
 | dogfood | Enforces dogfooding and prevents manual workarounds |
 | function-analyzer | Per-function deep analysis for audit context |
 | model-router | Model tier routing for cost and reliability |
@@ -33,7 +33,7 @@
 | rick-rubin | Scope discipline and simplicity |
 | semgrep | Semgrep static analysis with parallel scan/triage |
 | skill-maker | Create agentic skills |
-| spec-compliance-checker | Spec-to-code compliance analysis |
+| spec-checker | Spec-to-code compliance analysis |
 | tdd | Test-driven development workflow |
 | workflow | Structured development cycle |
 
@@ -48,7 +48,7 @@
 - **Merged no-workarounds into dogfood** - Consolidated into a single "use your tools, fix when broken" skill
 - **Moved svelte5-rustaws-neon-devops** - Skill moved to [openclaw-skills](https://github.com/4meta5/openclaw-skills) repository
 - **README links** - All skill table entries now link to their SKILL.md files
-- **Skill descriptions** - Added `Use when:` trigger phrases to code-review-ts, differential-review, refactor-suggestions
+- **Skill descriptions** - Added `Use when:` trigger phrases to code-review-ts, diff-review, refactor-suggestions
 - **Cross-references** - rick-rubin and skill-maker now reference model-router
 
 ### Removed
@@ -62,7 +62,7 @@
 |-------|-------------|
 | code-review-rust | Rust code review guidelines |
 | code-review-ts | TypeScript code review guidelines |
-| differential-review | Security-focused code review for diffs |
+| diff-review | Security-focused code review for diffs |
 | dogfood | Enforces dogfooding and prevents manual workarounds |
 | model-router | Model tier routing for cost and reliability |
 | refactor-suggestions | Suggest refactors for modified code |

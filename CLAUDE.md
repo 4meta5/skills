@@ -1,48 +1,32 @@
 # Skills Collection
 
-A curated collection of agentic skills for AI-assisted development workflows. Works with Claude Code and OpenAI Codex.
+Canonical categories (only supported): `meta`, `audit`, `principles`, `habits`, `hot`.
 
 ## Skills
 
-| Skill | Description |
-|-------|-------------|
-| code-review-rust | Rust code review guidelines |
-| code-review-ts | TypeScript code review guidelines |
-| differential-review | Security-focused code review for diffs |
-| dogfood | Enforces dogfooding and prevents manual workarounds |
-| function-analyzer | Per-function deep analysis for audit context |
-| model-router | Model tier routing for cost and reliability |
-| paul-graham | Paul Graham inspired writing and markdown/README editing |
-| refactor-suggestions | Suggest refactors for modified code |
-| repo-hygiene | Repository housekeeping and documentation |
-| rick-rubin | Scope discipline and simplicity |
-| semgrep | Semgrep static analysis with parallel scan/triage |
-| skill-maker | Create agentic skills |
-| spec-compliance-checker | Spec-to-code compliance analysis |
-| tdd | Test-driven development workflow |
-| workflow | Structured development cycle |
+### meta
+- make-skill
+- install-skill
 
-## Installation
+### audit
+- code-review-rust
+- code-review-ts
+- diff-review
+- function-analyzer
+- semantic-grep
+- spec-checker
 
-### Claude Code
+### principles
+- tdd
+- refactor-suggestions
+- dogfood
+- model-router
+- rick-rubin
 
-Copy skills to your project's `.claude/skills/` directory:
+### habits
+- compound-workflow
+- repo-hygiene
+- paul-graham
 
-```bash
-cp -r <skill-name> /path/to/project/.claude/skills/
-```
-
-Then reference in your CLAUDE.md:
-
-```markdown
-## Installed Skills
-- @.claude/skills/<skill-name>/SKILL.md
-```
-
-### OpenAI Codex
-
-Every skill includes an `agents/openai.yaml` config for Codex agent usage.
-
-## TypeScript Tooling
-
-For the skills CLI and library, see the [hooks](https://github.com/4meta5/hooks) repository.
+### hot
+- svelte5-cloudflare

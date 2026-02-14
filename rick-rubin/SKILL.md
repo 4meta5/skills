@@ -6,7 +6,7 @@ description: |
   from an existing plan with minimal deviation, (3) reviewing changes for
   unnecessary complexity or refactor creep, (4) analyzing bugs and root causes
   without expanding scope. Select and inject exactly one prompt per task.
-category: development
+category: principles
 ---
 
 # SKILL: rick-rubin
