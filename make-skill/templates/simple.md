@@ -4,7 +4,7 @@ description: |
   One-sentence description of what this skill does.
   Use when: (1) first trigger condition, (2) second trigger condition.
   Specific symptoms, error messages, or contexts it addresses.
-category: development
+category: principles
 ---
 
 # Skill Name

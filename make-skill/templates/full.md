@@ -8,7 +8,7 @@ description: |
 author: Your Name
 version: 1.0.0
 date: YYYY-MM-DD
-category: development
+category: principles
 user-invocable: true
 ---
 

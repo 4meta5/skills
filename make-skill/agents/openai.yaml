@@ -1,4 +1,4 @@
 interface:
-  display_name: "Skill Maker"
-  short_description: "Create and validate skills by repo rules"
-  default_prompt: "Use $make-skill to create or refine a skill in this repository."
+  display_name: "Make Skill"
+  short_description: "Create and validate skills with canonical taxonomy"
+  default_prompt: "Use $make-skill to create or update this skill using the canonical taxonomy and local hooks validation flow."
