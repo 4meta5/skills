@@ -48,17 +48,31 @@ If you change naming/category rules, update all of:
 3. `../hooks/packages/cli/src/detector/types.ts`
 4. Related docs in `../hooks/packages/*/README.md`
 
-Then rebuild local hooks packages:
+## Mandatory Post-Change Local Sync
+
+After any skill creation/rename/category change, run this exact flow before handoff:
+
 ```bash
 cd ../hooks
 npm run build -w @4meta5/skill-loader
 npm run build -w @4meta5/skills
 npm run build -w @4meta5/skills-cli
+
+cd ../skills
+node ../hooks/packages/cli/bin/skills.js validate <skill-name>
+node ../hooks/packages/cli/bin/skills.js sync <skill-name> --push
+```
+
+If target projects need immediate refresh without publish, run:
+```bash
+cd ../skills
+node ../hooks/packages/cli/bin/skills.js add <skill-name> --cwd /absolute/path/to/project
+node ../hooks/packages/cli/bin/skills.js claudemd sync --cwd /absolute/path/to/project
 ```
 
 ## Handoff to Install Skill
 
-After creation, use `$install-skill` flow to install into a target project via local paths, not npm publish.
+After creation, use `$install-skill` flow to install into target projects via local paths, not npm publish.
 
 ## Auto-Maintenance
 
