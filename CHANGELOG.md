@@ -1,5 +1,46 @@
 # Changelog
 
+## [0.7.0] - 2026-02-16
+
+### Added
+
+- **bryan-cantrill** - Evidence-first engineering. Written design before implementation, risk-ordered execution, observability contracts.
+- **elon-musk** - Delete-first refactoring with strict Git safety gates and rollback discipline.
+- **linus-torvalds** - No regressions, no breaking userspace, minimal patches, proof over talk. P0-P4 priority stack.
+- **steve-jobs** - Experience-first product planning. Top-10 enforcement, DRI ownership, ruthless focus.
+
+### Changed
+
+- **make-skill** - Added mandatory steps to update CLAUDE.md and verify AGENTS.md after skill creation.
+
+### Skills (23)
+
+| Skill | Category |
+|-------|----------|
+| bryan-cantrill | principles |
+| code-review-rust | audit |
+| code-review-ts | audit |
+| compound-workflow | habits |
+| diff-review | audit |
+| dogfood | principles |
+| elon-musk | principles |
+| fresh-eyes | principles |
+| function-analyzer | audit |
+| install-skill | meta |
+| linus-torvalds | principles |
+| make-skill | meta |
+| model-router | principles |
+| paul-graham | habits |
+| refactor-suggestions | principles |
+| repo-hygiene | habits |
+| rick-rubin | principles |
+| semantic-grep | audit |
+| spec-checker | audit |
+| steve-jobs | principles |
+| svelte5-cloudflare | hot |
+| tdd | principles |
+| wip | meta |
+
 ## [0.6.0] - 2026-02-14
 
 ### Stabilized

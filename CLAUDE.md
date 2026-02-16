@@ -24,11 +24,15 @@ Canonical categories (only supported): `meta`, `audit`, `principles`, `habits`, 
 - spec-checker
 
 ### principles
+- bryan-cantrill
 - dogfood
+- elon-musk
 - fresh-eyes
+- linus-torvalds
 - model-router
 - refactor-suggestions
 - rick-rubin
+- steve-jobs
 - tdd
 
 ### habits
@@ -40,6 +44,8 @@ Canonical categories (only supported): `meta`, `audit`, `principles`, `habits`, 
 - svelte5-cloudflare
 
 ## Installed Skills
+- @.claude/skills/bryan-cantrill/SKILL.md
+- @.claude/skills/elon-musk/SKILL.md
 - @.claude/skills/code-review-rust/SKILL.md
 - @.claude/skills/code-review-ts/SKILL.md
 - @.claude/skills/compound-workflow/SKILL.md
@@ -48,6 +54,7 @@ Canonical categories (only supported): `meta`, `audit`, `principles`, `habits`, 
 - @.claude/skills/fresh-eyes/SKILL.md
 - @.claude/skills/function-analyzer/SKILL.md
 - @.claude/skills/install-skill/SKILL.md
+- @.claude/skills/linus-torvalds/SKILL.md
 - @.claude/skills/make-skill/SKILL.md
 - @.claude/skills/model-router/SKILL.md
 - @.claude/skills/paul-graham/SKILL.md
@@ -56,6 +63,7 @@ Canonical categories (only supported): `meta`, `audit`, `principles`, `habits`, 
 - @.claude/skills/rick-rubin/SKILL.md
 - @.claude/skills/semantic-grep/SKILL.md
 - @.claude/skills/spec-checker/SKILL.md
+- @.claude/skills/steve-jobs/SKILL.md
 - @.claude/skills/svelte5-cloudflare/SKILL.md
 - @.claude/skills/tdd/SKILL.md
 - @.claude/skills/wip/SKILL.md

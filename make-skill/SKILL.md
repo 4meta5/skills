@@ -44,7 +44,12 @@ Do not introduce any additional categories.
 1. Create/update `<skill-name>/SKILL.md`.
 2. Set frontmatter fields: `name`, `description`, optional `category`, optional `user-invocable`.
 3. Add/update `agents/openai.yaml` so `default_prompt` references `$<skill-name>`.
-4. Validate with local hooks CLI:
+4. **Update `CLAUDE.md`** (mandatory, do not skip):
+   - Add the skill name under the correct category in the `## Skills` section.
+   - Add `- @.claude/skills/<skill-name>/SKILL.md` to the `## Installed Skills` section.
+   - Maintain alphabetical order within each section.
+5. **Verify `AGENTS.md`** mirrors `CLAUDE.md`. If `AGENTS.md` is a symlink to `CLAUDE.md`, this is automatic. If not, update it manually to match.
+6. Validate with local hooks CLI:
 ```bash
 cd ../skills
 node ../hooks/packages/cli/bin/skills.js validate <skill-name>

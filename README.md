@@ -1,6 +1,6 @@
 # Skills
 
-19 curated agentic skills for Claude Code, organized into five categories.
+23 curated agentic skills for Claude Code, organized into five categories.
 
 ## All Skills
 
@@ -15,11 +15,15 @@
 | [function-analyzer](./function-analyzer/SKILL.md) | `audit` | Per-function deep analysis for security audit context |
 | [semantic-grep](./semantic-grep/SKILL.md) | `audit` | Semgrep static analysis with parallel execution and structured triage |
 | [spec-checker](./spec-checker/SKILL.md) | `audit` | Specification-to-code compliance analysis |
+| [bryan-cantrill](./bryan-cantrill/SKILL.md) | `principles` | Evidence-first engineering with written design and observability |
 | [dogfood](./dogfood/SKILL.md) | `principles` | Enforce dogfooding for tool projects. No manual workarounds. |
+| [elon-musk](./elon-musk/SKILL.md) | `principles` | Delete-first refactoring with strict safety and rollback |
 | [fresh-eyes](./fresh-eyes/SKILL.md) | `principles` | Perspective-shift discipline for plans, code, and bugs |
+| [linus-torvalds](./linus-torvalds/SKILL.md) | `principles` | No regressions, minimal patches, proof over talk |
 | [model-router](./model-router/SKILL.md) | `principles` | Route work to the cheapest model tier that succeeds |
 | [refactor-suggestions](./refactor-suggestions/SKILL.md) | `principles` | Scoped refactor suggestions from branch diffs |
 | [rick-rubin](./rick-rubin/SKILL.md) | `principles` | Scope discipline and simplicity for agent tasks |
+| [steve-jobs](./steve-jobs/SKILL.md) | `principles` | Experience-first product planning with ruthless focus |
 | [tdd](./tdd/SKILL.md) | `principles` | Test-driven development with RED-GREEN-REFACTOR enforcement |
 | [compound-workflow](./compound-workflow/SKILL.md) | `habits` | Structured workflow: brainstorm, plan, work, review, compound |
 | [paul-graham](./paul-graham/SKILL.md) | `habits` | Clear, direct prose. Optimize for insight per sentence. |
