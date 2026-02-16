@@ -17,11 +17,12 @@ Canonical categories (only supported): `meta`, `audit`, `principles`, `habits`, 
 - spec-checker
 
 ### principles
-- tdd
-- refactor-suggestions
 - dogfood
+- fresh-eyes
 - model-router
+- refactor-suggestions
 - rick-rubin
+- tdd
 
 ### habits
 - compound-workflow
@@ -37,6 +38,7 @@ Canonical categories (only supported): `meta`, `audit`, `principles`, `habits`, 
 - @.claude/skills/compound-workflow/SKILL.md
 - @.claude/skills/diff-review/SKILL.md
 - @.claude/skills/dogfood/SKILL.md
+- @.claude/skills/fresh-eyes/SKILL.md
 - @.claude/skills/function-analyzer/SKILL.md
 - @.claude/skills/install-skill/SKILL.md
 - @.claude/skills/make-skill/SKILL.md
