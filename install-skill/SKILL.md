@@ -1,11 +1,11 @@
 ---
 name: install-skill
-description: |
-  Install skills from ../skills into a target project via local ../hooks CLI,
-  including pre-publish local-path workflows after make-skill changes.
-  Use when: (1) a new or renamed skill was added in ../skills, (2) hooks packages
-  changed locally and are not published yet, (3) you need deterministic installation
-  into .claude/skills with CLAUDE.md sync and no stale npm dependency assumptions.
+description: Install skills from ../skills into a target project via local ../hooks CLI,
+including pre-publish local-path workflows after make-skill changes.
+Use when: (1) a new or renamed skill was added in ../skills, (2) hooks packages
+changed locally and are not published yet, (3) you need deterministic installation
+for both Claude Code and Codex with no stale npm dependency assumptions.
+
 category: meta
 user-invocable: true
 ---
@@ -29,9 +29,32 @@ npm run build -w @4meta5/skills-cli
 cd ../skills
 node ../hooks/packages/cli/bin/skills.js add <skill-name> --cwd /absolute/path/to/project
 ```
-4. Validate install in target project:
+4. Sync project skill references:
+```bash
+cd /absolute/path/to/project
+node ../hooks/packages/cli/bin/skills.js claudemd sync
+```
+
+## Dual Runtime Requirement (Claude + Codex)
+
+The install is not complete until both runtimes are covered:
+
+1. Claude Code path:
 - `.claude/skills/<skill-name>/SKILL.md` exists
 - `CLAUDE.md` contains `- @.claude/skills/<skill-name>/SKILL.md`
+- `.claude/hooks/skill-forced-eval.sh` exists and points to local CLI fallback when available
+
+2. Codex path:
+- `AGENTS.md` must expose the same installed skill references.
+- Preferred pattern: `AGENTS.md` symlink to `CLAUDE.md`.
+- If symlink is not used, keep `AGENTS.md` skill refs in lockstep with `CLAUDE.md`.
+
+Verification commands:
+```bash
+cd /absolute/path/to/project
+ls -l AGENTS.md
+rg -n "@.claude/skills/.*/SKILL.md" CLAUDE.md AGENTS.md
+```
 
 ## Hard-Cut Rename Install
 
@@ -43,6 +66,37 @@ cd ../skills
 node ../hooks/packages/cli/bin/skills.js remove <old-skill-name> --cwd /absolute/path/to/project
 ```
 3. Run `node ../hooks/packages/cli/bin/skills.js claudemd sync --cwd /absolute/path/to/project`.
+4. Re-check `AGENTS.md` mirrors updated references.
+
+## Replace Set Workflow
+
+When user requests a strict target set (replace stale installs completely):
+
+```bash
+# 1) remove everything not in target set
+cd /absolute/path/to/project
+ls .claude/skills
+# remove non-target skills explicitly via skills.js remove
+
+# 2) install target set from local skills repo
+cd ../skills
+node ../hooks/packages/cli/bin/skills.js add <skill-a> <skill-b> ... --cwd /absolute/path/to/project
+
+# 3) sync docs and verify both runtimes
+node ../hooks/packages/cli/bin/skills.js claudemd sync --cwd /absolute/path/to/project
+cd /absolute/path/to/project
+rg -n "@.claude/skills/.*/SKILL.md" CLAUDE.md AGENTS.md
+```
+
+## Safety Guardrails For Bulk Cleanup
+
+Before removing skills from `.claude/skills`:
+1. Never treat dot-prefixed entries as skills (`.git`, `.claude`, `.scout`, etc.).
+2. If `.claude/skills` is a symlink, resolve it and verify it points to a dedicated skills directory.
+3. Only remove names that:
+- are in a known stale-name list, or
+- are installed skill directories with a valid `SKILL.md`.
+4. After cleanup, verify repository metadata still exists (`.git` present) and rerun `skills list`.
 
 ## Auto-Maintenance
 

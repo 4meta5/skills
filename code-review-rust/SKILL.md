@@ -1,8 +1,8 @@
 ---
 name: code-review-rust
-description: |
-  Rust code review guidelines with prioritized focus on correctness, safety, and idiomatic patterns.
-  Use when: (1) reviewing Rust PRs, (2) checking error handling, (3) validating unsafe code.
+description: Rust code review guidelines with prioritized focus on correctness, safety, and idiomatic patterns.
+Use when: (1) reviewing Rust PRs, (2) checking error handling, (3) validating unsafe code.
+
 category: audit
 disable-model-invocation: false
 user-invocable: true

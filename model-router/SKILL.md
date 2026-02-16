@@ -1,9 +1,9 @@
 ---
 name: model-router
-description: |
-  Route work to the cheapest model tier that can reliably complete it.
-  Use when: (1) choosing a model for a task, (2) deciding model level for sub-agents,
-  (3) escalating after a failed attempt, (4) avoiding premium-model overuse on routine work.
+description: Route work to the cheapest model tier that can reliably complete it.
+Use when: (1) choosing a model for a task, (2) deciding model level for sub-agents,
+(3) escalating after a failed attempt, (4) avoiding premium-model overuse on routine work.
+
 category: principles
 user-invocable: true
 ---

@@ -1,10 +1,10 @@
 ---
 name: spec-checker
-description: |
-  Performs specification-to-code compliance analysis.
-  Use when: (1) verifying implementations match their formal specifications,
-  (2) auditing smart contracts against whitepapers, (3) checking that code
-  behavior aligns with design documents.
+description: Performs specification-to-code compliance analysis.
+Use when: (1) verifying implementations match their formal specifications,
+(2) auditing smart contracts against whitepapers, (3) checking that code
+behavior aligns with design documents.
+
 category: audit
 ---
 

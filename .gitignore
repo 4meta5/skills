@@ -13,3 +13,12 @@ Thumbs.db
 
 # Internal directories
 .scout/
+
+# Added by gia guard
+node_modules/
+dist/
+target/
+build/
+.env
+.env.*
+*.log

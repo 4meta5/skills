@@ -1,9 +1,9 @@
 ---
 name: code-review-ts
-description: |
-  TypeScript-specific code review guidelines focusing on type safety and TypeScript idioms.
-  Use when: (1) reviewing TypeScript pull requests, (2) auditing type-safety regressions,
-  (3) checking TS API and error-handling patterns.
+description: TypeScript-specific code review guidelines focusing on type safety and TypeScript idioms.
+Use when: (1) reviewing TypeScript pull requests, (2) auditing type-safety regressions,
+(3) checking TS API and error-handling patterns.
+
 category: audit
 disable-model-invocation: false
 user-invocable: true

@@ -1,11 +1,11 @@
 ---
 name: svelte5-cloudflare
-description: |
-  Deploy and operate Svelte 5 + SvelteKit projects on Cloudflare Workers safely.
-  Use when adding server routes, configuring adapters, setting Wrangler secrets,
-  deploying with CLI, or debugging waitlist/form flows that proxy to external services.
-  Prevents common mistakes: wrong adapter, wrong wrangler command target (Pages vs Worker),
-  missing entrypoint/assets, missing runtime secrets, and false-positive submission success.
+description: Deploy and operate Svelte 5 + SvelteKit projects on Cloudflare Workers safely.
+Use when adding server routes, configuring adapters, setting Wrangler secrets,
+deploying with CLI, or debugging waitlist/form flows that proxy to external services.
+Prevents common mistakes: wrong adapter, wrong wrangler command target (Pages vs Worker),
+missing entrypoint/assets, missing runtime secrets, and false-positive submission success.
+
 category: hot
 user-invocable: true
 ---

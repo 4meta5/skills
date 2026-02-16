@@ -1,4 +1,4 @@
-interface:
+agent:
   display_name: "Install Skill"
-  short_description: "Install skills locally via ../hooks without publish"
-  default_prompt: "Use $install-skill to install this skill from ../skills into the target project using local ../hooks packages."
+  short_description: "Install skills locally for Claude Code and Codex via ../hooks without publish"
+  default_prompt: "Use $install-skill to install this skill from ../skills into the target project using local ../hooks packages, then verify both Claude Code and Codex activation surfaces are updated."

@@ -1,10 +1,10 @@
 ---
 name: semantic-grep
-description: |
-  Run Semgrep static analysis scans with parallel execution and structured triage.
-  Use when: (1) scanning a codebase for security vulnerabilities, (2) running a
-  first-pass static analysis audit, (3) finding known bug patterns before code review.
-  Enforces scan-plan approval gate, scanner/triager split, and triage-required reporting.
+description: Run Semgrep static analysis scans with parallel execution and structured triage.
+Use when: (1) scanning a codebase for security vulnerabilities, (2) running a
+first-pass static analysis audit, (3) finding known bug patterns before code review.
+Enforces scan-plan approval gate, scanner/triager split, and triage-required reporting.
+
 category: audit
 ---
 

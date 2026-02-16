@@ -1,10 +1,10 @@
 ---
 name: paul-graham
-description: |
-  Write and edit high-signal prose in a Paul Graham inspired style for essays,
-  technical posts, READMEs, and markdown docs. Use when: (1) drafting from notes,
-  (2) rewriting weak or bloated prose, (3) tightening argument flow and clarity,
-  (4) enforcing markdown readability and README structure quality.
+description: Write and edit high-signal prose in a Paul Graham inspired style for essays,
+technical posts, READMEs, and markdown docs. Use when: (1) drafting from notes,
+(2) rewriting weak or bloated prose, (3) tightening argument flow and clarity,
+(4) enforcing markdown readability and README structure quality.
+
 category: habits
 user-invocable: true
 ---
@@ -84,4 +84,3 @@ For README-specific standards, use:
 - If claims are time-sensitive, verify current data before asserting.
 - If a requested tone conflicts with clarity, preserve clarity first.
 - If asked for "Paul Graham style", apply style principles, not mimicry.
-

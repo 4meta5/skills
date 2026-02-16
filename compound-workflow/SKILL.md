@@ -1,10 +1,10 @@
 ---
 name: compound-workflow
-description: |
-  Structured development workflow: brainstorm, plan, work, review, compound.
-  Use when: (1) starting a new feature end-to-end, (2) coordinating multi-phase
-  development work, (3) ensuring each phase completes before the next begins.
-  Orchestration-thin — routes to existing local skills for phase-specific logic.
+description: Structured development workflow: brainstorm, plan, work, review, compound.
+Use when: (1) starting a new feature end-to-end, (2) coordinating multi-phase
+development work, (3) ensuring each phase completes before the next begins.
+Orchestration-thin — routes to existing local skills for phase-specific logic.
+
 category: habits
 ---
 

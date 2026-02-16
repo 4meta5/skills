@@ -1,9 +1,9 @@
 ---
 name: make-skill
-description: |
-  Create and validate new skills in this repository using the canonical taxonomy.
-  Use when: (1) adding a new skill, (2) renaming or recategorizing a skill,
-  (3) updating skill metadata/docs to match hooks validation contracts.
+description: Create and validate new skills in this repository using the canonical taxonomy.
+Use when: (1) adding a new skill, (2) renaming or recategorizing a skill,
+(3) updating skill metadata/docs to match hooks validation contracts.
+
 category: meta
 user-invocable: true
 ---

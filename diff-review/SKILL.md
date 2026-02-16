@@ -1,15 +1,14 @@
 ---
 name: diff-review
-description: |
-  Performs security-focused differential review of code changes (PRs, commits, diffs).
-  Adapts analysis depth to codebase size, uses git history for context, calculates
-  blast radius, checks test coverage, and generates comprehensive markdown reports.
-  Automatically detects and prevents security regressions.
-  Use when: (1) reviewing security-sensitive changes, (2) assessing blast radius
-  from a diff, (3) producing an evidence-based security review report with severity
-  and exploitability context.
-category: audit
+description: Performs security-focused differential review of code changes (PRs, commits, diffs).
+Adapts analysis depth to codebase size, uses git history for context, calculates
+blast radius, checks test coverage, and generates comprehensive markdown reports.
+Automatically detects and prevents security regressions.
+Use when: (1) reviewing security-sensitive changes, (2) assessing blast radius
+from a diff, (3) producing an evidence-based security review report with severity
+and exploitability context.
 
+category: audit
 allowed-tools: Read,Write,Grep,Glob,Bash
 ---
 
