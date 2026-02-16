@@ -52,7 +52,7 @@ Do not introduce any additional categories.
 6. Validate with local hooks CLI:
 ```bash
 cd ../skills
-node ../hooks/packages/cli/bin/skills.js validate <skill-name>
+node ../skillex/packages/skills-cli/bin/skills.js validate <skill-name>
 ```
 
 ## Cross-Repo Contract (Required)
@@ -74,15 +74,15 @@ npm run build -w @4meta5/skills
 npm run build -w @4meta5/skills-cli
 
 cd ../skills
-node ../hooks/packages/cli/bin/skills.js validate <skill-name>
-node ../hooks/packages/cli/bin/skills.js sync <skill-name> --push
+node ../skillex/packages/skills-cli/bin/skills.js validate <skill-name>
+node ../skillex/packages/skills-cli/bin/skills.js sync <skill-name> --push
 ```
 
 If target projects need immediate refresh without publish, run:
 ```bash
 cd ../skills
-node ../hooks/packages/cli/bin/skills.js add <skill-name> --cwd /absolute/path/to/project
-node ../hooks/packages/cli/bin/skills.js claudemd sync --cwd /absolute/path/to/project
+node ../skillex/packages/skills-cli/bin/skills.js add <skill-name> --cwd /absolute/path/to/project
+node ../skillex/packages/skills-cli/bin/skills.js claudemd sync --cwd /absolute/path/to/project
 ```
 
 ## Handoff to Install Skill

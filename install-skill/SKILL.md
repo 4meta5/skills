@@ -27,12 +27,12 @@ npm run build -w @4meta5/skills-cli
 3. Install into target project from local source:
 ```bash
 cd ../skills
-node ../hooks/packages/cli/bin/skills.js add <skill-name> --cwd /absolute/path/to/project
+node ../skillex/packages/skills-cli/bin/skills.js add <skill-name> --cwd /absolute/path/to/project
 ```
 4. Sync project skill references:
 ```bash
 cd /absolute/path/to/project
-node ../hooks/packages/cli/bin/skills.js claudemd sync
+node ../skillex/packages/skills-cli/bin/skills.js claudemd sync
 ```
 
 ## Dual Runtime Requirement (Claude + Codex)
@@ -63,9 +63,9 @@ If skill names were renamed, do not keep aliases.
 2. Remove old name from project:
 ```bash
 cd ../skills
-node ../hooks/packages/cli/bin/skills.js remove <old-skill-name> --cwd /absolute/path/to/project
+node ../skillex/packages/skills-cli/bin/skills.js remove <old-skill-name> --cwd /absolute/path/to/project
 ```
-3. Run `node ../hooks/packages/cli/bin/skills.js claudemd sync --cwd /absolute/path/to/project`.
+3. Run `node ../skillex/packages/skills-cli/bin/skills.js claudemd sync --cwd /absolute/path/to/project`.
 4. Re-check `AGENTS.md` mirrors updated references.
 
 ## Replace Set Workflow
@@ -80,10 +80,10 @@ ls .claude/skills
 
 # 2) install target set from local skills repo
 cd ../skills
-node ../hooks/packages/cli/bin/skills.js add <skill-a> <skill-b> ... --cwd /absolute/path/to/project
+node ../skillex/packages/skills-cli/bin/skills.js add <skill-a> <skill-b> ... --cwd /absolute/path/to/project
 
 # 3) sync docs and verify both runtimes
-node ../hooks/packages/cli/bin/skills.js claudemd sync --cwd /absolute/path/to/project
+node ../skillex/packages/skills-cli/bin/skills.js claudemd sync --cwd /absolute/path/to/project
 cd /absolute/path/to/project
 rg -n "@.claude/skills/.*/SKILL.md" CLAUDE.md AGENTS.md
 ```

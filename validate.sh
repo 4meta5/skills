@@ -2,15 +2,15 @@
 # Validate skills using the hooks CLI validator.
 # Usage: ./validate.sh [skill-name]
 #
-# Requires: ../hooks repo with packages/cli/bin/skills.js
+# Requires: ../skillex repo with packages/skills-cli/bin/skills.js
 set -euo pipefail
 
 SKILLS_DIR="$(cd "$(dirname "$0")" && pwd)"
-HOOKS_CLI="${SKILLS_DIR}/../hooks/packages/cli/bin/skills.js"
+HOOKS_CLI="${SKILLS_DIR}/../skillex/packages/skills-cli/bin/skills.js"
 
 if [ ! -f "$HOOKS_CLI" ]; then
-  echo "Error: hooks CLI not found at $HOOKS_CLI"
-  echo "Ensure ../hooks repo exists with packages/cli/bin/skills.js"
+  echo "Error: skills CLI not found at $HOOKS_CLI"
+  echo "Ensure ../skillex repo exists with packages/skills-cli/bin/skills.js"
   exit 1
 fi
 
