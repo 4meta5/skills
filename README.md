@@ -46,6 +46,8 @@ cp -r <skill-name> /path/to/project/.claude/skills/
 
 Or install with the [hooks CLI](https://github.com/4meta5/hooks).
 
+Runtime libraries for loading, matching, and detecting skills live in [skillex](https://github.com/4meta5/skillex).
+
 ## Prompt Workflow
 
 Shell wrappers for fast prompt reuse. Defined in `~/.zsh/skills-promptlib.zsh`, sourced from `~/.zshrc`.

@@ -10,7 +10,7 @@ Status lifecycle: `new` -> `triaged` -> `proposed` -> `approved` -> `applied` (o
 
 ### 2026-02-15 | verify-before-trust
 
-**Pattern:** Do not trust summary by default; verify against source artifacts.
+**Pattern:** Do not trust summaries; verify every claim against primary source artifacts before proceeding.
 
 **Source:** manual
 **Tags:** review, audit
@@ -20,7 +20,7 @@ Status lifecycle: `new` -> `triaged` -> `proposed` -> `approved` -> `applied` (o
 
 ### 2026-02-15 | rick-rubin-review
 
-**Pattern:** Review Claude implementation with `rick-rubin` moderate scope defense (prompt E).
+**Pattern:** Review the Claude implementation using the rick-rubin moderate-scope defense (prompt E) to detect overreach and unnecessary complexity.
 
 **Source:** manual
 **Tags:** review, scope
@@ -30,7 +30,7 @@ Status lifecycle: `new` -> `triaged` -> `proposed` -> `approved` -> `applied` (o
 
 ### 2026-02-15 | fix-no-shortcuts
 
-**Pattern:** Fix issues as prescribed without shortcuts. No workarounds, no skipped steps.
+**Pattern:** Resolve issues exactly as prescribed; prohibit shortcuts, workarounds, or skipped steps.
 
 **Source:** manual
 **Tags:** discipline, work
@@ -40,7 +40,7 @@ Status lifecycle: `new` -> `triaged` -> `proposed` -> `approved` -> `applied` (o
 
 ### 2026-02-15 | plan-with-scope
 
-**Pattern:** Plan next steps with scope discipline. Use rick-rubin prompt A or B before committing to implementation.
+**Pattern:** Define next steps with strict scope discipline; run rick-rubin prompt A or B before approving implementation.
 
 **Source:** manual
 **Tags:** plan, scope
@@ -50,7 +50,7 @@ Status lifecycle: `new` -> `triaged` -> `proposed` -> `approved` -> `applied` (o
 
 ### 2026-02-15 | fresh-eyes-cracks
 
-**Pattern:** Fresh-eyes high-level tech debt crack detection. Use Planning mode before implementation, Reflection mode after fixes.
+**Pattern:** Perform high-level tech debt crack detection with fresh-eyes analysis; use Planning mode before implementation and Reflection mode after fixes.
 
 **Source:** manual
 **Tags:** review, tech-debt
@@ -60,7 +60,7 @@ Status lifecycle: `new` -> `triaged` -> `proposed` -> `approved` -> `applied` (o
 
 ### 2026-02-15 | sota-simplicity
 
-**Pattern:** Research SOTA simplicity conventions before broader refactors. Prefer boring, deterministic, grep-friendly workflows.
+**Pattern:** Research current SOTA simplicity conventions before major refactors; favor boring, deterministic, grep-friendly workflows.
 
 **Source:** manual
 **Tags:** plan, research
@@ -70,7 +70,7 @@ Status lifecycle: `new` -> `triaged` -> `proposed` -> `approved` -> `applied` (o
 
 ### 2026-02-15 | shared-parsing-eval
 
-**Pattern:** Evaluate ergonomic shared parsing/library extraction without forced publish. Local-path workflows preferred.
+**Pattern:** Assess shared parsing or library extraction ergonomics without forced publishing; prioritize local-path workflows.
 
 **Source:** manual
 **Tags:** plan, architecture
@@ -80,7 +80,7 @@ Status lifecycle: `new` -> `triaged` -> `proposed` -> `approved` -> `applied` (o
 
 ### 2026-02-15 | codex-sota-interview
 
-**Pattern:** Please interview me in a way that shares SOTA conventions related to any open questions or suggestions with multiple options so we can choose the right ones and incorporate them into a tightly scoped plan for Claude Code to implement the fixes.
+**Pattern:** Conduct a structured interview that surfaces SOTA conventions, open questions, and alternative options, then synthesize a tightly scoped implementation plan for Claude Code.
 
 **Source:** manual
 **Tags:** review, codex, plan
