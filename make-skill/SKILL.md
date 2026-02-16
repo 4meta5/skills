@@ -1,8 +1,9 @@
 ---
 name: make-skill
-description: Create and validate new skills in this repository using the canonical taxonomy.
+description: Create, update, or edit skills in this repository using the canonical taxonomy.
 Use when: (1) adding a new skill, (2) renaming or recategorizing a skill,
-(3) updating skill metadata/docs to match hooks validation contracts.
+(3) updating skill metadata/docs to match hooks validation contracts,
+(4) editing any existing skill's SKILL.md content.
 
 category: meta
 user-invocable: true
@@ -10,7 +11,16 @@ user-invocable: true
 
 # Make Skill
 
-Create or update skills with strict consistency across `../skills` and `../hooks`.
+Create, update, or edit skills with strict consistency across `../skills` and `../hooks`.
+
+## Flat Path Convention (Hard Rule)
+
+Skills live flat at the repo root: `<skill-name>/SKILL.md`. The `.claude/skills` directory is a symlink to `..` (the repo root). Always edit via the flat canonical path:
+
+- Correct: `wip/SKILL.md`, `make-skill/SKILL.md`
+- Wrong: `.claude/skills/wip/SKILL.md`, `.claude/skills/make-skill/SKILL.md`
+
+Both resolve to the same file, but the flat path is the source of truth. Never use the symlink path in edits or references.
 
 ## Canonical Taxonomy (Hard-Cut)
 
@@ -31,7 +41,7 @@ Do not introduce any additional categories.
 
 ## Minimal Workflow
 
-1. Create/update `skills/<skill-name>/SKILL.md`.
+1. Create/update `<skill-name>/SKILL.md`.
 2. Set frontmatter fields: `name`, `description`, optional `category`, optional `user-invocable`.
 3. Add/update `agents/openai.yaml` so `default_prompt` references `$<skill-name>`.
 4. Validate with local hooks CLI:
@@ -81,3 +91,10 @@ Whenever an install/validation incident happens, update this skill with:
 2. Root cause
 3. Detection command
 4. Minimal fix
+
+### Incident: Editing via symlink path instead of flat path (2026-02-15)
+
+1. **Symptom**: Agent edited `.claude/skills/wip/SKILL.md` instead of `wip/SKILL.md`.
+2. **Root cause**: Agent was unaware that `.claude/skills` is a symlink to `..` and that the flat path is canonical.
+3. **Detection**: `ls -la .claude/skills` shows the symlink. Check edit paths in agent output.
+4. **Fix**: Added "Flat Path Convention" section to this skill and "Repo Layout" section to `CLAUDE.md`. Always use `<skill-name>/SKILL.md`, never `.claude/skills/<skill-name>/SKILL.md`.

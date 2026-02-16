@@ -1,0 +1,4 @@
+interface:
+  display_name: "WIP"
+  short_description: "Prompt library workflow with safe mutation guardrails"
+  default_prompt: "Use $wip to pick, edit, or log prompt patterns from the skills library with approval-gated mutations."

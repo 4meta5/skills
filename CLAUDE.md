@@ -1,12 +1,19 @@
 # Skills Collection
 
+## Repo Layout
+
+Skills live flat at the repo root: `<skill-name>/SKILL.md`. The `.claude/skills` directory is a symlink to `..` (the repo root). Always edit via the flat path (`wip/SKILL.md`), never via the symlink path (`.claude/skills/wip/SKILL.md`). They resolve to the same file, but the flat path is canonical.
+
+## Categories
+
 Canonical categories (only supported): `meta`, `audit`, `principles`, `habits`, `hot`.
 
 ## Skills
 
 ### meta
-- make-skill
 - install-skill
+- make-skill
+- wip
 
 ### audit
 - code-review-rust
@@ -26,8 +33,8 @@ Canonical categories (only supported): `meta`, `audit`, `principles`, `habits`, 
 
 ### habits
 - compound-workflow
-- repo-hygiene
 - paul-graham
+- repo-hygiene
 
 ### hot
 - svelte5-cloudflare
@@ -51,3 +58,4 @@ Canonical categories (only supported): `meta`, `audit`, `principles`, `habits`, 
 - @.claude/skills/spec-checker/SKILL.md
 - @.claude/skills/svelte5-cloudflare/SKILL.md
 - @.claude/skills/tdd/SKILL.md
+- @.claude/skills/wip/SKILL.md

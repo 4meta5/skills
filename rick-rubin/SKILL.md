@@ -238,6 +238,15 @@ Default strictness is moderate. Escalate only with signal.
 - Do not plan refactors without reflection.
 - Prefer deletion over addition.
 
+### Prompt E Exception: Learning-Oriented Anti-Regression Fixes
+
+During Prompt E review, learning-oriented, non-runtime process fixes are allowed when tied to a concrete incident and repeat-risk prevention. This is the only case where a review may include corrective edits beyond the original scope.
+
+Required evidence fields when using this exception:
+- **Incident**: What went wrong (specific, not hypothetical).
+- **Repeat-risk**: Why it will happen again without the fix.
+- **Minimal fix**: The smallest change that prevents recurrence.
+
 ## Minimal Usage
 
 Invoke when needed.
