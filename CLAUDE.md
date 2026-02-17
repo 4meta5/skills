@@ -13,6 +13,7 @@ Canonical categories (only supported): `meta`, `audit`, `principles`, `habits`, 
 ### meta
 - install-skill
 - make-skill
+- script-agents
 - wip
 
 ### audit
@@ -61,6 +62,7 @@ Canonical categories (only supported): `meta`, `audit`, `principles`, `habits`, 
 - @.claude/skills/refactor-suggestions/SKILL.md
 - @.claude/skills/repo-hygiene/SKILL.md
 - @.claude/skills/rick-rubin/SKILL.md
+- @.claude/skills/script-agents/SKILL.md
 - @.claude/skills/semantic-grep/SKILL.md
 - @.claude/skills/spec-checker/SKILL.md
 - @.claude/skills/steve-jobs/SKILL.md

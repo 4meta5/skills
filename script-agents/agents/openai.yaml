@@ -1,0 +1,4 @@
+interface:
+  display_name: "Script Agents"
+  short_description: "Build minimal one-shot agent dispatch scripts"
+  default_prompt: "Use $script-agents to design or update scripts with strict scope, deterministic artifacts, and configurable coding-agent harness dispatch."
