@@ -1,6 +1,6 @@
 # Skills
 
-23 curated agentic skills for Claude Code, organized into five categories.
+24 curated agentic skills for Claude Code, organized into five categories.
 
 ## All Skills
 
@@ -8,6 +8,7 @@
 | --- | --- | --- |
 | [install-skill](./install-skill/SKILL.md) | `meta` | Install skills into a target project via the hooks CLI |
 | [make-skill](./make-skill/SKILL.md) | `meta` | Create, update, and validate skills using the canonical taxonomy |
+| [script-agents](./script-agents/SKILL.md) | `meta` | Build minimal prompt-dispatch scripts for coding agents |
 | [wip](./wip/SKILL.md) | `meta` | Prompt library workflow with safe mutation guardrails |
 | [code-review-rust](./code-review-rust/SKILL.md) | `audit` | Rust code review focused on correctness, safety, and idiomatic patterns |
 | [code-review-ts](./code-review-ts/SKILL.md) | `audit` | TypeScript code review focused on type safety and TS idioms |

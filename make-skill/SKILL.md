@@ -48,8 +48,16 @@ Do not introduce any additional categories.
    - Add the skill name under the correct category in the `## Skills` section.
    - Add `- @.claude/skills/<skill-name>/SKILL.md` to the `## Installed Skills` section.
    - Maintain alphabetical order within each section.
-5. **Verify `AGENTS.md`** mirrors `CLAUDE.md`. If `AGENTS.md` is a symlink to `CLAUDE.md`, this is automatic. If not, update it manually to match.
-6. Validate with local hooks CLI:
+5. **Update `README.md`** (mandatory, do not skip):
+   - Add the skill to the `## All Skills` table in the correct category group, alphabetical within group.
+   - Update the count on line 1 (e.g., "24 curated" to "25 curated").
+6. **Run count check** (mandatory, do not skip):
+```bash
+./scripts/check-skill-count.sh
+```
+   All counts must pass. If any fail, fix before proceeding.
+7. **Verify `AGENTS.md`** mirrors `CLAUDE.md`. If `AGENTS.md` is a symlink to `CLAUDE.md`, this is automatic. If not, update it manually to match.
+8. Validate with local hooks CLI:
 ```bash
 cd ../skills
 node ../skillex/packages/skills-cli/bin/skills.js validate <skill-name>
@@ -103,3 +111,10 @@ Whenever an install/validation incident happens, update this skill with:
 2. **Root cause**: Agent was unaware that `.claude/skills` is a symlink to `..` and that the flat path is canonical.
 3. **Detection**: `ls -la .claude/skills` shows the symlink. Check edit paths in agent output.
 4. **Fix**: Added "Flat Path Convention" section to this skill and "Repo Layout" section to `CLAUDE.md`. Always use `<skill-name>/SKILL.md`, never `.claude/skills/<skill-name>/SKILL.md`.
+
+### Incident: README count and table out of sync after adding skills (2026-02-16)
+
+1. **Symptom**: README said "23 curated" but 24 skills existed on disk. `script-agents` was missing from the README table.
+2. **Root cause**: make-skill workflow did not include README update or count validation as mandatory steps.
+3. **Detection**: `./scripts/check-skill-count.sh`
+4. **Fix**: Added steps 5 (update README) and 6 (run count check) to Minimal Workflow. Created `scripts/check-skill-count.sh` to validate disk, README, and CLAUDE.md stay in sync.
